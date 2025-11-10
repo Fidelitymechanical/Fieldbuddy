@@ -2,511 +2,188 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="theme-color" content="#0B1121" />
-  <meta name="description" content="Field Buddy Pro v5.0 — Premium HVAC Field Service Management" />
-  <link rel="manifest" href="manifest.json" />
-  <title>Field Buddy Pro v5.0 — Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+  <meta name="description" content="Field Buddy Pro v5.0 - Elite Edition HVAC Field Service System" />
+  <meta name="theme-color" content="#0a0e1a" />
+  <title>Field Buddy Pro v5.0 - Elite Edition</title>
 
-  <!-- Libraries -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-
+  <!-- Core CSS -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- External Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+  <!-- App Script -->
+  <script type="module" src="app.js" defer></script>
 </head>
+
 <body>
   <div class="app-container">
-    <!-- Overlay for mobile -->
-    <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
-
-    <!-- Sidebar -->
+    <!-- ============ SIDEBAR ============ -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
-          <div class="sidebar-logo-icon" aria-hidden="true">🔧</div>
+          <div class="sidebar-logo-icon">🔧</div>
           <div class="sidebar-logo-text">
             <div class="sidebar-title">Field Buddy Pro</div>
-            <div class="sidebar-version">v5.0 Premium</div>
+            <div class="sidebar-version">v5.0 Elite</div>
           </div>
         </div>
       </div>
 
-      <nav class="sidebar-nav" aria-label="Main">
-        <div class="nav-section">
-          <div class="nav-section-title">Navigation</div>
-          <button class="nav-item active" data-page="dashboard"><span class="nav-icon">🏠</span>Dashboard</button>
-          <button class="nav-item" data-page="service"><span class="nav-icon">📋</span>Service Calls</button>
-          <button class="nav-item" data-page="materials"><span class="nav-icon">📦</span>Materials</button>
-          <button class="nav-item" data-page="duct-design"><span class="nav-icon">🏗️</span>Pro Duct Design</button>
-          <button class="nav-item" data-page="cfm"><span class="nav-icon">🌪️</span>CFM Calculator</button>
-          <button class="nav-item" data-page="history"><span class="nav-icon">📊</span>History & Reports</button>
+      <nav class="sidebar-nav">
+        <div class="nav-item active" onclick="switchPage('dashboard')">
+          <span class="nav-icon">🏠</span>
+          <span>Dashboard</span>
         </div>
-
-        <div class="nav-section">
-          <div class="nav-section-title">Tools</div>
-          <button class="nav-item" id="btn-save"><span class="nav-icon">💾</span>Save Progress</button>
-          <button class="nav-item" id="btn-load"><span class="nav-icon">📥</span>Load Saved Data</button>
-          <button class="nav-item" id="btn-export"><span class="nav-icon">📤</span>Export All Data</button>
+        <div class="nav-item" onclick="switchPage('service')">
+          <span class="nav-icon">🧰</span>
+          <span>Service Calls</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('materials')">
+          <span class="nav-icon">📦</span>
+          <span>Materials Catalog</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('ductdesign')">
+          <span class="nav-icon">🏗️</span>
+          <span>Duct Design</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('cfm')">
+          <span class="nav-icon">🌪️</span>
+          <span>CFM Calculator</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('reports')">
+          <span class="nav-icon">📊</span>
+          <span>Reports & History</span>
         </div>
       </nav>
     </aside>
 
-    <!-- Main -->
-    <main class="main-content" id="main">
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content">
+      <!-- HEADER -->
       <header class="top-header">
-        <div class="header-left">
-          <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">☰</button>
-          <div class="header-title" id="page-title">Dashboard</div>
-        </div>
-        <div class="header-actions">
-          <div class="header-user" title="Signed in">
-            <div class="user-avatar">MP</div>
-            <span id="header-tech-name">Martín Pérez</span>
+        <div class="header-title" id="page-title">Dashboard</div>
+        <div class="header-user">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--gradient-cyan);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">MP</div>
+            <span>Martín Pérez</span>
           </div>
         </div>
       </header>
 
-      <div class="workspace">
-        <!-- DASHBOARD -->
-        <section id="dashboard-page" class="page-content">
-          <div class="welcome">
-            <h1 class="welcome-title">Welcome back, Martín!</h1>
-            <p class="welcome-subtitle">Your professional HVAC field service management system</p>
-          </div>
+      <!-- WORKSPACE -->
+      <div class="workspace" id="workspace">
+        <!-- DASHBOARD PAGE -->
+        <section id="dashboard-page" class="page">
+          <h1 style="font-size:28px;margin-bottom:8px;background:var(--gradient-cyan);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Welcome back, Martín 👋</h1>
+          <p style="color:var(--text-secondary);margin-bottom:24px;">Your all-in-one HVAC field management and diagnostics system.</p>
 
           <div class="dashboard-grid">
-            <article class="dashboard-tile" role="button" data-link="service">
-              <div class="tile-header">
-                <div class="tile-icon">📋</div>
-                <div class="tile-badge premium">Advanced</div>
-              </div>
-              <div class="tile-content">
-                <div class="tile-title">Service Calls</div>
-                <p class="tile-description">Diagnostics, photos, signature, and report PDF</p>
-                <div class="tile-stats">
-                  <div class="tile-stat">
-                    <span class="tile-stat-value" id="dash-stat-reports">0</span>
-                    <span class="tile-stat-label">Reports</span>
-                  </div>
-                  <div class="tile-stat">
-                    <span class="tile-stat-value" id="dash-stat-quality">0%</span>
-                    <span class="tile-stat-label">Avg Quality</span>
-                  </div>
-                </div>
-              </div>
-            </article>
+            <div class="dashboard-tile" onclick="switchPage('service')">
+              <div class="tile-title">🧰 Service Calls</div>
+              <div class="tile-description">Full diagnostic reports, measurements, and quality scoring</div>
+            </div>
 
-            <article class="dashboard-tile" role="button" data-link="materials">
-              <div class="tile-header">
-                <div class="tile-icon orange">📦</div>
-                <div class="tile-badge pro">Pro</div>
-              </div>
-              <div class="tile-content">
-                <div class="tile-title">Materials Catalog</div>
-                <p class="tile-description">Instant takeoffs with 2025 catalog</p>
-                <div class="tile-stats">
-                  <div class="tile-stat">
-                    <span class="tile-stat-value">350+</span>
-                    <span class="tile-stat-label">Items</span>
-                  </div>
-                  <div class="tile-stat">
-                    <span class="tile-stat-value">12</span>
-                    <span class="tile-stat-label">Categories</span>
-                  </div>
-                </div>
-              </div>
-            </article>
+            <div class="dashboard-tile" onclick="switchPage('materials')">
+              <div class="tile-title">📦 Materials Catalog</div>
+              <div class="tile-description">Interactive catalog and material takeoff builder</div>
+            </div>
 
-            <article class="dashboard-tile" role="button" data-link="duct-design">
-              <div class="tile-header">
-                <div class="tile-icon purple">🏗️</div>
-                <div class="tile-badge">Premium</div>
-              </div>
-              <div class="tile-content">
-                <div class="tile-title">Pro Duct Design</div>
-                <p class="tile-description">Manual D aligned helpers and tree</p>
-                <div class="tile-stats">
-                  <div class="tile-stat"><span class="tile-stat-value">✓</span><span class="tile-stat-label">Guided</span></div>
-                  <div class="tile-stat"><span class="tile-stat-value">Auto</span><span class="tile-stat-label">Takeoff</span></div>
-                </div>
-              </div>
-            </article>
+            <div class="dashboard-tile" onclick="switchPage('ductdesign')">
+              <div class="tile-title">🏗️ Duct Design</div>
+              <div class="tile-description">Professional duct layout visualization and CFM balancing</div>
+            </div>
 
-            <article class="dashboard-tile" role="button" data-link="cfm">
-              <div class="tile-header">
-                <div class="tile-icon premium">🌪️</div>
-                <div class="tile-badge">Essential</div>
-              </div>
-              <div class="tile-content">
-                <div class="tile-title">Airflow & Sizing</div>
-                <p class="tile-description">CFM targets, duct sizes, register sizing</p>
-                <div class="tile-stats">
-                  <div class="tile-stat"><span class="tile-stat-value">4</span><span class="tile-stat-label">Calcs</span></div>
-                  <div class="tile-stat"><span class="tile-stat-value">Instant</span><span class="tile-stat-label">Results</span></div>
-                </div>
-              </div>
-            </article>
+            <div class="dashboard-tile" onclick="switchPage('cfm')">
+              <div class="tile-title">🌪️ CFM Calculator</div>
+              <div class="tile-description">Instant airflow and friction rate calculations</div>
+            </div>
 
-            <article class="dashboard-tile" role="button" data-link="history">
-              <div class="tile-header">
-                <div class="tile-icon orange">📊</div>
-                <div class="tile-badge pro">Pro</div>
-              </div>
-              <div class="tile-content">
-                <div class="tile-title">History & Reports</div>
-                <p class="tile-description">Saved jobs, JSON export, PDFs</p>
-                <div class="tile-stats">
-                  <div class="tile-stat"><span class="tile-stat-value" id="dash-stat-total">0</span><span class="tile-stat-label">Total</span></div>
-                  <div class="tile-stat"><span class="tile-stat-value" id="dash-stat-month">0</span><span class="tile-stat-label">This Month</span></div>
-                </div>
-              </div>
-            </article>
-
-            <article class="dashboard-tile quick" role="button" data-link="service">
-              <div class="tile-header">
-                <div class="tile-icon">⚡</div>
-              </div>
-              <div class="tile-content">
-                <div class="tile-title">Quick Actions</div>
-                <div class="quick-actions">
-                  <button class="btn btn-secondary" data-link="service">🆕 New Service Call</button>
-                  <button class="btn btn-secondary" data-link="materials">📝 Create Material List</button>
-                  <button class="btn btn-secondary" id="qa-save">💾 Save Progress</button>
-                </div>
-              </div>
-            </article>
+            <div class="dashboard-tile" onclick="switchPage('reports')">
+              <div class="tile-title">📊 Reports & History</div>
+              <div class="tile-description">Track quality metrics, saved reports, and exported PDFs</div>
+            </div>
           </div>
         </section>
 
-        <!-- SERVICE -->
-        <section id="service-page" class="page-content hidden" aria-labelledby="service">
-          <div class="quality-dashboard" id="quality-dashboard">
-            <div class="quality-header">
-              <span>📊 Report Quality Score</span>
-              <span id="quality-badge" class="badge badge-info">In Progress</span>
-            </div>
-            <div class="quality-score-large" id="quality-score-large">0%</div>
-            <div class="quality-metrics">
-              <div class="quality-metric"><div class="metric-value" id="metric-basic">0/5</div><div class="metric-label">Basic Info</div></div>
-              <div class="quality-metric"><div class="metric-value" id="metric-diagnostics">0/3</div><div class="metric-label">Diagnostics</div></div>
-              <div class="quality-metric"><div class="metric-value" id="metric-photos">0</div><div class="metric-label">Photos</div></div>
-              <div class="quality-metric"><div class="metric-value" id="metric-signature">✗</div><div class="metric-label">Signature</div></div>
-            </div>
-          </div>
-
+        <!-- SERVICE PAGE -->
+        <section id="service-page" class="page hidden">
           <div class="card">
-            <div class="card-header">
-              <div class="card-title">System Mode</div>
-              <div class="toggle-group">
-                <button class="toggle-btn active" id="mode-cooling">❄️ Cooling</button>
-                <button class="toggle-btn" id="mode-heating">🔥 Heating</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header"><div class="card-title">Job Information</div></div>
+            <div class="card-header"><div class="card-title">Service Call Report</div></div>
             <div class="card-body">
-              <div class="card-section">
-                <label>Call Type</label>
-                <div class="toggle-group">
-                  <button class="toggle-btn active" id="call-trouble">Trouble Call</button>
-                  <button class="toggle-btn" id="call-maintenance">Maintenance</button>
-                </div>
+              <div class="form-group">
+                <label>Customer Name</label>
+                <input id="customer-name" type="text" placeholder="Enter customer name">
               </div>
-
-              <div class="form-grid form-grid-2">
-                <div class="form-group">
-                  <label>Customer Name</label>
-                  <input type="text" id="customer-name" placeholder="Enter customer name" />
-                </div>
-                <div class="form-group">
-                  <label>Date</label>
-                  <input type="date" id="service-date" />
-                </div>
+              <div class="form-group">
+                <label>Service Address</label>
+                <input id="service-address" type="text" placeholder="123 Main St, Houston TX">
               </div>
-
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Service Address</label>
-                  <input type="text" id="service-address" placeholder="123 Main St, City, State ZIP" />
-                </div>
+              <div class="form-group">
+                <label>Customer Complaint</label>
+                <textarea id="customer-complaint" placeholder="Describe the issue..."></textarea>
               </div>
-
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Customer Complaint / Reason for Service</label>
-                  <textarea id="customer-complaint" placeholder="Describe the issue or maintenance reason..."></textarea>
-                </div>
-              </div>
+              <button class="btn btn-primary" onclick="saveServiceReport()">💾 Save Report</button>
             </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header"><div class="card-title">Equipment Information</div></div>
-            <div class="card-body">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label>Unit Type</label>
-                  <select id="unit-type">
-                    <option value="">Select unit type...</option>
-                    <option value="split">Split System</option>
-                    <option value="package">Package Unit</option>
-                    <option value="mini-split">Mini-Split</option>
-                    <option value="heat-pump">Heat Pump</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-grid form-grid-2">
-                <div class="form-group">
-                  <label>Indoor Unit (Model/Serial)</label>
-                  <input type="text" id="indoor-unit" placeholder="Model & Serial Number" />
-                </div>
-                <div class="form-group" id="outdoor-unit-group">
-                  <label>Outdoor Unit (Model/Serial)</label>
-                  <input type="text" id="outdoor-unit" placeholder="Model & Serial Number" />
-                </div>
-              </div>
-
-              <div class="form-grid form-grid-3">
-                <div class="form-group">
-                  <label>Tonnage</label>
-                  <select id="tonnage">
-                    <option value="">Select...</option>
-                    <option value="1.5">1.5 Ton</option><option value="2">2 Ton</option>
-                    <option value="2.5">2.5 Ton</option><option value="3">3 Ton</option>
-                    <option value="3.5">3.5 Ton</option><option value="4">4 Ton</option>
-                    <option value="5">5 Ton</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Refrigerant Type</label>
-                  <select id="refrigerant-type">
-                    <option value="R410A">R-410A</option>
-                    <option value="R22">R-22</option>
-                    <option value="R454B">R-454B</option>
-                    <option value="R32">R-32</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>Filter Size</label>
-                  <input type="text" id="filter-size" placeholder="e.g., 16x25x1" />
-                </div>
-              </div>
-
-              <div class="form-grid form-grid-2">
-                <div class="form-group">
-                  <label>Metering Device</label>
-                  <select id="metering-device">
-                    <option value="">Unknown</option>
-                    <option value="txv">TXV</option>
-                    <option value="piston">Fixed Orifice / Piston</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>SEER Rating</label>
-                  <input type="number" id="seer-rating" placeholder="e.g., 14" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cooling Measurements -->
-          <div class="card" id="cooling-measurements">
-            <div class="card-header"><div class="card-title">Diagnostic Measurements (Cooling)</div></div>
-            <div class="card-body">
-              <div class="card-section">
-                <div class="section-title">Temperature Readings</div>
-                <div class="form-grid form-grid-4">
-                  <div class="form-group"><label>Outdoor Ambient (°F)</label><input type="number" step="0.1" id="outdoor-ambient" /></div>
-                  <div class="form-group"><label>Ambient Temp (°F)</label><input type="number" step="0.1" id="ambient-temp" /></div>
-                  <div class="form-group"><label>Return Temp (°F)</label><input type="number" step="0.1" id="return-temp" /></div>
-                  <div class="form-group"><label>Supply Temp (°F)</label><input type="number" step="0.1" id="supply-temp" /></div>
-                </div>
-
-                <div class="form-grid form-grid-2">
-                  <div class="form-group"><label>Delta-T (Calculated)</label><input type="text" id="delta-t" readonly /></div>
-                  <div class="form-group"><label>Wet Bulb Temperature (°F)</label><input type="number" step="0.1" id="wet-bulb" /></div>
-                </div>
-              </div>
-
-              <div class="card-section">
-                <div class="section-title">Refrigerant Pressures & Temps</div>
-                <div class="form-grid form-grid-2">
-                  <div class="form-group"><label>Suction Pressure (PSI)</label><input type="number" step="0.1" id="suction-pressure" /></div>
-                  <div class="form-group"><label>Suction Line Temp (°F)</label><input type="number" step="0.1" id="suction-temp" /></div>
-                  <div class="form-group"><label>Liquid Pressure (PSI)</label><input type="number" step="0.1" id="liquid-pressure" /></div>
-                  <div class="form-group"><label>Liquid Line Temp (°F)</label><input type="number" step="0.1" id="liquid-temp" /></div>
-                </div>
-
-                <div class="form-grid form-grid-2">
-                  <div class="form-group"><label>Superheat (Calculated)</label><input type="text" id="superheat" readonly /></div>
-                  <div class="form-group"><label>Subcool (Calculated)</label><input type="text" id="subcool" readonly /></div>
-                </div>
-              </div>
-
-              <div class="card-section">
-                <div class="section-title">Airflow & Electrical</div>
-                <div class="form-grid form-grid-4">
-                  <div class="form-group"><label>Static Pressure (in w.c.)</label><input type="number" step="0.01" id="static-pressure" /></div>
-                  <div class="form-group"><label>Blower Amps (A)</label><input type="number" step="0.1" id="blower-amps" /></div>
-                  <div class="form-group"><label>Supply RH (%)</label><input type="number" step="0.1" id="supply-rh" /></div>
-                  <div class="form-group"><label>Return RH (%)</label><input type="number" step="0.1" id="return-rh" /></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Photos & Signature -->
-          <div class="card">
-            <div class="card-header"><div class="card-title">Photos & Signature</div></div>
-            <div class="card-body">
-              <div class="photo-gallery" id="photo-gallery"></div>
-              <label class="btn btn-secondary mt-lg">
-                Upload Photos
-                <input type="file" id="photo-input" accept="image/*" multiple hidden />
-              </label>
-
-              <div class="mt-lg">
-                <canvas id="signature-pad" class="signature-pad" aria-label="Signature pad"></canvas>
-                <div class="btn-group mt-lg">
-                  <button class="btn btn-secondary" id="sig-clear">Clear</button>
-                  <button class="btn btn-primary" id="sig-save">Save Signature</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Report actions -->
-          <div class="btn-group mt-lg">
-            <button class="btn btn-primary" id="btn-generate-pdf">Generate PDF Report</button>
-            <button class="btn btn-secondary" id="btn-email">Email Report</button>
           </div>
         </section>
 
-        <!-- MATERIALS -->
-        <section id="materials-page" class="page-content hidden">
+        <!-- MATERIALS PAGE -->
+        <section id="materials-page" class="page hidden">
           <div class="card">
             <div class="card-header"><div class="card-title">Materials Catalog</div></div>
-            <div class="card-body">
-              <div class="form-grid form-grid-3">
-                <div class="form-group">
-                  <label>Search</label>
-                  <input type="text" id="materials-search" placeholder="Filter by name or spec..." />
-                </div>
-                <div class="form-group">
-                  <label>Category</label>
-                  <select id="materials-category"></select>
-                </div>
-                <div class="form-group">
-                  <label>Sort</label>
-                  <select id="materials-sort">
-                    <option value="name">Name</option>
-                    <option value="category">Category</option>
-                  </select>
-                </div>
-              </div>
-
-              <div id="materials-list" class="materials-list mt-lg" aria-live="polite"></div>
-
-              <h3 class="section-title mt-lg">Selected</h3>
-              <div id="selected-materials"></div>
-
-              <div class="info-box mt-lg">
-                <div class="info-box-title">Totals</div>
-                <div class="info-box-content" id="materials-totals">No items selected.</div>
-              </div>
-
-              <div class="btn-group mt-lg">
-                <button class="btn btn-primary" id="btn-export-materials">Export Takeoff (PDF)</button>
-                <button class="btn btn-secondary" id="btn-clear-materials">Clear</button>
-              </div>
+            <div class="card-body" id="materials-container">
+              <p style="color:var(--text-secondary)">Loading materials...</p>
             </div>
           </div>
         </section>
 
-        <!-- DUCT DESIGN -->
-        <section id="duct-design-page" class="page-content hidden">
+        <!-- DUCT DESIGN PAGE -->
+        <section id="ductdesign-page" class="page hidden">
           <div class="card">
-            <div class="card-header"><div class="card-title">Duct Design Helper</div></div>
+            <div class="card-header"><div class="card-title">Duct Design</div></div>
             <div class="card-body">
-              <div class="form-grid form-grid-3">
-                <div class="form-group"><label>Total Area (sqft)</label><input type="number" id="dd-area" placeholder="e.g., 2400" /></div>
-                <div class="form-group"><label>System Tonnage</label><input type="number" id="dd-tons" placeholder="e.g., 5" /></div>
-                <div class="form-group"><label>Target CFM per ton</label><input type="number" id="dd-cfmpt" value="400" /></div>
-              </div>
-
-              <div class="form-grid form-grid-2">
-                <div class="form-group"><label>ESP Target (in w.c.)</label><input type="number" step="0.01" id="dd-esp" value="0.5" /></div>
-                <div class="form-group"><label>Friction Rate (in w.c./100ft)</label><input type="number" step="0.01" id="dd-fric" value="0.08" /></div>
-              </div>
-
-              <div class="btn-group mt-lg">
-                <button class="btn btn-primary" id="dd-calc">Calculate</button>
-                <button class="btn btn-secondary" id="dd-reset">Reset</button>
-              </div>
-
-              <pre class="duct-tree mt-lg" id="duct-tree" aria-live="polite">// Results will appear here</pre>
+              <p>Generate sub-plenum and trunk layouts with automated CFM balancing.</p>
+              <button class="btn btn-primary" onclick="generateDuctDesign()">Generate Layout</button>
+              <pre id="duct-output" class="mt-lg" style="color:var(--text-tertiary);"></pre>
             </div>
           </div>
         </section>
 
-        <!-- CFM -->
-        <section id="cfm-page" class="page-content hidden">
+        <!-- CFM CALCULATOR PAGE -->
+        <section id="cfm-page" class="page hidden">
           <div class="card">
-            <div class="card-header"><div class="card-title">CFM & Register Sizing</div></div>
+            <div class="card-header"><div class="card-title">CFM Calculator</div></div>
             <div class="card-body">
-              <div class="form-grid form-grid-3">
-                <div class="form-group"><label>Tonnage</label><input type="number" id="cfm-tons" placeholder="e.g., 5" /></div>
-                <div class="form-group"><label>CFM per ton</label><input type="number" id="cfm-per-ton" value="400" /></div>
-                <div class="form-group"><label>Target Face Velocity (FPM)</label><input type="number" id="cfm-face" value="500" /></div>
+              <div class="form-group">
+                <label>Square Footage</label>
+                <input id="cfm-sqft" type="number" placeholder="e.g. 2400">
               </div>
-
-              <div class="btn-group mt-lg">
-                <button class="btn btn-primary" id="cfm-calc">Calculate CFM</button>
-                <button class="btn btn-secondary" id="cfm-reset">Reset</button>
+              <div class="form-group">
+                <label>System Tonnage</label>
+                <input id="cfm-tonnage" type="number" placeholder="e.g. 5">
               </div>
-
-              <div class="info-box mt-lg">
-                <div class="info-box-title">Results</div>
-                <div class="info-box-content" id="cfm-results">Enter values and press Calculate.</div>
-              </div>
+              <button class="btn btn-primary" onclick="calculateCFM()">Calculate</button>
+              <p class="mt-lg" id="cfm-result"></p>
             </div>
           </div>
         </section>
 
-        <!-- HISTORY -->
-        <section id="history-page" class="page-content hidden">
+        <!-- REPORTS PAGE -->
+        <section id="reports-page" class="page hidden">
           <div class="card">
-            <div class="card-header"><div class="card-title">Saved Reports</div></div>
+            <div class="card-header"><div class="card-title">Reports & History</div></div>
             <div class="card-body">
-              <div id="history-list"></div>
-              <div class="btn-group mt-lg">
-                <button class="btn btn-secondary" id="history-export-json">Export JSON</button>
-                <button class="btn btn-danger" id="history-clear">Clear All</button>
-              </div>
+              <p style="color:var(--text-secondary)">No reports saved yet.</p>
+              <button class="btn btn-primary" onclick="exportAllReports()">Export All (PDF)</button>
             </div>
           </div>
         </section>
       </div>
     </main>
   </div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <div class="modal-overlay" id="modal">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div class="modal-title" id="modal-title">Confirm</div>
-      <div class="modal-content" id="modal-content">Are you sure?</div>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
-        <button class="btn btn-primary" id="modal-ok">OK</button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="app.js"></script>
 </body>
 </html>
