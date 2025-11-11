@@ -120,3 +120,712 @@ document.querySelectorAll('.nav-btn').forEach(btn=>{
 </script>
 </body>
 </html>
+<script>
+// =============================
+// SERVICE INSPECTION MODULE LOGIC
+// =============================
+
+// --- Dynamic checklists for call types ---
+const SOPs = {
+  "Heating Inspection": {
+    safety: [
+      "Verify CO detector operation",
+      "Inspect heat exchanger for cracks or corrosion",
+      "Check gas line for leaks and secure fittings",
+      "Confirm flue draft and clear vent termination",
+      "Inspect electrical connections and safety controls"
+    ],
+    mechanical: [
+      "Measure blower motor amperage vs rated",
+      "Inspect draft inducer bearings & noise",
+      "Check limit switch operation",
+      "Inspect burners, ignition, and flame signal",
+      "Confirm furnace cabinet cleanliness"
+    ],
+    health: [
+      "Check air filter cleanliness",
+      "Inspect return and supply plenums for microbial growth",
+      "Measure static pressure (target ≤ 0.5 in wc)",
+      "Evaluate airflow balance across registers",
+      "Note any signs of dust or debris accumulation"
+    ]
+  },
+  "Cooling Inspection": {
+    safety: [
+      "Confirm disconnect and breaker size",
+      "Inspect insulation on refrigerant lines",
+      "Check condensate drain & safety float switch",
+      "Verify fan blade condition and motor mounts",
+      "Confirm proper grounding and polarity"
+    ],
+    mechanical: [
+      "Measure compressor and fan motor amperage",
+      "Check refrigerant pressures and superheat/subcool",
+      "Inspect contactor & capacitor condition",
+      "Inspect blower wheel cleanliness",
+      "Clean condenser coil and check airflow"
+    ],
+    health: [
+      "Inspect evaporator coil for biological growth",
+      "Check filter cabinet and seals",
+      "Measure supply air temp drop (ΔT 16–20 °F)",
+      "Check humidity level at return",
+      "Evaluate indoor air quality improvements (UV, media filter, etc.)"
+    ]
+  },
+  "Trouble Call": {
+    safety: [
+      "Check electrical supply and wiring integrity",
+      "Inspect any burnt wiring or loose connections",
+      "Confirm system grounding and fuse integrity"
+    ],
+    mechanical: [
+      "Record error codes and diagnostic LEDs",
+      "Test control voltage and signal continuity",
+      "Inspect motors, capacitors, and relays",
+      "Check refrigerant pressures if cooling related",
+      "Confirm airflow path unobstructed"
+    ],
+    health: [
+      "Evaluate air filter and coil cleanliness",
+      "Inspect drain system for clogs or microbial odor",
+      "Note environmental or IAQ concerns (humidity, leaks, etc.)"
+    ]
+  }
+};
+
+// --- Elements ---
+const serviceTypeSelect = document.getElementById('serviceType');
+const checklistContainer = document.getElementById('inspectionChecklist');
+const generateBtn = document.getElementById('generateFindings');
+const summarySection = document.getElementById('summaryContent');
+
+// --- Render checklist on call type select ---
+serviceTypeSelect.addEventListener('change', e => {
+  const type = e.target.value;
+  checklistContainer.innerHTML = '';
+  if (!SOPs[type]) return;
+
+  const sop = SOPs[type];
+  for (const [category, tasks] of Object.entries(sop)) {
+    const catTitle = category.charAt(0).toUpperCase() + category.slice(1);
+    const catDiv = document.createElement('div');
+    catDiv.className = "mb-4";
+    catDiv.innerHTML = `<h3 class="font-semibold text-blue-400 mb-2">${catTitle} Checklist</h3>`;
+    tasks.forEach(item=>{
+      const id = item.replace(/\s+/g,'_');
+      catDiv.innerHTML += `
+        <label class="block text-sm mb-1">
+          <input type="checkbox" id="${id}" class="mr-2"> ${item}
+        </label>`;
+    });
+    checklistContainer.appendChild(catDiv);
+  }
+});
+
+// --- Generate Findings Summary ---
+generateBtn.addEventListener('click', () => {
+  const type = serviceTypeSelect.value;
+  if (!type) {
+    alert('Select a service type first.');
+    return;
+  }
+
+  const allChecks = checklistContainer.querySelectorAll('input[type="checkbox"]');
+  const unchecked = [];
+  allChecks.forEach(c=>{
+    if(!c.checked) unchecked.push(c.nextSibling.textContent.trim());
+  });
+
+  // Findings summary text
+  const custName = document.getElementById('custName').value || 'Client';
+  let findingsHTML = `
+    <h3 class="text-lg font-semibold mb-2">Findings Summary</h3>
+    <p class="text-sm text-gray-400 mb-3">${custName} — ${type}</p>
+    <p class="mb-2 text-gray-300">Focus areas: <strong>Safety</strong>, <strong>Mechanical</strong>, <strong>Health</strong></p>
+  `;
+
+  if (unchecked.length === 0) {
+    findingsHTML += `<p class="text-green-400">All inspection points passed within acceptable parameters. System is operating safely and efficiently.</p>`;
+  } else {
+    findingsHTML += `<p class="text-red-400 font-semibold mb-1">Issues or items needing attention:</p><ul class="list-disc ml-6 text-gray-300">`;
+    unchecked.forEach(i => findingsHTML += `<li>${i}</li>`);
+    findingsHTML += `</ul>`;
+    findingsHTML += `<p class="mt-3 text-gray-400">Recommendation: Review identified items and discuss long-term solutions with project manager if repair costs accumulate due to age or condition.</p>`;
+  }
+
+  summarySection.innerHTML = findingsHTML;
+  // Automatically navigate to summary view
+  sections.forEach(sec=>sec.classList.remove('active-section'));
+  document.getElementById('summary').classList.add('active-section');
+});
+</script>
+<script>
+// =============================
+// HVAC CATALOG MODULE
+// =============================
+
+// --- Example catalog dataset (can be replaced by backend API later) ---
+const hvacCatalog = [
+  // Equipment
+  {
+    category: "Equipment",
+    name: "Daikin 5 Ton Condenser 16 SEER2",
+    model: "DX16TC060",
+    description: "Two-stage scroll compressor with high-efficiency coil. Ideal for 2400–2800 sqft homes.",
+    specs: { capacity: "5 Ton", voltage: "208/230V", phase: "1", seer: "16.0" },
+    tag: "cooling outdoor condenser"
+  },
+  {
+    category: "Equipment",
+    name: "Lennox ML296V Gas Furnace",
+    model: "ML296UH090XV36B",
+    description: "Two-stage variable-speed furnace for improved comfort and quieter operation.",
+    specs: { btuh: "90,000", efficiency: "96%", configuration: "Upflow/Horizontal" },
+    tag: "heating furnace gas"
+  },
+  {
+    category: "Equipment",
+    name: "Goodman Air Handler ASPT37B14",
+    model: "ASPT37B14",
+    description: "Multi-position, 3-ton air handler with ECM blower motor and all-aluminum coil.",
+    specs: { tonnage: "3 Ton", voltage: "208/230V", blower: "ECM" },
+    tag: "air handler cooling indoor"
+  },
+  // Parts
+  {
+    category: "Parts",
+    name: "Run Capacitor 45+5 µF 440V",
+    model: "C4545R440",
+    description: "Dual capacitor for compressor and fan motor support; universal fit.",
+    specs: { type: "Dual", rating: "440V AC" },
+    tag: "capacitor component"
+  },
+  {
+    category: "Parts",
+    name: "Blower Motor ECM 1/2 HP",
+    model: "BMECM12HP",
+    description: "Variable-speed blower motor assembly compatible with most ECM controllers.",
+    specs: { horsepower: "1/2", voltage: "120/240V", speed: "Variable" },
+    tag: "motor fan blower"
+  },
+  {
+    category: "Parts",
+    name: "Pressure Switch 0.80 in wc",
+    model: "PS080",
+    description: "Factory-set negative pressure switch for inducer safety verification.",
+    specs: { setting: "0.80 in wc", voltage: "24V" },
+    tag: "switch safety"
+  },
+  // Upgrades
+  {
+    category: "Upgrades",
+    name: "Reme Halo LED Air Purifier",
+    model: "REME-LED",
+    description: "Whole-home IAQ upgrade reducing particulates, VOCs, and microbes.",
+    specs: { voltage: "24V", coverage: "Up to 5 Tons" },
+    tag: "IAQ UV purifier"
+  },
+  {
+    category: "Upgrades",
+    name: "Media Filtration Cabinet 20x25x4",
+    model: "MF20254",
+    description: "Heavy-duty cabinet supporting MERV 11–16 filters; low static design.",
+    specs: { size: "20x25x4", filter: "MERV 13" },
+    tag: "filter cabinet upgrade"
+  },
+  {
+    category: "Upgrades",
+    name: "Smart Thermostat (WiFi Enabled)",
+    model: "TSTAT-SMARTPRO",
+    description: "Adaptive schedule learning thermostat with mobile app integration.",
+    specs: { voltage: "24V", connectivity: "WiFi", feature: "Smart learning" },
+    tag: "thermostat wifi"
+  },
+  // Services
+  {
+    category: "Services",
+    name: "Seasonal Tune-Up",
+    model: "SRV-TUNE",
+    description: "Comprehensive inspection covering heating or cooling operations.",
+    specs: { duration: "1–1.5 hours", includes: "Full diagnostic & cleaning" },
+    tag: "service maintenance"
+  },
+  {
+    category: "Services",
+    name: "Duct Redesign & Airflow Balancing",
+    model: "SRV-DUCT",
+    description: "Engineering-based duct optimization improving static pressure & comfort.",
+    specs: { includes: "CFM audit, duct schematic, material list" },
+    tag: "ductwork design service"
+  },
+  {
+    category: "Services",
+    name: "Indoor Air Quality Assessment",
+    model: "SRV-IAQ",
+    description: "Home IAQ analysis with microbial surface sampling & ventilation review.",
+    specs: { includes: "Air sampling, humidity log, remediation plan" },
+    tag: "IAQ inspection service"
+  }
+];
+
+// --- Elements ---
+const searchInput = document.getElementById('catalogSearch');
+const resultsDiv = document.getElementById('catalogResults');
+
+// --- Utility: Render item card ---
+function renderCatalog(items) {
+  resultsDiv.innerHTML = '';
+  if (!items.length) {
+    resultsDiv.innerHTML = `<p class="text-gray-400 text-sm">No items found matching your search.</p>`;
+    return;
+  }
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = "bg-slate-800 rounded p-4 shadow hover:shadow-lg transition";
+    card.innerHTML = `
+      <h3 class="text-lg font-semibold text-blue-400 mb-1">${item.name}</h3>
+      <p class="text-sm text-gray-400 mb-2">${item.description}</p>
+      <p class="text-xs text-gray-500 mb-1"><strong>Category:</strong> ${item.category}</p>
+      <p class="text-xs text-gray-500 mb-1"><strong>Model:</strong> ${item.model}</p>
+      <ul class="text-xs text-gray-400 mb-2">
+        ${Object.entries(item.specs).map(([k,v])=>`<li><strong>${k}:</strong> ${v}</li>`).join('')}
+      </ul>
+      <button class="bg-blue-700 text-white px-3 py-1 rounded text-xs addToSummary" data-name="${item.name}" data-model="${item.model}" data-category="${item.category}">Add to Material List</button>
+    `;
+    resultsDiv.appendChild(card);
+  });
+}
+
+// --- Initial Render ---
+renderCatalog(hvacCatalog);
+
+// --- Search functionality ---
+searchInput.addEventListener('input', e=>{
+  const term = e.target.value.toLowerCase();
+  const filtered = hvacCatalog.filter(item =>
+    item.name.toLowerCase().includes(term) ||
+    item.description.toLowerCase().includes(term) ||
+    item.category.toLowerCase().includes(term) ||
+    item.tag.toLowerCase().includes(term)
+  );
+  renderCatalog(filtered);
+});
+
+// --- Add selected items to Job Summary material list ---
+document.addEventListener('click', e=>{
+  if (e.target.classList.contains('addToSummary')) {
+    const { name, model, category } = e.target.dataset;
+    const summary = document.getElementById('summaryContent');
+    const list = summary.querySelector('#materialList') || (() => {
+      const div = document.createElement('div');
+      div.id = 'materialList';
+      div.innerHTML = `<h4 class="text-lg font-semibold text-blue-400 mt-4 mb-2">Material List</h4><ul class="list-disc ml-6 text-gray-300"></ul>`;
+      summary.appendChild(div);
+      return div;
+    })();
+    const ul = list.querySelector('ul');
+    const li = document.createElement('li');
+    li.textContent = `${category} – ${name} (${model})`;
+    ul.appendChild(li);
+    alert(`${name} added to material list.`);
+  }
+});
+</script>
+<script>
+// =============================
+// DUCT DESIGN & SIZING LAB
+// =============================
+
+// Canvas context
+const ductCanvas = document.getElementById('ductCanvas');
+const ctx = ductCanvas.getContext('2d');
+let drawing = false;
+let points = [];
+
+// --- Basic drawing controls ---
+ductCanvas.addEventListener('mousedown', e=>{
+  drawing = true;
+  const rect = ductCanvas.getBoundingClientRect();
+  points.push({x:e.clientX - rect.left, y:e.clientY - rect.top});
+});
+ductCanvas.addEventListener('mousemove', e=>{
+  if(!drawing) return;
+  const rect = ductCanvas.getBoundingClientRect();
+  const {x,y} = {x:e.clientX - rect.left, y:e.clientY - rect.top};
+  const last = points[points.length-1];
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(last.x, last.y);
+  ctx.lineTo(x, y);
+  ctx.stroke();
+  points.push({x,y});
+});
+ductCanvas.addEventListener('mouseup', ()=>{
+  drawing = false;
+});
+ductCanvas.addEventListener('dblclick', ()=>{
+  ctx.fillStyle = '#1e40af';
+  ctx.font = '12px monospace';
+  ctx.fillText(`Node ${points.length}`, points[points.length-1].x+5, points[points.length-1].y+5);
+});
+
+// --- Clear canvas function ---
+function clearCanvas(){
+  ctx.clearRect(0,0,ductCanvas.width,ductCanvas.height);
+  points = [];
+}
+
+// --- Duct sizing calculations ---
+const cfmInput = document.getElementById('cfmTarget');
+const resultDisplay = document.getElementById('ductResult');
+const calcBtn = document.getElementById('calcDuct');
+
+calcBtn.addEventListener('click', ()=>{
+  const cfm = parseFloat(cfmInput.value);
+  if(isNaN(cfm) || cfm<=0){
+    alert("Enter valid CFM value.");
+    return;
+  }
+  // Typical target velocities
+  const mainVel = 700;      // FPM
+  const branchVel = 600;    // FPM
+  const subVel = 550;       // FPM
+
+  // Area (sq in) = (CFM / FPM) * 144
+  const areaIn2Main = (cfm/mainVel)*144;
+  const diaMain = Math.sqrt(areaIn2Main / 0.785); // round diameter (in)
+  const rectMain = Math.sqrt(areaIn2Main); // simple equal sides
+
+  const areaIn2Sub = (cfm/3/subVel)*144;  // assume 3 sub-plenums
+  const diaSub = Math.sqrt(areaIn2Sub / 0.785);
+  const rectSub = Math.sqrt(areaIn2Sub);
+
+  resultDisplay.innerHTML = `
+    <div class="mt-3 text-gray-300">
+      <p><strong>Main Supply:</strong> ${cfm.toFixed(0)} CFM @ ${mainVel} FPM → ${diaMain.toFixed(1)}″ Ø or ${rectMain.toFixed(1)}″ × ${rectMain.toFixed(1)}″</p>
+      <p><strong>Sub-Plenums (×3):</strong> ${(cfm/3).toFixed(0)} CFM @ ${subVel} FPM → ${diaSub.toFixed(1)}″ Ø or ${rectSub.toFixed(1)}″ × ${rectSub.toFixed(1)}″</p>
+      <p class="mt-2 text-xs text-gray-500">Targets assume ≤ 0.5 in wc ESP and friction rate ≈ 0.08 in wc per 100 ft.</p>
+    </div>
+  `;
+});
+
+// --- Export schematic snapshot to summary ---
+document.getElementById('exportPDF').addEventListener('click', ()=>{
+  const img = ductCanvas.toDataURL('image/png');
+  const summary = document.getElementById('summaryContent');
+  const div = document.createElement('div');
+  div.className = "mt-4";
+  div.innerHTML = `<h4 class="text-lg font-semibold text-blue-400 mb-2">Duct Schematic</h4><img src="${img}" class="rounded border border-slate-700" alt="Duct schematic">`;
+  summary.appendChild(div);
+});
+
+// --- Optional keyboard shortcut (C = clear) ---
+document.addEventListener('keydown', e=>{
+  if(e.key.toLowerCase()==='c' && document.getElementById('duct').classList.contains('active-section')){
+    clearCanvas();
+  }
+});
+</script>
+<script>
+// =============================
+// JOB SUMMARY & PDF EXPORT
+// =============================
+
+// Ensure jsPDF is available (lazy-load CDN if needed)
+(function ensureJsPDF() {
+  if (window.jspdf || window.jsPDF) return;
+  const s = document.createElement('script');
+  s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+  s.defer = true;
+  document.head.appendChild(s);
+})();
+
+// --- Inject Job Header Form into Summary section (once) ---
+const summaryRoot = document.getElementById('summaryContent');
+let summaryHeaderInjected = false;
+
+function injectSummaryHeader() {
+  if (summaryHeaderInjected) return;
+  summaryHeaderInjected = true;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = "bg-slate-800 rounded p-4 mb-4 border border-slate-700";
+  wrapper.innerHTML = `
+    <h3 class="text-lg font-semibold text-blue-400 mb-3">Job Information</h3>
+    <div class="grid md:grid-cols-2 gap-3">
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Customer Name</label>
+        <input id="jobCustomer" class="w-full p-2 rounded" placeholder="Full name" />
+      </div>
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Job Site Address</label>
+        <input id="jobAddress" class="w-full p-2 rounded" placeholder="Street, City, State" />
+      </div>
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Customer Phone</label>
+        <input id="jobPhone" class="w-full p-2 rounded" placeholder="(xxx) xxx-xxxx" />
+      </div>
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Customer Email</label>
+        <input id="jobEmail" class="w-full p-2 rounded" placeholder="name@email.com" />
+      </div>
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Technician</label>
+        <input id="jobTech" class="w-full p-2 rounded" placeholder="Martín Pérez" />
+      </div>
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Service Date</label>
+        <input id="jobDate" type="date" class="w-full p-2 rounded" />
+      </div>
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Work Order / Ticket #</label>
+        <input id="jobTicket" class="w-full p-2 rounded" placeholder="WO-000123" />
+      </div>
+      <div>
+        <label class="block text-xs mb-1 text-gray-400">Notes (internal)</label>
+        <input id="jobNotes" class="w-full p-2 rounded" placeholder="Optional notes…" />
+      </div>
+    </div>
+  `;
+  summaryRoot.prepend(wrapper);
+
+  // Load from localStorage if present
+  const saved = localStorage.getItem('fb_job_header');
+  if (saved) {
+    const data = JSON.parse(saved);
+    ['jobCustomer','jobAddress','jobPhone','jobEmail','jobTech','jobDate','jobTicket','jobNotes'].forEach(id=>{
+      if (data[id]) document.getElementById(id).value = data[id];
+    });
+  }
+
+  // Persist on input
+  wrapper.addEventListener('input', () => {
+    const data = {};
+    ['jobCustomer','jobAddress','jobPhone','jobEmail','jobTech','jobDate','jobTicket','jobNotes'].forEach(id=>{
+      data[id] = document.getElementById(id).value;
+    });
+    localStorage.setItem('fb_job_header', JSON.stringify(data));
+  });
+}
+
+// Inject header when user navigates to Summary or when findings are generated
+(function autoInjectOnNav(){
+  const navSummaryBtn = [...document.querySelectorAll('.nav-btn')].find(b => b.dataset.section === 'summary');
+  if (navSummaryBtn) {
+    navSummaryBtn.addEventListener('click', injectSummaryHeader);
+  }
+})();
+
+// Also inject when Part 2 auto-navigates to summary after generating findings
+// (Mutation observer just in case the content gets replaced)
+const mo = new MutationObserver(() => injectSummaryHeader());
+mo.observe(summaryRoot, { childList: true, subtree: true });
+
+// --- Helpers to gather report content ---
+function gatherFindingsText() {
+  // Part 2 writes findings into summaryContent; capture readable text
+  const findingsHeader = summaryRoot.querySelector('h3');
+  const lists = summaryRoot.querySelectorAll('ul');
+  let text = '';
+
+  // Title + contextual intro (if present)
+  const intro = summaryRoot.querySelector('p');
+  if (intro) text += `${intro.textContent.trim()}\n\n`;
+
+  // Issues list if present
+  lists.forEach(ul => {
+    const items = [...ul.querySelectorAll('li')].map(li => `• ${li.textContent.trim()}`);
+    if (items.length) text += items.join('\n') + '\n';
+  });
+
+  // If no list, look for the pass message
+  const passMsg = summaryRoot.querySelector('.text-green-400');
+  if (passMsg) text += passMsg.textContent.trim() + '\n';
+
+  // Recommendation paragraph (if present)
+  const rec = [...summaryRoot.querySelectorAll('p')].find(p => p.textContent.toLowerCase().includes('recommendation'));
+  if (rec) text += '\n' + rec.textContent.trim() + '\n';
+
+  return text.trim();
+}
+
+function gatherMaterialList() {
+  const listDiv = summaryRoot.querySelector('#materialList');
+  if (!listDiv) return [];
+  return [...listDiv.querySelectorAll('li')].map(li => li.textContent.trim());
+}
+
+function getDuctImageDataUrl() {
+  const ductCanvas = document.getElementById('ductCanvas');
+  try {
+    // Only embed if something has been drawn
+    const blank = document.createElement('canvas');
+    blank.width = ductCanvas.width; blank.height = ductCanvas.height;
+    const isBlank = blank.toDataURL() === ductCanvas.toDataURL();
+    if (isBlank) return null;
+  } catch(e) { /* ignore */ }
+  return ductCanvas.toDataURL('image/png');
+}
+
+// --- Build a printable, structured HTML summary (on screen) ---
+function renderFinalSummaryPreview() {
+  injectSummaryHeader();
+
+  const findingsText = gatherFindingsText();
+  const materials = gatherMaterialList();
+
+  const previewId = 'finalPreview';
+  let preview = document.getElementById(previewId);
+  if (!preview) {
+    preview = document.createElement('div');
+    preview.id = previewId;
+    preview.className = "bg-slate-800 rounded p-4 mt-4 border border-slate-700";
+    summaryRoot.appendChild(preview);
+  }
+
+  preview.innerHTML = `
+    <h3 class="text-lg font-semibold text-blue-400 mb-2">Report Preview</h3>
+    <div class="grid md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <p><span class="text-gray-400">Customer:</span> ${document.getElementById('jobCustomer')?.value || ''}</p>
+        <p><span class="text-gray-400">Address:</span> ${document.getElementById('jobAddress')?.value || ''}</p>
+        <p><span class="text-gray-400">Phone:</span> ${document.getElementById('jobPhone')?.value || ''}</p>
+        <p><span class="text-gray-400">Email:</span> ${document.getElementById('jobEmail')?.value || ''}</p>
+      </div>
+      <div>
+        <p><span class="text-gray-400">Technician:</span> ${document.getElementById('jobTech')?.value || ''}</p>
+        <p><span class="text-gray-400">Date:</span> ${document.getElementById('jobDate')?.value || new Date().toISOString().slice(0,10)}</p>
+        <p><span class="text-gray-400">Ticket #:</span> ${document.getElementById('jobTicket')?.value || ''}</p>
+        <p><span class="text-gray-400">Notes:</span> ${document.getElementById('jobNotes')?.value || ''}</p>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <h4 class="font-semibold text-blue-300 mb-1">Findings (Safety • Mechanical • Health)</h4>
+      <pre class="whitespace-pre-wrap text-gray-200 text-sm bg-slate-900/60 rounded p-3 border border-slate-700/60">${findingsText || 'No findings captured yet.'}</pre>
+    </div>
+
+    <div class="mt-4">
+      <h4 class="font-semibold text-blue-300 mb-1">Material List</h4>
+      ${
+        materials.length
+          ? `<ul class="list-disc ml-6 text-gray-200">${materials.map(m=>`<li>${m}</li>`).join('')}</ul>`
+          : `<p class="text-gray-400 text-sm">No materials added yet.</p>`
+      }
+    </div>
+  `;
+}
+
+// Re-render preview whenever user lands on Summary
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  if (btn.dataset.section === 'summary') {
+    btn.addEventListener('click', renderFinalSummaryPreview);
+  }
+});
+
+// --- PDF Export ---
+document.getElementById('exportPDF').addEventListener('click', async ()=> {
+  // Ensure jsPDF loaded
+  let jsPDF;
+  try {
+    jsPDF = window.jspdf?.jsPDF || window.jsPDF;
+  } catch(e) {}
+  if (!jsPDF) {
+    alert('Loading PDF engine… try again in a moment.');
+    return;
+  }
+
+  renderFinalSummaryPreview(); // make sure preview is up-to-date
+
+  // Gather header fields
+  const cust = document.getElementById('jobCustomer')?.value || '';
+  const addr = document.getElementById('jobAddress')?.value || '';
+  const phone = document.getElementById('jobPhone')?.value || '';
+  const email = document.getElementById('jobEmail')?.value || '';
+  const tech = document.getElementById('jobTech')?.value || '';
+  const date = document.getElementById('jobDate')?.value || new Date().toISOString().slice(0,10);
+  const ticket = document.getElementById('jobTicket')?.value || '';
+  const notes = document.getElementById('jobNotes')?.value || '';
+
+  const findings = gatherFindingsText() || 'No findings captured.';
+  const materials = gatherMaterialList();
+  const ductImg = getDuctImageDataUrl();
+
+  // PDF init
+  const doc = new jsPDF('p','pt','letter');
+  const left = 48, top = 56, width = 515;
+  let y = top;
+
+  // Header
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16);
+  doc.text('Fidelity Mechanical Solutions — FieldBuddy Pro', left, y); y += 18;
+  doc.setFontSize(12);
+  doc.setFont('helvetica','normal');
+  doc.text(`HVAC Service Report — ${date}`, left, y); y += 8;
+  if (ticket) { doc.text(`Ticket: ${ticket}`, left, y); y += 16; } else { y += 8; }
+
+  // Job info box
+  doc.setFont('helvetica','bold'); doc.text('Job Information', left, y); y += 12;
+  doc.setFont('helvetica','normal');
+  const jobLines = [
+    `Customer: ${cust}`, `Address: ${addr}`,
+    `Phone: ${phone}`, `Email: ${email}`,
+    `Technician: ${tech}`, `Notes: ${notes}`
+  ].filter(Boolean);
+  jobLines.forEach(line=>{
+    const split = doc.splitTextToSize(line, width);
+    split.forEach(l=>{ doc.text(l, left, y); y += 14; });
+  });
+  y += 6;
+
+  // Findings
+  doc.setFont('helvetica','bold'); doc.text('Findings (Safety • Mechanical • Health)', left, y); y += 12;
+  doc.setFont('helvetica','normal');
+  const findingsLines = doc.splitTextToSize(findings, width);
+  findingsLines.forEach(l=>{
+    if (y > 720) { doc.addPage(); y = top; }
+    doc.text(l, left, y); y += 14;
+  });
+  y += 6;
+
+  // Materials
+  doc.setFont('helvetica','bold'); doc.text('Material List', left, y); y += 12;
+  doc.setFont('helvetica','normal');
+  if (materials.length === 0) {
+    doc.text('No materials selected.', left, y); y += 14;
+  } else {
+    materials.forEach(m=>{
+      const line = `• ${m}`;
+      const split = doc.splitTextToSize(line, width);
+      split.forEach(l=>{
+        if (y > 720) { doc.addPage(); y = top; }
+        doc.text(l, left, y); y += 14;
+      });
+    });
+  }
+  y += 6;
+
+  // Duct schematic image
+  if (ductImg) {
+    if (y > 620) { doc.addPage(); y = top; }
+    doc.setFont('helvetica','bold'); doc.text('Duct Schematic', left, y); y += 10;
+    // Fit image to width while keeping aspect ratio
+    const imgW = width, imgH = 280;
+    doc.addImage(ductImg, 'PNG', left, y, imgW, imgH, undefined, 'FAST');
+    y += imgH + 8;
+  }
+
+  // Footer
+  doc.setFont('helvetica','italic');
+  if (y > 740) { doc.addPage(); y = 740; }
+  doc.text('© 2025 Fidelity Mechanical Solutions — FieldBuddy Pro', left, 770);
+
+  // Save
+  const safeCust = cust ? cust.replace(/[^\w\-]+/g,'_') : 'client';
+  const safeTicket = ticket ? ticket.replace(/[^\w\-]+/g,'_') : 'report';
+  doc.save(`${safeCust}_${safeTicket}_HVAC_Report.pdf`);
+});
+</script>
