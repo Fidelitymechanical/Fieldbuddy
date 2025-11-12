@@ -45,6 +45,8 @@ const HVACFieldApp = () => {
     equipment: true,
     details: true
   });
+  const [materialQuantities, setMaterialQuantities] = useState({});
+  const [showQuickAdd, setShowQuickAdd] = useState(null);
 
   const [calculations, setCalculations] = useState({
     duct: {
@@ -248,12 +250,28 @@ const HVACFieldApp = () => {
   ];
 
   // ========== MATERIAL MANAGEMENT ==========
-  const addMaterial = (item) => {
-    const qty = prompt('Enter quantity:', '1');
-    if (qty && parseInt(qty) > 0) {
-      setMaterialList([...materialList, { ...item, quantity: parseInt(qty), id: Date.now() }]);
-      showToast(`Added ${item.name}`, 'success');
+  const getCatalogQuantity = (itemPart) => {
+    return materialQuantities[itemPart] || 1;
+  };
+
+  const setCatalogQuantity = (itemPart, quantity) => {
+    const qty = Math.max(1, Math.min(9999, parseInt(quantity) || 1));
+    setMaterialQuantities(prev => ({ ...prev, [itemPart]: qty }));
+  };
+
+  const quickAddMaterial = (item, quantity) => {
+    const qty = parseInt(quantity) || 1;
+    if (qty > 0) {
+      setMaterialList([...materialList, { ...item, quantity: qty, id: Date.now() }]);
+      showToast(`Added ${qty}x ${item.name}`, 'success');
+      // Reset quantity to 1 after adding
+      setMaterialQuantities(prev => ({ ...prev, [item.part]: 1 }));
     }
+  };
+
+  const addMaterialWithQuantity = (item) => {
+    const qty = getCatalogQuantity(item.part);
+    quickAddMaterial(item, qty);
   };
 
   const removeMaterial = (id) => {
@@ -265,6 +283,15 @@ const HVACFieldApp = () => {
     setMaterialList(materialList.map(item =>
       item.id === id
         ? { ...item, quantity: Math.max(1, item.quantity + delta) }
+        : item
+    ));
+  };
+
+  const updateQuantityDirect = (id, newQuantity) => {
+    const qty = Math.max(1, parseInt(newQuantity) || 1);
+    setMaterialList(materialList.map(item =>
+      item.id === id
+        ? { ...item, quantity: qty }
         : item
     ));
   };
@@ -1319,33 +1346,104 @@ const HVACFieldApp = () => {
                 </select>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto pr-2">
-                {filteredCatalog().map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`border-2 rounded-lg p-4 transition-all hover:shadow-lg hover:scale-105 ${
-                      darkMode ? 'bg-gray-700 border-gray-600 hover:border-blue-500' : 'bg-gray-50 border-gray-200 hover:border-blue-400'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-1`}>
-                          {item.name}
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[600px] overflow-y-auto pr-2">
+                {filteredCatalog().map((item, idx) => {
+                  const quantity = getCatalogQuantity(item.part);
+                  return (
+                    <div
+                      key={idx}
+                      className={`border-2 rounded-xl p-4 transition-all ${
+                        darkMode ? 'bg-gray-700 border-gray-600 hover:border-blue-500' : 'bg-white border-gray-200 hover:border-blue-400'
+                      } hover:shadow-xl`}
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex-1">
+                          <div className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-gray-800'} mb-1 line-clamp-2`}>
+                            {item.name}
+                          </div>
+                          <div className="text-xs text-gray-500 font-mono">{item.part}</div>
                         </div>
-                        <div className="text-sm text-gray-500 font-mono">{item.part}</div>
                       </div>
+
+                      <div className="mb-3">
+                        <div className="text-2xl font-bold text-blue-600">${item.price.toFixed(2)}</div>
+                        <div className="text-xs text-gray-500">per unit</div>
+                      </div>
+
+                      {/* Quantity Controls */}
+                      <div className="space-y-2">
+                        <div className={`flex items-center gap-2 p-2 rounded-lg ${
+                          darkMode ? 'bg-gray-600' : 'bg-gray-100'
+                        }`}>
+                          <button
+                            onClick={() => setCatalogQuantity(item.part, quantity - 1)}
+                            className={`p-1.5 rounded transition-all ${
+                              darkMode ? 'bg-gray-700 hover:bg-gray-800' : 'bg-white hover:bg-gray-200'
+                            } shadow-sm`}
+                          >
+                            <Minus size={14} />
+                          </button>
+                          <input
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setCatalogQuantity(item.part, e.target.value)}
+                            className={`flex-1 text-center font-bold text-lg py-1 rounded border-2 ${
+                              darkMode ? 'bg-gray-700 border-gray-500 text-white' : 'bg-white border-gray-300'
+                            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                            min="1"
+                            max="9999"
+                          />
+                          <button
+                            onClick={() => setCatalogQuantity(item.part, quantity + 1)}
+                            className={`p-1.5 rounded transition-all ${
+                              darkMode ? 'bg-gray-700 hover:bg-gray-800' : 'bg-white hover:bg-gray-200'
+                            } shadow-sm`}
+                          >
+                            <Plus size={14} />
+                          </button>
+                        </div>
+
+                        {/* Quick Add Buttons */}
+                        <div className="flex gap-2">
+                          {[1, 5, 10].map(num => (
+                            <button
+                              key={num}
+                              onClick={() => quickAddMaterial(item, num)}
+                              className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg transition-all ${
+                                darkMode
+                                  ? 'bg-gray-600 hover:bg-gray-500 text-gray-200'
+                                  : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                              }`}
+                            >
+                              +{num}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Main Add Button */}
+                        <button
+                          onClick={() => addMaterialWithQuantity(item)}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md hover:shadow-lg font-semibold"
+                        >
+                          <Plus size={18} />
+                          Add {quantity > 1 ? `${quantity}x` : ''}
+                        </button>
+                      </div>
+
+                      {/* Total Preview */}
+                      {quantity > 1 && (
+                        <div className={`mt-2 pt-2 border-t ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Total:</span>
+                            <span className="font-bold text-blue-600">
+                              ${(item.price * quantity).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center justify-between mt-3">
-                      <div className="text-2xl font-bold text-blue-600">${item.price.toFixed(2)}</div>
-                      <button
-                        onClick={() => addMaterial(item)}
-                        className="p-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md hover:shadow-lg transform hover:scale-110"
-                      >
-                        <Plus size={20} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -1358,47 +1456,72 @@ const HVACFieldApp = () => {
                   {materialList.map((item) => (
                     <div
                       key={item.id}
-                      className={`flex items-center gap-4 p-4 rounded-lg transition-all ${
-                        darkMode ? 'bg-gray-700' : 'bg-gray-50'
-                      }`}
+                      className={`border-2 rounded-xl p-4 transition-all ${
+                        darkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                      } hover:border-blue-400`}
                     >
-                      <div className="flex-1">
-                        <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                          {item.name}
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-1`}>
+                            {item.name}
+                          </div>
+                          <div className="text-sm text-gray-500 font-mono">{item.part}</div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            ${item.price.toFixed(2)} per unit
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500 font-mono">{item.part}</div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className={`p-2 rounded-lg transition-all ${
-                            darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'
-                          }`}
-                        >
-                          <Minus size={16} />
-                        </button>
-                        <span className="w-16 text-center font-bold text-lg">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className={`p-2 rounded-lg transition-all ${
-                            darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'
-                          }`}
-                        >
-                          <Plus size={16} />
-                        </button>
-                      </div>
-                      <div className="w-32 text-right">
-                        <div className="text-sm text-gray-500">@ ${item.price.toFixed(2)}</div>
-                        <div className="text-lg font-bold text-blue-600">
-                          ${(item.price * item.quantity).toFixed(2)}
+
+                        <div className="flex-shrink-0">
+                          <div className={`flex items-center gap-2 p-2 rounded-lg ${
+                            darkMode ? 'bg-gray-600' : 'bg-white border-2 border-gray-200'
+                          }`}>
+                            <button
+                              onClick={() => updateQuantity(item.id, -1)}
+                              disabled={item.quantity <= 1}
+                              className={`p-1.5 rounded transition-all ${
+                                item.quantity <= 1
+                                  ? 'opacity-50 cursor-not-allowed'
+                                  : darkMode ? 'bg-gray-700 hover:bg-gray-800' : 'bg-gray-100 hover:bg-gray-200'
+                              }`}
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <input
+                              type="number"
+                              value={item.quantity}
+                              onChange={(e) => updateQuantityDirect(item.id, e.target.value)}
+                              className={`w-16 text-center font-bold text-lg py-1 px-2 rounded border-2 ${
+                                darkMode ? 'bg-gray-700 border-gray-500 text-white' : 'bg-white border-gray-300'
+                              } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                              min="1"
+                              max="9999"
+                            />
+                            <button
+                              onClick={() => updateQuantity(item.id, 1)}
+                              className={`p-1.5 rounded transition-all ${
+                                darkMode ? 'bg-gray-700 hover:bg-gray-800' : 'bg-gray-100 hover:bg-gray-200'
+                              }`}
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+
+                          <div className="mt-2 text-right">
+                            <div className="text-xs text-gray-500 mb-0.5">Line Total</div>
+                            <div className="text-xl font-bold text-blue-600">
+                              ${(item.price * item.quantity).toFixed(2)}
+                            </div>
+                          </div>
                         </div>
+
+                        <button
+                          onClick={() => removeMaterial(item.id)}
+                          className="flex-shrink-0 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all self-start"
+                          title="Remove item"
+                        >
+                          <Trash2 size={18} />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => removeMaterial(item.id)}
-                        className="p-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
-                      >
-                        <Trash2 size={18} />
-                      </button>
                     </div>
                   ))}
 
