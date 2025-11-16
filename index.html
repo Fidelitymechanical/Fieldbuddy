@@ -1,97 +1,94 @@
-<!DOCTYPE html>
+
+     <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <meta name="description" content="Field Buddy Pro v4.0 - Modern Premium HVAC Field Service Management">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Field Buddy Pro v4.0 - Premium Edition</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Field Buddy Pro v5.0 - Flow Edition</title>
   
-  <!-- CDN Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-  <script type="importmap">
-    {
-      "imports": {
-        "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0"
-      }
-    }
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0B1121">
+  
+  <!-- Libraries (lazy loaded) -->
+  <script>
+    // Lazy load heavy libs only when needed
+    window.loadPDF = () => import('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    window.loadChart = () => import('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js');
+    window.loadSignature = () => import('https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js');
   </script>
   
   <style>
-    /* ==================== MODERN DESIGN SYSTEM ==================== */
+    /* ==================== DESIGN TOKENS ==================== */
     :root {
-      /* Dark Theme Colors */
+      /* Dark Theme */
       --bg-primary: #0B1121;
       --bg-secondary: #151B2D;
       --bg-tertiary: #1E2638;
       --bg-elevated: #242D42;
+      --bg-card: #1A2332;
       
-      /* Accent Colors */
-      --accent-cyan: #00D9FF;
-      --accent-cyan-dark: #00A8CC;
-      --accent-orange: #FF6B35;
-      --accent-orange-dark: #E85D2F;
-      --accent-purple: #A855F7;
-      --accent-green: #10B981;
-      --accent-yellow: #FCD34D;
+      /* Accents */
+      --cyan: #00D9FF;
+      --cyan-dark: #00A8CC;
+      --orange: #FF6B35;
+      --purple: #A855F7;
+      --green: #10B981;
+      --yellow: #FCD34D;
+      --red: #EF4444;
+      --blue: #3B82F6;
       
       /* Status Colors */
       --success: #10B981;
-      --success-glow: rgba(16, 185, 129, 0.3);
       --warning: #FCD34D;
-      --warning-glow: rgba(252, 211, 77, 0.3);
       --danger: #EF4444;
-      --danger-glow: rgba(239, 68, 68, 0.3);
       --info: #3B82F6;
-      --info-glow: rgba(59, 130, 246, 0.3);
       
-      /* Text Colors */
+      /* Text */
       --text-primary: #F8FAFC;
       --text-secondary: #CBD5E1;
       --text-tertiary: #94A3B8;
-      --text-disabled: #64748B;
+      --text-muted: #64748B;
       
       /* Glass Effects */
-      --glass-bg: rgba(30, 38, 56, 0.7);
+      --glass-bg: rgba(30, 38, 56, 0.8);
       --glass-border: rgba(255, 255, 255, 0.1);
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       
       /* Shadows */
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-      --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
+      --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.6);
       
-      /* Gradients */
-      --gradient-cyan: linear-gradient(135deg, #00D9FF 0%, #00A8CC 100%);
-      --gradient-orange: linear-gradient(135deg, #FF6B35 0%, #E85D2F 100%);
-      --gradient-purple: linear-gradient(135deg, #A855F7 0%, #7C3AED 100%);
-      --gradient-premium: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
-      --gradient-dark: linear-gradient(135deg, #1E2638 0%, #0B1121 100%);
-      
-      /* Spacing */
-      --spacing-xs: 4px;
-      --spacing-sm: 8px;
-      --spacing-md: 12px;
-      --spacing-lg: 16px;
-      --spacing-xl: 24px;
-      --spacing-2xl: 32px;
-      --spacing-3xl: 48px;
-      
-      /* Transitions */
-      --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      
-      /* Border Radius */
+      /* Radius */
       --radius-sm: 6px;
-      --radius: 12px;
+      --radius: 8px;
+      --radius-md: 12px;
       --radius-lg: 16px;
       --radius-xl: 24px;
+      --radius-full: 9999px;
+      
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 12px;
+      --space-lg: 16px;
+      --space-xl: 24px;
+      --space-2xl: 32px;
+      --space-3xl: 48px;
+      
+      /* Transitions */
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+      
+      /* Touch Targets (Android GS24 optimized) */
+      --touch-min: 48px;
+      --touch-comfortable: 56px;
     }
     
     /* ==================== RESET & BASE ==================== */
@@ -99,140 +96,203 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    html {
+      font-size: 16px; /* Base for rem calculations */
+      -webkit-text-size-adjust: 100%;
     }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: var(--bg-primary);
       color: var(--text-primary);
-      font-size: 14px;
+      font-size: 0.875rem; /* 14px */
       line-height: 1.6;
-      overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-    }
-    
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: var(--bg-secondary);
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: var(--bg-elevated);
-      border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-cyan-dark);
+      overflow-x: hidden;
+      position: relative;
     }
     
     /* ==================== LAYOUT ==================== */
-    .app-container {
+    .app {
       display: flex;
       min-height: 100vh;
+      position: relative;
     }
     
-    /* Premium Sidebar */
+    /* Sidebar - Collapsible on mobile */
     .sidebar {
       width: 280px;
       background: var(--bg-secondary);
       border-right: 1px solid var(--glass-border);
-      height: 100vh;
       position: fixed;
       left: 0;
       top: 0;
+      height: 100vh;
       overflow-y: auto;
-      z-index: 100;
+      z-index: 1000;
       transition: transform var(--transition-slow);
-      backdrop-filter: blur(10px);
+      transform: translateX(0);
     }
     
-    .sidebar-header {
-      padding: var(--spacing-2xl);
+    .sidebar.collapsed {
+      transform: translateX(-100%);
+    }
+    
+    /* Main Content */
+    .main {
+      flex: 1;
+      margin-left: 280px;
+      min-height: 100vh;
+      transition: margin-left var(--transition-slow);
+    }
+    
+    .main.full-width {
+      margin-left: 0;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--glass-border);
-      background: var(--gradient-dark);
-    }
-    
-    .sidebar-logo {
+      padding: 0 var(--space-xl);
+      height: 64px;
       display: flex;
       align-items: center;
-      gap: var(--spacing-lg);
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
     }
     
-    .sidebar-logo-icon {
-      width: 48px;
-      height: 48px;
-      background: var(--gradient-cyan);
-      border-radius: var(--radius-lg);
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+    
+    .menu-toggle {
+      display: none; /* Show on mobile */
+      width: var(--touch-min);
+      height: var(--touch-min);
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 0 20px var(--success-glow);
-      animation: pulse-glow 2s ease-in-out infinite;
+      border-radius: var(--radius);
+      transition: var(--transition);
     }
     
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 20px var(--success-glow); }
-      50% { box-shadow: 0 0 30px var(--success-glow), 0 0 40px var(--success-glow); }
+    .menu-toggle:active {
+      background: rgba(255, 255, 255, 0.1);
     }
     
-    .sidebar-logo-text {
-      flex: 1;
-    }
-    
-    .sidebar-title {
-      font-size: 18px;
+    .page-title {
+      font-size: 1.25rem;
       font-weight: 700;
-      background: var(--gradient-cyan);
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-dark) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
     
-    .sidebar-version {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    /* Workspace */
+    .workspace {
+      padding: var(--space-xl);
+      max-width: 1400px;
+      margin: 0 auto;
     }
     
-    .sidebar-nav {
-      padding: var(--spacing-xl) 0;
+    /* ==================== SIDEBAR COMPONENTS ==================== */
+    .sidebar-header {
+      padding: var(--space-2xl);
+      border-bottom: 1px solid var(--glass-border);
+      background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-dark) 100%);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 217, 255, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(0, 217, 255, 0.6); }
+    }
+    
+    .logo-text h1 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-dark) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+    }
+    
+    .logo-text .version {
+      font-size: 0.6875rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    
+    /* Navigation */
+    .nav {
+      padding: var(--space-xl) 0;
     }
     
     .nav-section {
-      margin-bottom: var(--spacing-xl);
+      margin-bottom: var(--space-xl);
     }
     
     .nav-section-title {
-      padding: var(--spacing-sm) var(--spacing-xl);
-      font-size: 11px;
+      padding: var(--space-sm) var(--space-xl);
+      font-size: 0.6875rem;
       font-weight: 700;
       color: var(--text-tertiary);
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1px;
     }
     
     .nav-item {
       display: flex;
       align-items: center;
-      gap: var(--spacing-md);
-      padding: var(--spacing-md) var(--spacing-xl);
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-xl);
       color: var(--text-secondary);
+      text-decoration: none;
       cursor: pointer;
       transition: var(--transition);
       border-left: 3px solid transparent;
-      font-size: 14px;
       font-weight: 500;
+      min-height: var(--touch-min);
       position: relative;
-      overflow: hidden;
+      user-select: none;
     }
     
     .nav-item::before {
@@ -242,279 +302,33 @@
       top: 0;
       height: 100%;
       width: 0;
-      background: var(--gradient-cyan);
-      opacity: 0.1;
+      background: linear-gradient(90deg, var(--cyan) 0%, transparent 100%);
+      opacity: 0;
       transition: var(--transition);
     }
     
     .nav-item:hover {
-      color: var(--accent-cyan);
+      color: var(--cyan);
       background: rgba(0, 217, 255, 0.05);
     }
     
     .nav-item:hover::before {
       width: 100%;
+      opacity: 0.1;
     }
     
     .nav-item.active {
-      color: var(--accent-cyan);
+      color: var(--cyan);
       background: rgba(0, 217, 255, 0.1);
-      border-left-color: var(--accent-cyan);
-      box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.1);
+      border-left-color: var(--cyan);
+      font-weight: 600;
     }
     
-    .nav-icon {
-      font-size: 20px;
+    .nav-item .icon {
+      font-size: 1.25rem;
       width: 28px;
       text-align: center;
-      filter: drop-shadow(0 0 8px currentColor);
-    }
-    
-    /* Main Content Area */
-    .main-content {
-      margin-left: 280px;
-      flex: 1;
-      min-height: 100vh;
-      background: var(--bg-primary);
-    }
-    
-    /* Premium Header */
-    .top-header {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--glass-border);
-      padding: 0 var(--spacing-2xl);
-      height: 72px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      box-shadow: var(--shadow);
-    }
-    
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-    }
-    
-    .menu-toggle {
-      display: none;
-      width: 44px;
-      height: 44px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      color: var(--text-primary);
-      transition: var(--transition);
-    }
-    
-    .menu-toggle:hover {
-      background: var(--accent-cyan);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px var(--success-glow);
-    }
-    
-    .header-title {
-      font-size: 24px;
-      font-weight: 700;
-      background: var(--gradient-cyan);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
-    }
-    
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-lg);
-    }
-    
-    .header-user {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      padding: var(--spacing-sm) var(--spacing-lg);
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      font-size: 14px;
-      font-weight: 500;
-      transition: var(--transition);
-      cursor: pointer;
-    }
-    
-    .header-user:hover {
-      background: var(--bg-tertiary);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-    }
-    
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      background: var(--gradient-cyan);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 700;
-      font-size: 14px;
-      box-shadow: 0 0 20px var(--success-glow);
-    }
-    
-    .workspace {
-      padding: var(--spacing-2xl);
-      max-width: 1600px;
-      margin: 0 auto;
-    }
-    
-    /* ==================== DASHBOARD TILES ==================== */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: var(--spacing-xl);
-      margin-bottom: var(--spacing-3xl);
-    }
-    
-    .dashboard-tile {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-2xl);
-      cursor: pointer;
-      transition: var(--transition-slow);
-      position: relative;
-      overflow: hidden;
-      min-height: 200px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow);
-    }
-    
-    .dashboard-tile::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--gradient-cyan);
-      opacity: 0;
-      transition: var(--transition);
-    }
-    
-    .dashboard-tile:hover {
-      transform: translateY(-8px);
-      box-shadow: var(--shadow-xl), 0 0 40px rgba(0, 217, 255, 0.3);
-      border-color: var(--accent-cyan);
-    }
-    
-    .dashboard-tile:hover::before {
-      opacity: 1;
-    }
-    
-    .tile-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: var(--spacing-lg);
-    }
-    
-    .tile-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: var(--radius-lg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      background: var(--gradient-cyan);
-      box-shadow: 0 0 20px var(--success-glow);
-      animation: float 3s ease-in-out infinite;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    
-    .tile-icon.orange { background: var(--gradient-orange); box-shadow: 0 0 20px rgba(255, 107, 53, 0.4); }
-    .tile-icon.purple { background: var(--gradient-purple); box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
-    .tile-icon.premium { background: var(--gradient-premium); box-shadow: 0 0 20px rgba(102, 126, 234, 0.4); }
-    
-    .tile-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: var(--gradient-cyan);
-      color: white;
-      box-shadow: 0 0 10px var(--success-glow);
-    }
-    
-    .tile-badge.pro {
-      background: var(--gradient-orange);
-      box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
-    }
-    
-    .tile-badge.premium {
-      background: var(--gradient-purple);
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
-    }
-    
-    .tile-content {
-      flex: 1;
-    }
-    
-    .tile-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: var(--spacing-sm);
-    }
-    
-    .tile-description {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-    
-    .tile-stats {
-      display: flex;
-      gap: var(--spacing-lg);
-      margin-top: var(--spacing-lg);
-      padding-top: var(--spacing-lg);
-      border-top: 1px solid var(--glass-border);
-    }
-    
-    .tile-stat {
-      flex: 1;
-    }
-    
-    .tile-stat-value {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      display: block;
-    }
-    
-    .tile-stat-label {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      flex-shrink: 0;
     }
     
     /* ==================== CARDS ==================== */
@@ -523,41 +337,41 @@
       backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-xl);
-      margin-bottom: var(--spacing-xl);
+      margin-bottom: var(--space-xl);
       box-shadow: var(--shadow);
       overflow: hidden;
       transition: var(--transition);
     }
     
     .card:hover {
-      box-shadow: var(--shadow-lg);
-      border-color: rgba(0, 217, 255, 0.3);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(0, 217, 255, 0.2);
     }
     
     .card-header {
-      padding: var(--spacing-xl);
+      padding: var(--space-xl);
       border-bottom: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(0, 0, 0, 0.2);
     }
     
     .card-title {
-      font-size: 18px;
+      font-size: 1.125rem;
       font-weight: 700;
       color: var(--text-primary);
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
+      gap: var(--space-sm);
     }
     
     .card-body {
-      padding: var(--spacing-xl);
+      padding: var(--space-xl);
     }
     
     .card-section {
-      margin-bottom: var(--spacing-xl);
+      margin-bottom: var(--space-xl);
     }
     
     .card-section:last-child {
@@ -565,47 +379,58 @@
     }
     
     .section-title {
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 700;
-      color: var(--accent-cyan);
-      margin-bottom: var(--spacing-md);
+      color: var(--cyan);
+      margin-bottom: var(--space-md);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
+      gap: var(--space-sm);
     }
     
     .section-title::before {
       content: '';
       width: 4px;
       height: 16px;
-      background: var(--gradient-cyan);
+      background: var(--cyan);
       border-radius: 2px;
     }
     
-    /* ==================== FORMS ==================== */
+    /* ==================== FORM ELEMENTS ==================== */
     .form-grid {
       display: grid;
-      gap: var(--spacing-lg);
+      gap: var(--space-lg);
     }
     
-    .form-grid-2 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-    .form-grid-3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-    .form-grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    .form-grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .form-grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
     
     .form-group {
-      margin-bottom: 0;
-      position: relative;
+      display: flex;
+      flex-direction: column;
     }
     
     label {
-      display: block;
-      font-size: 13px;
+      font-size: 0.8125rem;
       font-weight: 600;
       color: var(--text-secondary);
-      margin-bottom: var(--spacing-sm);
-      letter-spacing: 0.3px;
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .required::after {
+      content: '*';
+      color: var(--red);
+      margin-left: 2px;
     }
     
     .help-icon {
@@ -614,64 +439,48 @@
       justify-content: center;
       width: 16px;
       height: 16px;
-      background: var(--accent-cyan);
+      background: var(--cyan);
       color: var(--bg-primary);
       border-radius: 50%;
-      font-size: 10px;
+      font-size: 0.625rem;
       font-weight: 700;
       cursor: help;
-      margin-left: 4px;
       position: relative;
-      box-shadow: 0 0 10px var(--success-glow);
     }
     
-    .help-icon:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 120%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      padding: 8px 12px;
-      border-radius: var(--radius);
-      font-size: 12px;
-      font-weight: normal;
-      white-space: nowrap;
-      z-index: 1000;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--glass-border);
-      animation: fadeIn 0.2s ease;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(-5px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-    
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
-      padding: var(--spacing-md) var(--spacing-lg);
+      padding: var(--space-md) var(--space-lg);
+      min-height: var(--touch-min);
+      background: var(--bg-elevated);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      font-size: 14px;
-      font-family: inherit;
-      background: var(--bg-elevated);
       color: var(--text-primary);
+      font-size: 0.875rem;
+      font-family: inherit;
       transition: var(--transition);
+      outline: none;
     }
     
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2), 0 0 20px rgba(0, 217, 255, 0.3);
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.2);
       background: var(--bg-tertiary);
     }
     
     input[readonly] {
       background: var(--bg-secondary);
       color: var(--text-tertiary);
-      border-color: var(--bg-elevated);
+      cursor: not-allowed;
+    }
+    
+    input.success {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.05);
     }
     
     input.warning {
@@ -685,8 +494,8 @@
     }
     
     textarea {
-      resize: vertical;
       min-height: 100px;
+      resize: vertical;
       line-height: 1.6;
     }
     
@@ -695,15 +504,20 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: var(--spacing-sm);
-      padding: var(--spacing-md) var(--spacing-xl);
-      border: none;
+      gap: var(--space-sm);
+      padding: var(--space-md) var(--space-xl);
+      min-height: var(--touch-min);
+      background: var(--bg-elevated);
+      border: 1px solid var(--glass-border);
       border-radius: var(--radius);
-      font-size: 14px;
+      color: var(--text-primary);
+      font-size: 0.875rem;
       font-weight: 600;
+      font-family: inherit;
       cursor: pointer;
       transition: var(--transition);
-      min-height: 44px;
+      user-select: none;
+      text-decoration: none;
       position: relative;
       overflow: hidden;
     }
@@ -716,7 +530,7 @@
       width: 0;
       height: 0;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.3);
       transform: translate(-50%, -50%);
       transition: width 0.6s, height 0.6s;
     }
@@ -732,830 +546,260 @@
     }
     
     .btn-primary {
-      background: var(--gradient-cyan);
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-dark) 100%);
       color: white;
-      box-shadow: 0 0 20px var(--success-glow);
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
     }
     
     .btn-primary:hover:not(:disabled) {
-      box-shadow: 0 0 30px var(--success-glow), 0 0 40px var(--success-glow);
+      box-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
       transform: translateY(-2px);
+    }
+    
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
     }
     
     .btn-success {
-      background: var(--gradient-cyan);
+      background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
       color: white;
-      box-shadow: 0 0 20px var(--success-glow);
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
     }
     
-    .btn-success:hover:not(:disabled) {
-      box-shadow: 0 0 30px var(--success-glow);
-      transform: translateY(-2px);
-    }
-    
-    .btn-warning {
-      background: var(--gradient-orange);
+    .btn-danger {
+      background: linear-gradient(135deg, var(--red) 0%, #DC2626 100%);
       color: white;
-      box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
-    }
-    
-    .btn-warning:hover:not(:disabled) {
-      box-shadow: 0 0 30px rgba(255, 107, 53, 0.4);
-      transform: translateY(-2px);
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
     }
     
     .btn-secondary {
       background: var(--bg-elevated);
-      color: var(--text-primary);
-      border: 1px solid var(--glass-border);
+      border-color: var(--glass-border);
     }
     
     .btn-secondary:hover:not(:disabled) {
       background: var(--bg-tertiary);
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-    }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-      color: white;
-      box-shadow: 0 0 20px var(--danger-glow);
-    }
-    
-    .btn-danger:hover:not(:disabled) {
-      box-shadow: 0 0 30px var(--danger-glow);
-      transform: translateY(-2px);
+      border-color: var(--cyan);
     }
     
     .btn-group {
       display: flex;
-      gap: var(--spacing-sm);
+      gap: var(--space-sm);
       flex-wrap: wrap;
     }
     
+    .btn-icon {
+      min-width: var(--touch-min);
+      padding: 0;
+    }
+    
+    .btn-lg {
+      min-height: var(--touch-comfortable);
+      padding: var(--space-lg) var(--space-2xl);
+      font-size: 1rem;
+    }
+    
     .btn-sm {
-      padding: var(--spacing-sm) var(--spacing-lg);
-      font-size: 12px;
-      min-height: 36px;
+      min-height: 40px;
+      padding: var(--space-sm) var(--space-lg);
+      font-size: 0.8125rem;
     }
     
-    /* ==================== TOGGLE BUTTONS ==================== */
-    .toggle-group {
-      display: inline-flex;
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      padding: 4px;
-      gap: 4px;
+    /* ==================== QUICK ACTION CARDS ==================== */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-2xl);
     }
     
-    .toggle-btn {
-      padding: var(--spacing-sm) var(--spacing-xl);
-      border: none;
-      background: transparent;
-      border-radius: calc(var(--radius) - 2px);
-      font-size: 13px;
-      font-weight: 600;
+    .action-card {
+      background: var(--bg-card);
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
       cursor: pointer;
       transition: var(--transition);
-      color: var(--text-secondary);
-      min-width: 120px;
-    }
-    
-    .toggle-btn.active {
-      background: var(--gradient-cyan);
-      color: white;
-      box-shadow: 0 0 20px var(--success-glow);
-    }
-    
-    /* ==================== BADGES ==================== */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      box-shadow: var(--shadow);
-    }
-    
-    .badge-success {
-      background: rgba(16, 185, 129, 0.2);
-      color: var(--success);
-      border: 1px solid var(--success);
-      box-shadow: 0 0 10px var(--success-glow);
-    }
-    
-    .badge-warning {
-      background: rgba(252, 211, 77, 0.2);
-      color: var(--warning);
-      border: 1px solid var(--warning);
-      box-shadow: 0 0 10px var(--warning-glow);
-    }
-    
-    .badge-danger {
-      background: rgba(239, 68, 68, 0.2);
-      color: var(--danger);
-      border: 1px solid var(--danger);
-      box-shadow: 0 0 10px var(--danger-glow);
-    }
-    
-    .badge-info {
-      background: rgba(59, 130, 246, 0.2);
-      color: var(--info);
-      border: 1px solid var(--info);
-      box-shadow: 0 0 10px var(--info-glow);
-    }
-    
-    /* ==================== QUALITY DASHBOARD ==================== */
-    .quality-dashboard {
-      background: var(--gradient-premium);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-2xl);
-      margin-bottom: var(--spacing-xl);
-      color: white;
-      box-shadow: var(--shadow-xl), 0 0 40px rgba(102, 126, 234, 0.4);
       position: relative;
       overflow: hidden;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
     }
     
-    .quality-dashboard::before {
+    .action-card::before {
       content: '';
       position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: rotate 20s linear infinite;
-    }
-    
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    
-    .quality-header {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: var(--spacing-lg);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      z-index: 1;
-    }
-    
-    .quality-score-large {
-      font-size: 64px;
-      font-weight: 700;
-      text-align: center;
-      margin: var(--spacing-xl) 0;
-      text-shadow: 0 0 40px rgba(255, 255, 255, 0.5);
-      position: relative;
-      z-index: 1;
-    }
-    
-    .quality-metrics {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: var(--spacing-lg);
-      margin-top: var(--spacing-xl);
-      position: relative;
-      z-index: 1;
-    }
-    
-    .quality-metric {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-      text-align: center;
-      transition: var(--transition);
-    }
-    
-    .quality-metric:hover {
-      background: rgba(255, 255, 255, 0.15);
-      transform: translateY(-4px);
-    }
-    
-    .metric-value {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 4px;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-    }
-    
-    .metric-label {
-      font-size: 12px;
-      opacity: 0.9;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    /* ==================== DIAGNOSTIC PANEL ==================== */
-    .diagnostic-panel {
-      background: var(--gradient-dark);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-xl);
-      margin: var(--spacing-xl) 0;
-      box-shadow: var(--shadow-lg);
-    }
-    
-    .diagnostic-header {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: var(--spacing-lg);
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      color: var(--accent-cyan);
-    }
-    
-    .diagnostic-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-      margin-bottom: var(--spacing-md);
-      transition: var(--transition);
-    }
-    
-    .diagnostic-card:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-    }
-    
-    .diagnostic-card:last-child {
-      margin-bottom: 0;
-    }
-    
-    .diagnostic-card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--spacing-sm);
-    }
-    
-    .diagnostic-card-title {
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--text-primary);
-    }
-    
-    .diagnostic-recommendations {
-      margin-top: var(--spacing-md);
-      padding-top: var(--spacing-md);
-      border-top: 1px solid var(--glass-border);
-    }
-    
-    .diagnostic-recommendations ul {
-      margin: var(--spacing-sm) 0;
-      padding-left: var(--spacing-xl);
-      font-size: 13px;
-    }
-    
-    .diagnostic-recommendations li {
-      margin: var(--spacing-sm) 0;
-      color: var(--text-secondary);
-    }
-    
-    /* ==================== PHOTO GALLERY ==================== */
-    .photo-gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: var(--spacing-md);
-      margin-top: var(--spacing-md);
-    }
-    
-    .photo-item {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      border: 2px solid var(--glass-border);
-      cursor: pointer;
-      background: var(--bg-elevated);
-      transition: var(--transition);
-    }
-    
-    .photo-item:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
-      transform: scale(1.05);
-    }
-    
-    .photo-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .photo-item-actions {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      display: flex;
-      gap: 4px;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--cyan) 0%, var(--purple) 100%);
       opacity: 0;
       transition: var(--transition);
     }
     
-    .photo-item:hover .photo-item-actions {
+    .action-card:hover {
+      border-color: var(--cyan);
+      transform: translateY(-4px);
+      box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+    }
+    
+    .action-card:hover::before {
       opacity: 1;
     }
     
-    .photo-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--radius);
-      border: none;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
-      color: white;
-      cursor: pointer;
+    .action-card:active {
+      transform: translateY(-2px);
+    }
+    
+    .action-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-dark) 100%);
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
-      transition: var(--transition);
+      font-size: 2rem;
+      margin-bottom: var(--space-lg);
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
     }
     
-    .photo-btn:hover {
-      background: var(--danger);
-      box-shadow: 0 0 10px var(--danger-glow);
+    .action-card.orange .action-icon {
+      background: linear-gradient(135deg, var(--orange) 0%, #E85D2F 100%);
+      box-shadow: 0 0 20px rgba(255, 107, 53, 0.4);
     }
     
-    .photo-upload {
-      aspect-ratio: 1;
-      border: 2px dashed var(--glass-border);
-      border-radius: var(--radius-lg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      background: var(--bg-elevated);
-      transition: var(--transition);
+    .action-card.purple .action-icon {
+      background: linear-gradient(135deg, var(--purple) 0%, #7C3AED 100%);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
     }
     
-    .photo-upload:hover {
-      border-color: var(--accent-cyan);
-      background: rgba(0, 217, 255, 0.05);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+    .action-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+      color: var(--text-primary);
     }
     
-    /* ==================== SIGNATURE PAD ==================== */
-    .signature-pad {
-      width: 100%;
-      height: 200px;
-      border: 2px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      cursor: crosshair;
-      background: var(--bg-elevated);
-      transition: var(--transition);
-    }
-    
-    .signature-pad:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
-    }
-    
-    /* ==================== CHART ==================== */
-    .chart-container {
-      height: 300px;
-      margin: var(--spacing-lg) 0;
-      position: relative;
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-    }
-    
-    /* ==================== CHECKLIST ==================== */
-    .checklist-item {
-      display: flex;
-      align-items: flex-start;
-      padding: var(--spacing-md);
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      margin-bottom: var(--spacing-sm);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    
-    .checklist-item:hover {
-      border-color: var(--accent-cyan);
-      background: var(--bg-tertiary);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.1);
-    }
-    
-    .checklist-item.checked {
-      border-color: var(--success);
-      background: rgba(16, 185, 129, 0.1);
-    }
-    
-    input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      margin-right: var(--spacing-md);
-      accent-color: var(--accent-cyan);
-      cursor: pointer;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    
-    .checklist-item label {
-      margin: 0;
-      cursor: pointer;
-      font-weight: 400;
-      font-size: 13px;
-      line-height: 1.6;
+    .action-description {
+      font-size: 0.875rem;
       color: var(--text-secondary);
-    }
-    
-    /* ==================== MATERIALS CATALOG ==================== */
-    .materials-category {
-      margin-bottom: var(--spacing-md);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      background: var(--bg-elevated);
-      transition: var(--transition);
-    }
-    
-    .materials-category:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.1);
-    }
-    
-    .category-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--spacing-lg);
-      background: var(--bg-tertiary);
-      cursor: pointer;
-      user-select: none;
-      transition: var(--transition);
-      border-bottom: 1px solid var(--glass-border);
-    }
-    
-    .category-header:hover {
-      background: var(--bg-elevated);
-    }
-    
-    .category-title-group {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-    }
-    
-    .category-icon {
-      font-size: 24px;
-      filter: drop-shadow(0 0 8px currentColor);
-    }
-    
-    .category-name {
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--text-primary);
-    }
-    
-    .category-meta {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-    }
-    
-    .category-count {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      background: var(--bg-elevated);
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-weight: 600;
-      border: 1px solid var(--glass-border);
-    }
-    
-    .category-selected {
-      font-size: 11px;
-      color: white;
-      background: var(--gradient-cyan);
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-weight: 700;
-      box-shadow: 0 0 10px var(--success-glow);
-    }
-    
-    .category-arrow {
-      transition: transform 0.3s ease;
-      color: var(--text-tertiary);
-      font-size: 16px;
-    }
-    
-    .materials-category.expanded .category-arrow {
-      transform: rotate(180deg);
-    }
-    
-    .category-items {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-    }
-    
-    .materials-category.expanded .category-items {
-      max-height: 10000px;
-    }
-    
-    .material-item {
-      display: flex;
-      align-items: center;
-      padding: var(--spacing-md) var(--spacing-lg);
-      border-top: 1px solid var(--glass-border);
-      background: var(--bg-secondary);
-      transition: var(--transition);
-    }
-    
-    .material-item:hover {
-      background: var(--bg-tertiary);
-      box-shadow: inset 0 0 20px rgba(0, 217, 255, 0.05);
-    }
-    
-    .material-item:first-child {
-      border-top: none;
-    }
-    
-    .material-info {
-      flex: 1;
-      margin-left: var(--spacing-sm);
-    }
-    
-    .material-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-primary);
-    }
-    
-    .material-spec {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      margin-top: 2px;
-    }
-    
-    /* ==================== SELECTED MATERIALS ==================== */
-    .selected-material {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-md);
-      padding: var(--spacing-md);
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius);
-      margin-bottom: var(--spacing-sm);
-      transition: var(--transition);
-    }
-    
-    .selected-material:hover {
-      border-color: var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 217, 255, 0.1);
-    }
-    
-    .selected-material-info {
-      flex: 1;
-    }
-    
-    .selected-material-controls {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-    }
-    
-    .selected-material-controls select,
-    .selected-material-controls input {
-      padding: 8px 12px;
-      font-size: 13px;
-      border: 1px solid var(--glass-border);
-    }
-    
-    .selected-material-controls select {
-      width: 140px;
-    }
-    
-    .selected-material-controls input {
-      width: 70px;
-      text-align: center;
-    }
-    
-    /* ==================== STATUS CARDS ==================== */
-    .status-card {
-      padding: var(--spacing-lg);
-      border-radius: var(--radius-lg);
-      border-left: 4px solid;
-      font-size: 14px;
       line-height: 1.6;
-      margin-bottom: var(--spacing-md);
-      backdrop-filter: blur(10px);
+      flex: 1;
     }
     
-    .status-card.success {
-      background: rgba(16, 185, 129, 0.1);
-      border-color: var(--success);
-      color: var(--success);
+    .action-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--cyan);
+      color: white;
+      border-radius: var(--radius-full);
+      font-size: 0.625rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: var(--space-md);
+      align-self: flex-start;
     }
     
-    .status-card.warning {
-      background: rgba(252, 211, 77, 0.1);
-      border-color: var(--warning);
-      color: var(--warning);
+    /* ==================== UTILITIES ==================== */
+    .hidden {
+      display: none !important;
     }
     
-    .status-card.danger {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: var(--danger);
-      color: var(--danger);
-    }
+    .mt-sm { margin-top: var(--space-sm); }
+    .mt-md { margin-top: var(--space-md); }
+    .mt-lg { margin-top: var(--space-lg); }
+    .mt-xl { margin-top: var(--space-xl); }
     
-    .status-card.info {
-      background: rgba(59, 130, 246, 0.1);
-      border-color: var(--info);
-      color: var(--info);
-    }
+    .mb-sm { margin-bottom: var(--space-sm); }
+    .mb-md { margin-bottom: var(--space-md); }
+    .mb-lg { margin-bottom: var(--space-lg); }
+    .mb-xl { margin-bottom: var(--space-xl); }
     
-    /* ==================== TOAST ==================== */
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    
+    .text-success { color: var(--success); }
+    .text-warning { color: var(--warning); }
+    .text-danger { color: var(--danger); }
+    .text-info { color: var(--info); }
+    .text-muted { color: var(--text-muted); }
+    
+    /* ==================== TOAST NOTIFICATIONS ==================== */
     .toast {
       position: fixed;
-      bottom: 30px;
-      right: 30px;
+      bottom: var(--space-2xl);
+      right: var(--space-2xl);
       background: var(--bg-elevated);
       backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
-      color: white;
-      padding: var(--spacing-lg) var(--spacing-xl);
       border-radius: var(--radius-lg);
+      padding: var(--space-lg) var(--space-xl);
       box-shadow: var(--shadow-xl);
       z-index: 9999;
-      font-size: 14px;
-      font-weight: 600;
+      min-width: 280px;
+      max-width: 400px;
       opacity: 0;
       transform: translateY(20px);
       transition: var(--transition);
-      min-width: 280px;
-      text-align: center;
+      pointer-events: none;
     }
     
     .toast.show {
       opacity: 1;
       transform: translateY(0);
+      pointer-events: auto;
     }
     
     .toast.success {
-      background: var(--gradient-cyan);
-      box-shadow: var(--shadow-xl), 0 0 30px var(--success-glow);
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--cyan-dark) 100%);
+      color: white;
+      border-color: transparent;
     }
     
-    .toast.danger {
-      background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-      box-shadow: var(--shadow-xl), 0 0 30px var(--danger-glow);
+    .toast.error {
+      background: linear-gradient(135deg, var(--red) 0%, #DC2626 100%);
+      color: white;
+      border-color: transparent;
     }
     
     .toast.warning {
-      background: var(--gradient-orange);
-      box-shadow: var(--shadow-xl), 0 0 30px rgba(255, 107, 53, 0.4);
+      background: linear-gradient(135deg, var(--orange) 0%, #E85D2F 100%);
+      color: white;
+      border-color: transparent;
     }
     
-    /* ==================== MODAL ==================== */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      padding: var(--spacing-xl);
-      animation: fadeIn 0.3s ease;
+    /* ==================== LOADING STATES ==================== */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
     }
     
-    .modal-overlay.show {
-      display: flex;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
     
-    .modal {
-      background: var(--bg-secondary);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-xl);
-      padding: var(--spacing-2xl);
-      max-width: 500px;
-      width: 100%;
-      box-shadow: var(--shadow-xl);
-      animation: slideUp 0.3s ease;
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-elevated) 50%, var(--bg-tertiary) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s ease-in-out infinite;
+      border-radius: var(--radius);
     }
     
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .modal-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: var(--spacing-md);
-      color: var(--text-primary);
-    }
-    
-    .modal-content {
-      color: var(--text-secondary);
-      margin-bottom: var(--spacing-xl);
-      line-height: 1.6;
-      font-size: 14px;
-    }
-    
-    .modal-actions {
-      display: flex;
-      gap: var(--spacing-sm);
-      justify-content: flex-end;
-    }
-    
-    /* ==================== DUCT DESIGN TREE ==================== */
-    .duct-tree {
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-      background: var(--bg-elevated);
-      padding: var(--spacing-lg);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--glass-border);
-      line-height: 1.8;
-      overflow-x: auto;
-      color: var(--text-secondary);
-    }
-    
-    .duct-branch {
-      margin-left: 20px;
-      padding: 4px 0;
-      color: var(--text-tertiary);
-    }
-    
-    .duct-trunk {
-      font-weight: 700;
-      color: var(--accent-cyan);
-      text-shadow: 0 0 10px var(--success-glow);
-    }
-    
-    /* ==================== INFO BOX ==================== */
-    .info-box {
-      background: var(--bg-elevated);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: var(--spacing-lg);
-      margin: var(--spacing-md) 0;
-    }
-    
-    .info-box-title {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--accent-cyan);
-      margin-bottom: var(--spacing-sm);
-    }
-    
-    .info-box-content {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-    
-    /* ==================== UTILITIES ==================== */
-    .hidden { display: none !important; }
-    .mt-lg { margin-top: var(--spacing-lg); }
-    .mb-lg { margin-bottom: var(--spacing-lg); }
-    
-    /* ==================== MOBILE MENU ==================== */
-    .mobile-menu-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(10px);
-      z-index: 99;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
-    .mobile-menu-overlay.show {
-      display: block;
-      opacity: 1;
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
     }
     
     /* ==================== RESPONSIVE ==================== */
@@ -1564,12 +808,12 @@
         transform: translateX(-100%);
       }
       
-      .sidebar.mobile-open {
+      .sidebar.open {
         transform: translateX(0);
         box-shadow: var(--shadow-xl);
       }
       
-      .main-content {
+      .main {
         margin-left: 0;
       }
       
@@ -1578,325 +822,356 @@
       }
       
       .form-grid-2,
-      .form-grid-3,
-      .form-grid-4 {
-        grid-template-columns: 1fr;
-      }
-      
-      .quality-metrics {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .dashboard-grid {
+      .form-grid-3 {
         grid-template-columns: 1fr;
       }
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: 640px) {
       .workspace {
-        padding: var(--spacing-lg);
+        padding: var(--space-lg);
       }
       
-      .top-header {
-        padding: 0 var(--spacing-lg);
-        height: 64px;
+      .header {
+        padding: 0 var(--space-lg);
+        height: 56px;
       }
       
-      .header-title {
-        font-size: 18px;
-      }
-      
-      .quality-metrics {
+      .quick-actions {
+        grid.quick-actions {
         grid-template-columns: 1fr;
       }
       
-      .photo-gallery {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      .card-header {
+        padding: var(--space-lg);
       }
       
-      .tile-stats {
-        flex-direction: column;
+      .card-body {
+        padding: var(--space-lg);
+      }
+      
+      .toast {
+        bottom: var(--space-lg);
+        right: var(--space-lg);
+        left: var(--space-lg);
+        min-width: auto;
       }
     }
   </style>
 </head>
 
 <body>
-  <div class="app-container">
+  <div class="app">
     
-    <!-- MOBILE MENU OVERLAY -->
-    <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
-    
-    <!-- PREMIUM SIDEBAR -->
+    <!-- ==================== SIDEBAR ==================== -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <div class="sidebar-logo-icon">🔧</div>
-          <div class="sidebar-logo-text">
-            <div class="sidebar-title">Field Buddy Pro</div>
-            <div class="sidebar-version">v4.0 Premium</div>
+        <div class="logo">
+          <div class="logo-icon">🔧</div>
+          <div class="logo-text">
+            <h1>Field Buddy Pro</h1>
+            <div class="version">v5.0 Flow Edition</div>
           </div>
         </div>
       </div>
       
-      <nav class="sidebar-nav">
+      <nav class="nav">
         <div class="nav-section">
-          <div class="nav-section-title">Navigation</div>
-          <div class="nav-item active" data-page="dashboard">
-            <span class="nav-icon">🏠</span>
+          <div class="nav-section-title">Quick Start</div>
+          <button class="nav-item active" data-page="dashboard">
+            <span class="icon">🏠</span>
             <span>Dashboard</span>
-          </div>
-          <div class="nav-item" data-page="service">
-            <span class="nav-icon">📋</span>
-            <span>Service Calls</span>
-          </div>
-          <div class="nav-item" data-page="materials">
-            <span class="nav-icon">📦</span>
-            <span>Materials</span>
-          </div>
-          <div class="nav-item" data-page="duct-design">
-            <span class="nav-icon">🏗️</span>
-            <span>Pro Duct Design</span>
-          </div>
-          <div class="nav-item" data-page="cfm">
-            <span class="nav-icon">🌪️</span>
-            <span>CFM Calculator</span>
-          </div>
-          <div class="nav-item" data-page="history">
-            <span class="nav-icon">📊</span>
-            <span>History & Reports</span>
-          </div>
+          </button>
+          <button class="nav-item" data-page="new-job">
+            <span class="icon">➕</span>
+            <span>New Service Call</span>
+          </button>
+          <button class="nav-item" data-page="continue">
+            <span class="icon">▶️</span>
+            <span>Continue Last Job</span>
+          </button>
         </div>
         
         <div class="nav-section">
           <div class="nav-section-title">Tools</div>
-          <div class="nav-item" id="save-progress-btn">
-            <span class="nav-icon">💾</span>
-            <span>Save Progress</span>
-          </div>
-          <div class="nav-item" id="load-data-btn">
-            <span class="nav-icon">📥</span>
-            <span>Load Saved Data</span>
-          </div>
-          <div class="nav-item" id="export-data-btn">
-            <span class="nav-icon">📤</span>
-            <span>Export All Data</span>
-          </div>
+          <button class="nav-item" data-page="measurements">
+            <span class="icon">📏</span>
+            <span>Quick Measurements</span>
+          </button>
+          <button class="nav-item" data-page="materials">
+            <span class="icon">📦</span>
+            <span>Materials & Parts</span>
+          </button>
+          <button class="nav-item" data-page="photos">
+            <span class="icon">📷</span>
+            <span>Photo Gallery</span>
+          </button>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">History</div>
+          <button class="nav-item" data-page="history">
+            <span class="icon">📊</span>
+            <span>Past Jobs</span>
+          </button>
+          <button class="nav-item" data-page="reports">
+            <span class="icon">📄</span>
+            <span>Saved Reports</span>
+          </button>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Settings</div>
+          <button class="nav-item" data-page="sync">
+            <span class="icon">🔄</span>
+            <span>Sync Data</span>
+          </button>
+          <button class="nav-item" data-page="settings">
+            <span class="icon">⚙️</span>
+            <span>Preferences</span>
+          </button>
         </div>
       </nav>
     </aside>
     
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main" id="main">
       
-      <!-- PREMIUM HEADER -->
-      <header class="top-header">
+      <!-- Header -->
+      <header class="header">
         <div class="header-left">
-          <button class="menu-toggle" id="menu-toggle-btn">☰</button>
-          <div class="header-title" id="page-title">Dashboard</div>
+          <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+            ☰
+          </button>
+          <h2 class="page-title" id="page-title">Dashboard</h2>
         </div>
-        <div class="header-actions">
-          <div class="header-user">
-            <div class="user-avatar">MP</div>
-            <span id="header-tech-name">Martín Perez</span>
-          </div>
+        <div class="header-right">
+          <button class="btn btn-icon" id="sync-status" aria-label="Sync status" title="All data saved locally">
+            💾
+          </button>
         </div>
       </header>
       
-      <!-- WORKSPACE -->
+      <!-- Workspace -->
       <div class="workspace">
         
         <!-- ==================== DASHBOARD PAGE ==================== -->
-        <div id="dashboard-page" class="page-content">
-          
-          <div style="margin-bottom: var(--spacing-2xl);">
-            <h1 style="font-size: 32px; font-weight: 700; margin-bottom: var(--spacing-sm); background: var(--gradient-cyan); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-              Welcome Back, Martín! 👋
+        <div id="page-dashboard" class="page-content">
+          <div class="mb-xl">
+            <h1 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">
+              Welcome back, Martín! 👋
             </h1>
-            <p style="color: var(--text-secondary); font-size: 16px;">
-              Your professional HVAC field service management system
+            <p style="color: var(--text-secondary); font-size: 1rem;">
+              Let's get to work. What would you like to do?
             </p>
           </div>
           
-          <div class="dashboard-grid">
-            
-            <!-- Service Calls Tile -->
-            <div class="dashboard-tile" data-page="service">
-              <div class="tile-header">
-                <div class="tile-icon purple">📋</div>
-                <div class="tile-badge premium">Advanced</div>
+          <div class="quick-actions">
+            <div class="action-card" data-action="new-job">
+              <div class="action-icon">➕</div>
+              <div class="action-title">Start New Job</div>
+              <div class="action-description">
+                Begin a fresh service call with guided workflow
               </div>
-              <div class="tile-content">
-                <div class="tile-title">Service Calls</div>
-                <div class="tile-description">
-                  Complete diagnostic system with AI analysis, refrigerant calculations, and professional reporting
-                </div>
-              </div>
+              <span class="action-badge">Quick Start</span>
             </div>
             
-            <!-- Materials Tile -->
-            <div class="dashboard-tile" data-page="materials">
-              <div class="tile-header">
-                <div class="tile-icon orange">📦</div>
-                <div class="tile-badge pro">Pro</div>
+            <div class="action-card orange" data-action="continue">
+              <div class="action-icon">▶️</div>
+              <div class="action-title">Continue Last Job</div>
+              <div class="action-description">
+                Resume your most recent in-progress service call
               </div>
-              <div class="tile-content">
-                <div class="tile-title">Materials Catalog</div>
-                <div class="tile-description">
-                  Comprehensive 2025 materials database with instant lookup and professional takeoff lists
-                </div>
-              </div>
+              <span class="action-badge" style="background: var(--orange);">Resume</span>
             </div>
             
-            <!-- Duct Design Tile -->
-            <div class="dashboard-tile" data-page="duct-design">
-              <div class="tile-header">
-                <div class="tile-icon">🏗️</div>
-                <div class="tile-badge">Premium</div>
+            <div class="action-card purple" data-action="quick-measure">
+              <div class="action-icon">📏</div>
+              <div class="action-title">Quick Measurements</div>
+              <div class="action-description">
+                Log temps & pressures without starting a full job
               </div>
-              <div class="tile-content">
-                <div class="tile-title">Pro Duct Design</div>
-                <div class="tile-description">
-                  ACCA Manual D compliant duct system design with AI-powered recommendations and takeoffs
-                </div>
-              </div>
+              <span class="action-badge" style="background: var(--purple);">Fast Entry</span>
             </div>
-            
+          </div>
+          
+          <!-- Recent Jobs (INJECTION POINT 1) -->
+          <div id="recent-jobs-container"></div>
+          
+          <!-- Quick Stats (INJECTION POINT 2) -->
+          <div id="quick-stats-container"></div>
+          
+        </div>
+        
+        <!-- ==================== NEW JOB PAGE ==================== -->
+        <div id="page-new-job" class="page-content hidden">
+          
+          <!-- Issue Type Selector (INJECTION POINT 3) -->
+          <div id="issue-type-container"></div>
+          
+          <!-- Equipment Info (INJECTION POINT 4) -->
+          <div id="equipment-info-container"></div>
+          
+          <!-- Dynamic Measurements (INJECTION POINT 5) -->
+          <div id="measurements-container"></div>
+          
+          <!-- Smart Suggestions (INJECTION POINT 6) -->
+          <div id="suggestions-container"></div>
+          
+          <!-- Photos & Notes (INJECTION POINT 7) -->
+          <div id="photos-notes-container"></div>
+          
+          <!-- Action Buttons -->
+          <div class="btn-group mt-xl">
+            <button class="btn btn-secondary" id="save-draft">
+              💾 Save Draft
+            </button>
+            <button class="btn btn-success" id="complete-job">
+              ✓ Complete Job
+            </button>
           </div>
           
         </div>
         
-        <!-- SERVICE CALL PAGE -->
-        <div id="service-page" class="page-content hidden">
-          
-          <div class="card" id="ai-master-tech-card">
-              <div class="card-header">
-                  <div class="card-title" style="color: var(--accent-purple);">
-                      <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                      AI Master Tech Diagnosis
-                  </div>
+        <!-- ==================== CONTINUE JOB PAGE ==================== -->
+        <div id="page-continue" class="page-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Resume Job</div>
+            </div>
+            <div class="card-body">
+              <div id="continue-job-content">
+                <p class="text-muted">No jobs in progress</p>
               </div>
-              <div class="card-body">
-                  <p style="color: var(--text-secondary); margin-bottom: 1rem;">Enter your system readings, then let our AI expert provide an instant analysis and recommend next steps.</p>
-                  <button id="ask-ai-btn" class="btn" style="background: var(--gradient-purple);">
-                      <span id="ask-ai-btn-text">Ask AI Master Tech</span>
-                      <svg id="ask-ai-spinner" class="spinner hidden" style="width: 20px; height: 20px; animation: spin 1s linear infinite;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                  </button>
-                  <div id="ai-response-container" class="hidden" style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg);"></div>
-              </div>
+            </div>
           </div>
+        </div>
+        
+        <!-- ==================== MEASUREMENTS PAGE ==================== -->
+        <div id="page-measurements" class="page-content hidden">
+          
+          <!-- Quick Entry Form (INJECTION POINT 8) -->
+          <div id="quick-measurements-form"></div>
           
         </div>
         
-        <!-- MATERIALS PAGE -->
-        <div id="materials-page" class="page-content hidden">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Job Information</div>
-            </div>
-            <div class="card-body">
-              <div class="form-grid form-grid-2">
-                <div class="form-group">
-                  <label>Customer/Job Name</label>
-                  <input type="text" id="mat-customer" placeholder="Enter customer or job name">
-                </div>
-                <div class="form-group">
-                  <label>Date</label>
-                  <input type="date" id="mat-date">
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- ==================== MATERIALS PAGE ==================== -->
+        <div id="page-materials" class="page-content hidden">
           
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Materials Catalog (2025)</div>
-              <div class="btn-group">
-                <button class="btn btn-secondary btn-sm" id="expand-all-btn">Expand All</button>
-                <button class="btn btn-secondary btn-sm" id="collapse-all-btn">Collapse All</button>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="form-group">
-                <input type="text" id="material-search" placeholder="🔍 Search materials...">
-              </div>
-              <div id="materials-catalog-container" style="max-height: 60vh; overflow-y: auto; padding-right: 8px;"></div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">Selected Materials</div>
-              <span class="badge badge-info" id="selected-materials-count">0 items</span>
-            </div>
-            <div class="card-body">
-              <div id="selected-materials-container">
-                <div class="status-card info">
-                  ℹ️ No materials selected yet. Use the catalog above to add items.
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Material Packages (INJECTION POINT 9) -->
+          <div id="material-packages-container"></div>
           
-          <div class="btn-group">
-            <button class="btn btn-success" id="generate-materials-report-btn">📋 Generate Takeoff List</button>
-          </div>
-          <div id="materials-report-output" class="hidden"></div>
+          <!-- Custom Material Builder (INJECTION POINT 10) -->
+          <div id="custom-materials-container"></div>
+          
         </div>
         
-        <!-- DUCT DESIGN PAGE -->
-        <div id="duct-design-page" class="page-content hidden">
+        <!-- ==================== PHOTOS PAGE ==================== -->
+        <div id="page-photos" class="page-content hidden">
+          
+          <!-- Photo Gallery (INJECTION POINT 11) -->
+          <div id="photo-gallery-container"></div>
+          
+        </div>
+        
+        <!-- ==================== HISTORY PAGE ==================== -->
+        <div id="page-history" class="page-content hidden">
+          
+          <!-- Job History List (INJECTION POINT 12) -->
+          <div id="job-history-container"></div>
+          
+        </div>
+        
+        <!-- ==================== REPORTS PAGE ==================== -->
+        <div id="page-reports" class="page-content hidden">
+          
+          <!-- Saved Reports (INJECTION POINT 13) -->
+          <div id="saved-reports-container"></div>
+          
+        </div>
+        
+        <!-- ==================== SYNC PAGE ==================== -->
+        <div id="page-sync" class="page-content hidden">
           <div class="card">
-            <div class="card-header"><h2 class="card-title">🏗️ Project Information</h2></div>
-            <div class="card-body form-grid form-grid-3">
-              <div class="form-group"><label for="duct-project-name">Project Name</label><input id="duct-project-name" class="input" value="Smith Residence"></div>
-              <div class="form-group">
-                <label for="duct-tonnage">System Tonnage</label>
-                <select id="duct-tonnage" class="select"><option value="3">3 Ton</option><option value="1.5">1.5 Ton</option><option value="2">2 Ton</option><option value="2.5">2.5 Ton</option><option value="3.5">3.5 Ton</option><option value="4">4 Ton</option><option value="5">5 Ton</option></select>
-              </div>
-              <div class="form-group"><label>System CFM (Calculated)</label><input id="duct-system-cfm" class="input" readonly value="1200"></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><h2 class="card-title">🏠 Room-by-Room Design</h2><button class="btn btn-secondary" id="add-duct-room-btn">+ Add Room</button></div>
-            <div class="card-body" id="duct-rooms-container"></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><h2 class="card-title">📊 System Balance Dashboard</h2></div>
-            <div class="card-body form-grid form-grid-3">
-              <div class="balance-metric"><div class="balance-metric-label">System CFM</div><div id="balance-system-cfm" class="balance-metric-value">1200</div></div>
-              <div class="balance-metric"><div class="balance-metric-label">Total Branch CFM</div><div id="balance-branch-cfm" class="balance-metric-value">0</div></div>
-              <div class="balance-metric"><div class="balance-metric-label">System Balance</div><div id="balance-percentage" class="balance-metric-value">0%</div></div>
-            </div>
-          </div>
-          <div class="card" style="background: var(--gradient-premium);">
-            <div class="card-header" style="background: transparent; border: none;">
-                <h2 class="card-title" style="color: white;">
-                    <svg xmlns="http://www.w3.org/2000/svg" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.623 3.977a4.25 4.25 0 016.754 0c.784.894.945 2.24.412 3.385l-.542 1.144a.66.66 0 00.328.847l.848.375a.66.66 0 01.328.847l-.542 1.144a2.75 2.75 0 01-2.285 1.63H9.102a2.75 2.75 0 01-2.285-1.63l-.542-1.144a.66.66 0 01.328-.847l.848-.375a.66.66 0 00.328-.847l-.542-1.144A2.75 2.75 0 019.623 3.977zM12 15.5v2.75a.75.75 0 001.5 0v-2.75a.75.75 0 00-1.5 0z"></path></svg>
-                    AI Duct Design Assistant
-                </h2>
+            <div class="card-header">
+              <div class="card-title">Data Sync Status</div>
             </div>
             <div class="card-body">
-                <div class="form-group"><label for="duct-airflow-issues" style="color: var(--text-secondary);">Describe Known Airflow Issues</label><input id="duct-airflow-issues" class="input" value="Master bedroom is too hot in the summer."></div>
-                <button id="get-ai-duct-analysis-btn" class="btn" style="background: var(--gradient-purple); margin-top: 1rem;">
-                    <span id="get-ai-duct-analysis-btn-text">Get AI Recommendations</span>
-                    <svg id="get-ai-duct-analysis-spinner" class="spinner hidden" style="width: 20px; height: 20px; animation: spin 1s linear infinite;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              <div id="sync-status-content">
+                <p class="text-success">✓ All data saved locally</p>
+                <p class="text-muted mt-md">Last saved: <span id="last-save-time">Never</span></p>
+              </div>
+              <div class="btn-group mt-lg">
+                <button class="btn btn-primary" id="export-data">
+                  📤 Export All Data
                 </button>
-                <div id="ai-duct-analysis-response" class="hidden" style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: var(--radius-lg);"></div>
+                <button class="btn btn-secondary" id="import-data">
+                  📥 Import Data
+                </button>
+              </div>
             </div>
           </div>
-          <div style="text-align: center; margin-top: 1rem;"><button class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.125rem;" id="generate-design-btn">Generate Complete Design</button></div>
-          <div id="duct-design-output" class="hidden" style="margin-top: 1.5rem;"></div>
         </div>
         
-        <!-- CFM CALCULATOR PAGE -->
-        <div id="cfm-page" class="page-content hidden">
-          <div class="card"><div class="card-body" style="text-align: center;">Coming Soon</div></div>
-        </div>
-        
-        <!-- HISTORY PAGE -->
-        <div id="history-page" class="page-content hidden">
-          <div class="card"><div class="card-body" style="text-align: center;">Coming Soon</div></div>
+        <!-- ==================== SETTINGS PAGE ==================== -->
+        <div id="page-settings" class="page-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Preferences</div>
+            </div>
+            <div class="card-body">
+              
+              <div class="card-section">
+                <div class="section-title">Technician Info</div>
+                <div class="form-grid form-grid-2">
+                  <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="tech-name" value="Martín Perez">
+                  </div>
+                  <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="tech-phone" value="(346)451-0024">
+                  </div>
+                </div>
+                <div class="form-group mt-md">
+                  <label>Email</label>
+                  <input type="email" id="tech-email" value="Mperez@villageplumbing.com">
+                </div>
+              </div>
+              
+              <div class="card-section">
+                <div class="section-title">Default Values</div>
+                <div class="form-grid form-grid-2">
+                  <div class="form-group">
+                    <label>Default Refrigerant</label>
+                    <select id="default-refrigerant">
+                      <option value="R-410A" selected>R-410A</option>
+                      <option value="R-22">R-22</option>
+                      <option value="R-32">R-32</option>
+                      <option value="R-454B">R-454B</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Measurement Units</label>
+                    <select id="default-units">
+                      <option value="imperial" selected>Imperial (°F, PSI)</option>
+                      <option value="metric">Metric (°C, kPa)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="btn-group mt-xl">
+                <button class="btn btn-success" id="save-settings">
+                  ✓ Save Preferences
+                </button>
+                <button class="btn btn-danger" id="clear-all-data">
+                  🗑️ Clear All Data
+                </button>
+              </div>
+              
+            </div>
+          </div>
         </div>
         
       </div>
@@ -1905,405 +1180,456 @@
     
   </div>
   
-  <!-- TOAST NOTIFICATION -->
-  <div class="toast" id="toast"></div>
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
   
-  <!-- MODAL -->
-  <div class="modal-overlay" id="modal-overlay">
-    <div class="modal">
-      <div class="modal-title" id="modal-title">Confirm Action</div>
-      <div class="modal-content" id="modal-content">Are you sure?</div>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" onclick="closeModal(false)">Cancel</button>
-        <button class="btn btn-primary" onclick="closeModal(true)">Confirm</button>
-      </div>
-    </div>
-  </div>
-  
-  <script type="module">
-    import { GoogleGenAI } from "@google/genai";
-
+  <script>
+    // ==================== [INJECTION POINT A: STATE MANAGEMENT] ====================
     // ==================== STATE MANAGEMENT ====================
-    let currentPage = 'dashboard';
-    let ductDesignRooms = [];
-    let selectedMaterials = [];
-    let categoryStates = {};
+
+// Global application state
+const AppState = {
+  // Current user/technician
+  tech: {
+    name: 'Martín Perez',
+    phone: '(346)451-0024',
+    email: 'Mperez@villageplumbing.com'
+  },
+  
+  // Current active job
+  currentJob: null,
+  
+  // All jobs stored locally
+  jobs: [],
+  
+  // App preferences
+  settings: {
+    defaultRefrigerant: 'R-410A',
+    units: 'imperial',
+    autoSave: true,
+    photoQuality: 'high'
+  },
+  
+  // UI state
+  ui: {
+    currentPage: 'dashboard',
+    sidebarOpen: false,
+    unsavedChanges: false
+  }
+};
+
+// Job template structure
+const createNewJob = () => ({
+  id: generateUUID(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  status: 'in_progress', // in_progress, completed, draft
+  
+  // Customer info
+  customer: {
+    name: '',
+    address: '',
+    phone: ''
+  },
+  
+  // Issue/complaint
+  issue: {
+    type: '', // no_cool, no_heat, poor_performance, noise, maintenance
+    description: '',
+    reportedBy: 'customer'
+  },
+  
+  // Equipment details
+  equipment: {
+    type: '', // split_system, package_unit, heat_pump, furnace, mini_split
+    indoor: {
+      brand: '',
+      model: '',
+      serial: ''
+    },
+    outdoor: {
+      brand: '',
+      model: '',
+      serial: ''
+    },
+    tonnage: '',
+    refrigerant: 'R-410A',
+    filterSize: '',
+    ageYears: null
+  },
+  
+  // Measurements timeline (chronological)
+  measurements: [],
+  
+  // Photos
+  photos: [],
+  
+  // Voice notes
+  notes: [],
+  
+  // Materials/parts used
+  materials: [],
+  
+  // Smart suggestions from diagnostic engine
+  suggestions: [],
+  
+  // Final diagnosis & work performed
+  diagnosis: {
+    issue: '',
+    cause: '',
+    workPerformed: '',
+    recommendations: ''
+  },
+  
+  // Customer signature
+  signature: null,
+  
+  // Quality score
+  qualityScore: 0
+});
+
+// Add measurement to current job
+const addMeasurement = (type, value, unit, label) => {
+  if (!AppState.currentJob) return;
+  
+  const measurement = {
+    id: generateUUID(),
+    timestamp: new Date().toISOString(),
+    type, // temp, pressure, voltage, amperage
+    field: label,
+    value: parseFloat(value),
+    unit,
+    valid: true
+  };
+  
+  AppState.currentJob.measurements.push(measurement);
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  AppState.ui.unsavedChanges = true;
+  
+  // Auto-save if enabled
+  if (AppState.settings.autoSave) {
+    saveToStorage();
+  }
+  
+  return measurement;
+};
+
+// Add photo to current job
+const addPhoto = (dataUrl, category = 'general') => {
+  if (!AppState.currentJob) return;
+  
+  const photo = {
+    id: generateUUID(),
+    timestamp: new Date().toISOString(),
+    data: dataUrl,
+    category, // equipment, issue, repair, before, after
+    caption: ''
+  };
+  
+  AppState.currentJob.photos.push(photo);
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  AppState.ui.unsavedChanges = true;
+  
+  if (AppState.settings.autoSave) {
+    saveToStorage();
+  }
+  
+  return photo;
+};
+
+// Update job status
+const updateJobStatus = (status) => {
+  if (!AppState.currentJob) return;
+  
+  AppState.currentJob.status = status;
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  
+  if (status === 'completed') {
+    AppState.currentJob.completedAt = new Date().toISOString();
+    calculateQualityScore();
+  }
+  
+  saveToStorage();
+};
+
+// Calculate quality score based on completeness
+const calculateQualityScore = () => {
+  if (!AppState.currentJob) return 0;
+  
+  let score = 0;
+  const job = AppState.currentJob;
+  
+  // Customer info (20 points)
+  if (job.customer.name) score += 7;
+  if (job.customer.address) score += 7;
+  if (job.customer.phone) score += 6;
+  
+  // Equipment info (15 points)
+  if (job.equipment.type) score += 5;
+  if (job.equipment.indoor.brand) score += 5;
+  if (job.equipment.indoor.model) score += 5;
+  
+  // Measurements (25 points)
+  if (job.measurements.length >= 3) score += 10;
+  if (job.measurements.length >= 6) score += 10;
+  if (job.measurements.length >= 10) score += 5;
+  
+  // Photos (15 points)
+  if (job.photos.length >= 1) score += 5;
+  if (job.photos.length >= 3) score += 5;
+  if (job.photos.length >= 5) score += 5;
+  
+  // Diagnosis (15 points)
+  if (job.diagnosis.issue) score += 5;
+  if (job.diagnosis.cause) score += 5;
+  if (job.diagnosis.workPerformed) score += 5;
+  
+  // Signature (10 points)
+  if (job.signature) score += 10;
+  
+  job.qualityScore = Math.min(score, 100);
+  return job.qualityScore;
+};
+
+// Get most recent measurement by type
+const getLastMeasurement = (type) => {
+  if (!AppState.currentJob) return null;
+  
+  const measurements = AppState.currentJob.measurements
+    .filter(m => m.type === type)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  
+  return measurements[0] || null;
+};
+
+// Get all measurements of specific type
+const getMeasurementsByType = (type) => {
+  if (!AppState.currentJob) return [];
+  
+  return AppState.currentJob.measurements
+    .filter(m => m.type === type)
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+};
     
-    // ==================== MATERIALS DATABASE ====================
-    const materialsCatalog = {
-      equipment: { name: 'Equipment', icon: '🏠', items: [ { id: 'furnace-gas', name: 'Gas Furnace', sizes: ['40K BTU', '60K BTU', '80K BTU', '100K BTU', '120K BTU'] }, { id: 'furnace-electric', name: 'Electric Furnace', sizes: ['10kW', '15kW', '20kW', '25kW'] }, { id: 'ac-unit', name: 'Air Conditioner', sizes: ['1.5 Ton', '2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton', '5 Ton'] }, { id: 'heat-pump', name: 'Heat Pump', sizes: ['2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton', '5 Ton'] }, { id: 'evap-coil', name: 'Evaporator Coil', sizes: ['2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton', '5 Ton'] }, { id: 'air-handler', name: 'Air Handler', sizes: ['2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton'] }, { id: 'package-unit', name: 'Package Unit', sizes: ['2 Ton', '3 Ton', '4 Ton', '5 Ton'] }, { id: 'minisplit', name: 'Mini-Split System', sizes: ['9K BTU', '12K BTU', '18K BTU', '24K BTU', '36K BTU'] } ] },
-      electrical: { name: 'Electrical Components', icon: '⚡', items: [ { id: 'contactor', name: 'Contactor', sizes: ['1-Pole 30A', '2-Pole 30A', '2-Pole 40A', '3-Pole 30A', '3-Pole 40A'] }, { id: 'capacitor-single', name: 'Run Capacitor (Single)', sizes: ['5µF', '7.5µF', '10µF', '15µF', '20µF', '25µF', '30µF', '35µF', '40µF', '45µF', '50µF', '60µF'] }, { id: 'capacitor-dual', name: 'Dual Run Capacitor', sizes: ['35/5µF', '40/5µF', '45/5µF', '50/5µF', '55/5µF', '60/5µF'] }, { id: 'hard-start', name: 'Hard Start Kit', sizes: ['1-2 Ton', '2-3 Ton', '3-5 Ton'] }, { id: 'soft-start', name: 'Soft Start Kit', sizes: ['1-2 Ton', '2-3 Ton', '3-5 Ton'] }, { id: 'compressor-saver', name: 'Compressor Saver', sizes: ['Universal'] }, { id: 'potential-relay', name: 'Potential Relay', sizes: ['Standard', 'Heavy Duty'] }, { id: 'voltage-regulator', name: 'Voltage Regulator/Stabilizer', sizes: ['240V 15A', '240V 30A', '240V 60A'] }, { id: 'surge-protector', name: 'Surge Protector (HVAC)', sizes: ['Whole Unit', 'Panel Mount'] }, { id: 'disconnect-30', name: 'Disconnect Box (30A)', sizes: ['30A Non-Fused', '30A Fused'] }, { id: 'disconnect-60', name: 'Disconnect Box (60A)', sizes: ['60A Non-Fused', '60A Fused'] }, { id: 'breaker', name: 'Circuit Breaker', sizes: ['15A', '20A', '25A', '30A', '40A', '50A', '60A'] }, { id: 'whip', name: 'Electrical Whip', sizes: ['3 ft', '6 ft', '10 ft'] }, { id: 'wire-lv', name: 'Low Voltage Wire (18ga)', sizes: ['18/2', '18/3', '18/5', '18/8'], unit: 'ft' }, { id: 'wire-hv', name: 'High Voltage Wire', sizes: ['14/2', '12/2', '10/2', '10/3', '8/2', '8/3'], unit: 'ft' }, { id: 'transformer', name: 'Control Transformer', sizes: ['24V 40VA', '24V 75VA', '24V 100VA'] } ] },
-      controls: { name: 'Controls & Thermostats', icon: '🌡️', items: [ { id: 'tstat-smart', name: 'WiFi Smart Thermostat', sizes: ['Nest', 'Ecobee', 'Honeywell T9'] }, { id: 'tstat-programmable', name: 'Programmable Thermostat', sizes: ['5-2 Day', '7 Day'] }, { id: 'tstat-nonprog', name: 'Non-Programmable Thermostat', sizes: ['Digital', 'Mercury Free'] }, { id: 'zone-control-panel', name: 'Zone Control Panel', sizes: ['2 Zone', '3 Zone', '4 Zone', '6 Zone'] }, { id: 'zone-damper', name: 'Zone Damper', sizes: ['6" Round', '8" Round', '10" Round', '6x10 Rect'] }, { id: 'humidistat', name: 'Humidistat Control', sizes: ['Digital', 'Mechanical'] } ] },
-      ductwork: { name: 'Ductwork & Distribution', icon: '🌬️', items: [ { id: 'flex-duct-insulated', name: 'Flex Duct (Insulated R6)', sizes: ['4"', '5"', '6"', '7"', '8"', '10"', '12"', '14"', '16"'], unit: '25ft bag' }, { id: 'rigid-galv', name: 'Rigid Galvanized Duct', sizes: ['4"', '6"', '8"', '10"', '12"', '14"', '16"'], unit: 'ft' }, { id: 'duct-board', name: 'Duct Board (1.5" thick)', sizes: ['4x8 sheet'], unit: 'sheet' }, { id: 'starting-collar', name: 'Starting Collar', sizes: ['4"', '5"', '6"', '7"', '8"', '10"', '12"'], unit: 'ea' }, { id: 'register', name: 'Supply Register', sizes: ['4x10', '4x12', '6x10', '6x12', '8x10', '10x10', '12x12'] }, { id: 'grille', name: 'Return Grille', sizes: ['10x10', '12x12', '14x14', '16x16', '20x20', '24x24'] }, { id: 'diffuser', name: 'Ceiling Diffuser', sizes: ['6" Round', '8" Round', '10" Round', '12" Round'] }, { id: 'damper-manual', name: 'Manual Balancing Damper', sizes: ['4"', '6"', '8"', '10"', '12"'] }, { id: 'boot-register', name: 'Register Boot', sizes: ['4"', '6"', '8"', '10"'], unit: 'ea' }, { id: 'duct-strap', name: 'Adjustable Duct Strap', sizes: ['Standard'], unit: 'box' } ] },
-      ductFittings: { name: 'Duct Fittings', icon: '🔧', items: [ { id: 'elbow-90', name: '90° Elbow', sizes: ['4"', '6"', '8"', '10"', '12"'], unit: 'ea' }, { id: 'elbow-45', name: '45° Elbow', sizes: ['4"', '6"', '8"', '10"', '12"'], unit: 'ea' }, { id: 'tee', name: 'Tee/Wye Fitting', sizes: ['6"', '8"', '10"', '12"'], unit: 'ea' }, { id: 'reducer', name: 'Reducer', sizes: ['10-8"', '12-10"', '10-6"', '8-6"'], unit: 'ea' }, { id: 'takeoff-collar', name: 'Takeoff Collar', sizes: ['6"', '7"', '8"', '10"'], unit: 'ea' }, { id: 'end-cap', name: 'End Cap', sizes: ['4"', '6"', '8"', '10"'], unit: 'ea' } ] },
-      iaq: { name: 'Air Quality & Filtration', icon: '💨', items: [ { id: 'filter-disposable', name: 'Disposable Filter', sizes: ['16x20x1', '16x25x1', '20x20x1', '20x25x1', '24x24x1'], unit: 'pack' }, { id: 'filter-pleated', name: 'Pleated Filter (MERV 11)', sizes: ['16x20x1', '16x25x1', '20x20x1', '20x25x1'], unit: 'pack' }, { id: 'filter-hepa', name: 'HEPA Filter (MERV 13)', sizes: ['16x20', '16x25', '20x20', '20x25'] }, { id: 'media-cleaner', name: 'Media Air Cleaner', sizes: ['16x25', '20x25'] }, { id: 'uv-light-single', name: 'UV Light System (Single)', sizes: ['24V'] }, { id: 'uv-light-dual', name: 'UV Light System (Dual)', sizes: ['24V'] }, { id: 'reme-halo', name: 'REME HALO Air Purifier', sizes: ['24V'] }, { id: 'humidifier-bypass', name: 'Bypass Humidifier', sizes: ['12 GPD', '17 GPD'] }, { id: 'dehumidifier-90', name: 'Whole-Home Dehumidifier', sizes: ['90 Pint', '120 Pint'] }, { id: 'erv', name: 'ERV System', sizes: ['100 CFM', '150 CFM', '200 CFM'] } ] },
-      refrigeration: { name: 'Refrigeration', icon: '❄️', items: [ { id: 'lineset-small', name: 'Line Set (1.5-2.5 Ton)', sizes: ['15 ft', '25 ft', '35 ft', '50 ft'], spec: '1/4" x 3/8"' }, { id: 'lineset-medium', name: 'Line Set (3-3.5 Ton)', sizes: ['15 ft', '25 ft', '35 ft', '50 ft'], spec: '3/8" x 3/4"' }, { id: 'lineset-large', name: 'Line Set (4-5 Ton)', sizes: ['15 ft', '25 ft', '35 ft', '50 ft'], spec: '3/8" x 7/8"' }, { id: 'copper-tubing', name: 'Copper Tubing (ACR)', sizes: ['1/4"', '3/8"', '1/2"', '5/8"', '3/4"', '7/8"'], unit: 'ft' }, { id: 'r410a', name: 'R-410A Refrigerant', sizes: ['25 lb', '50 lb'], unit: 'cylinder' }, { id: 'r22', name: 'R-22 Refrigerant', sizes: ['30 lb'], unit: 'cylinder' }, { id: 'r32', name: 'R-32 Refrigerant', sizes: ['20 lb'], unit: 'cylinder' }, { id: 'r454b', name: 'R-454B Refrigerant', sizes: ['25 lb'], unit: 'cylinder' }, { id: 'txv', name: 'TXV (Expansion Valve)', sizes: ['2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton', '5 Ton'] }, { id: 'filter-drier', name: 'Filter Drier', sizes: ['1/2"', '5/8"', '3/4"'] }, { id: 'refrig-oil', name: 'Refrigerant Oil', sizes: ['POE 8oz', 'POE 16oz'] } ] },
-      drainage: { name: 'Condensate Management', icon: '💧', items: [ { id: 'condensate-pump', name: 'Condensate Pump', sizes: ['Standard', 'Heavy Duty'] }, { id: 'drain-pvc', name: 'PVC Drain Pipe (3/4")', sizes: ['10 ft', '20 ft'], unit: 'length' }, { id: 'drain-pan-primary', name: 'Drain Pan (Primary)', sizes: ['24x24', '30x30', '36x36'] }, { id: 'drain-pan-secondary', name: 'Drain Pan (Secondary)', sizes: ['24x24', '30x30', '36x36'] }, { id: 'ptrap', name: 'P-Trap', sizes: ['3/4"', '1"'] }, { id: 'float-switch', name: 'Float Switch', sizes: ['Standard'] }, { id: 'drain-tubing', name: 'Clear Vinyl Drain Tubing', sizes: ['3/8"', '1/2"', '5/8"'], unit: 'ft' } ] },
-      venting: { name: 'Venting (Gas/Oil)', icon: '🔥', items: [ { id: 'bvent', name: 'B-Vent Pipe', sizes: ['3"', '4"', '5"', '6"', '7"'], unit: 'ft' }, { id: 'pvc-vent', name: 'PVC Vent Pipe', sizes: ['2"', '3"', '4"'], unit: 'ft' }, { id: 'vent-cap', name: 'Vent Cap/Termination', sizes: ['2"', '3"', '4"', '5"', '6"'] }, { id: 'vent-elbow-90', name: 'Vent Elbow (90°)', sizes: ['2"', '3"', '4"', '5"'] }, { id: 'inducer', name: 'Inducer Motor', sizes: ['Standard', 'High Efficiency'] } ] },
-      insulation: { name: 'Insulation & Sealants', icon: '🧱', items: [ { id: 'duct-insulation-fiberglass', name: 'Fiberglass Duct Wrap', sizes: ['R-6', 'R-8'], unit: 'roll' }, { id: 'pipe-insulation-foam', name: 'Foam Pipe Insulation', sizes: ['1/4"', '3/8"', '1/2"', '5/8"', '3/4"', '7/8"'], unit: 'ft' }, { id: 'mastic', name: 'Duct Mastic', sizes: ['1 Gallon', '5 Gallon'] }, { id: 'foil-tape', name: 'Foil Tape', sizes: ['2"', '3"'], unit: 'roll' }, { id: 'mesh-tape', name: 'Mesh Tape (for mastic)', sizes: ['2"', '3"'], unit: 'roll' }, { id: 'silicone-caulk', name: 'Silicone Caulk', sizes: ['Clear', 'White', 'Aluminum'], unit: 'tube' }, { id: 'foam-sealant', name: 'Expanding Foam Sealant', sizes: ['Standard', 'Fire-Rated'], unit: 'can' } ] },
-      tools: { name: 'Tools & Instruments', icon: '🔧', items: [ { id: 'multimeter', name: 'Digital Multimeter', sizes: ['Standard'] }, { id: 'clamp-meter', name: 'Clamp Meter', sizes: ['Digital'] }, { id: 'manometer-digital', name: 'Digital Manometer', sizes: ['Dual Port'] }, { id: 'leak-detector', name: 'Refrigerant Leak Detector', sizes: ['Electronic'] }, { id: 'thermometer-infrared', name: 'Infrared Thermometer', sizes: ['Standard'] }, { id: 'vacuum-pump', name: 'Vacuum Pump', sizes: ['3 CFM', '6 CFM'] }, { id: 'tubing-cutter', name: 'Tubing Cutter', sizes: ['1/8"-7/8"', '1/8"-1 1/8"'] } ] },
-      safety: { name: 'Safety & PPE', icon: '🦺', items: [ { id: 'safety-glasses', name: 'Safety Glasses', sizes: ['Clear', 'Tinted'], unit: 'each' }, { id: 'gloves-work', name: 'Work Gloves', sizes: ['S', 'M', 'L', 'XL'], unit: 'pair' }, { id: 'respirator', name: 'Respirator', sizes: ['Half-Face', 'Full-Face'] }, { id: 'ear-protection', name: 'Ear Protection', sizes: ['Plugs', 'Muffs'] }, { id: 'fire-extinguisher', name: 'Fire Extinguisher', sizes: ['5 lb ABC', '10 lb ABC'] }, { id: 'first-aid', name: 'First Aid Kit', sizes: ['Basic', 'Complete'] } ] },
-      accessories: { name: 'Accessories & Misc', icon: '🛠️', items: [ { id: 'condenser-pad', name: 'Condenser Pad', sizes: ['24x24', '30x30', '36x36'] }, { id: 'vibration-isolator', name: 'Vibration Isolators', sizes: ['Standard'], unit: 'set' }, { id: 'line-hide', name: 'Line Set Cover', sizes: ['3"', '4"', '6"'], unit: 'ft' }, { id: 'cleaning-coil', name: 'Coil Cleaner', sizes: ['Aerosol', '1 Gallon'] }, { id: 'cleaning-evap', name: 'Evaporator Coil Cleaner (No-Rinse)', sizes: ['Aerosol', '32 oz'] } ] }
+    
+    // ==================== [INJECTION POINT B: UTILITY FUNCTIONS] ====================// ==================== UTILITY FUNCTIONS ====================
+
+// Generate UUID v4
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+
+// Format date/time
+const formatDateTime = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
+// Format date only
+const formatDate = (isoString) => {
+  const date = new Date(isoString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
+
+// Show toast notification
+const showToast = (message, type = 'success') => {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = `toast show ${type}`;
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+};
+
+// Get element by ID (shorthand)
+const $ = (id) => document.getElementById(id);
+
+// Query selector (shorthand)
+const $$ = (selector) => document.querySelectorAll(selector);
+
+// Debounce function (for auto-save)
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
     };
-    
-    // ==================== HELPER FUNCTIONS ====================
-    const $ = (id) => document.getElementById(id);
-    
-    function showToast(message, type = 'success') {
-      const toast = $('toast');
-      toast.textContent = message;
-      toast.className = `toast show ${type}`;
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
-    // ==================== NAVIGATION ====================
-    function switchPage(page) {
-      currentPage = page;
-      document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-      $(`${page}-page`).classList.remove('hidden');
+// Validate number input
+const isValidNumber = (value) => {
+  return !isNaN(parseFloat(value)) && isFinite(value);
+};
+
+// Clamp number between min and max
+const clamp = (num, min, max) => {
+  return Math.min(Math.max(num, min), max);
+};
+
+// Format temperature
+const formatTemp = (value, unit = 'F') => {
+  if (!isValidNumber(value)) return 'N/A';
+  return `${parseFloat(value).toFixed(1)}°${unit}`;
+};
+
+// Format pressure
+const formatPressure = (value, unit = 'PSI') => {
+  if (!isValidNumber(value)) return 'N/A';
+  return `${parseFloat(value).toFixed(1)} ${unit}`;
+};
+
+// Format voltage
+const formatVoltage = (value) => {
+  if (!isValidNumber(value)) return 'N/A';
+  return `${parseFloat(value).toFixed(1)}V`;
+};
+
+// Format amperage
+const formatAmperage = (value) => {
+  if (!isValidNumber(value)) return 'N/A';
+  return `${parseFloat(value).toFixed(1)}A`;
+};
+
+// Get relative time (e.g., "2 hours ago")
+const getRelativeTime = (isoString) => {
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} min ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  return formatDate(isoString);
+};
+
+// Compress image (for photo storage)
+const compressImage = (dataUrl, maxWidth = 1200, quality = 0.8) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
       
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.page === page);
-      });
-      $('page-title').textContent = document.querySelector(`.nav-item[data-page="${page}"] span:last-child`).textContent;
-
-      const sidebar = $('sidebar');
-      const overlay = $('mobile-menu-overlay');
-      if (sidebar.classList.contains('mobile-open')) {
-        sidebar.classList.remove('mobile-open');
-        overlay.classList.remove('show');
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
       }
-    }
-
-    function toggleMobileMenu() {
-      $('sidebar').classList.toggle('mobile-open');
-      $('mobile-menu-overlay').classList.toggle('show');
-    }
-
-    // ==================== AI & API LOGIC ====================
-    async function getAIDiagnosis() {
-      const btn = $('ask-ai-btn');
-      const spinner = $('ask-ai-spinner');
-      const btnText = $('ask-ai-btn-text');
-      const responseContainer = $('ai-response-container');
       
-      btn.disabled = true;
-      spinner.classList.remove('hidden');
-      btnText.textContent = 'Analyzing...';
-      responseContainer.classList.add('hidden');
-      responseContainer.innerHTML = '';
+      canvas.width = width;
+      canvas.height = height;
       
-      try {
-        // Using placeholder data for demo purposes
-        const measurements = { systemMode: "cooling", outdoorAmbient: 95, returnTemp: 75, supplyTemp: 55, deltaT: 20, suctionPressure: 125, suctionTemp: 55, superheat: 13, liquidPressure: 350, liquidTemp: 95, subcool: 10, meteringDevice: "txv" };
-        const prompt = `You are an expert HVAC master technician with 30 years of experience. Analyze the following cooling system measurements and provide a concise, professional diagnosis and a bulleted list of recommendations.
-        Measurements: ${JSON.stringify(measurements, null, 2)}
-        Respond in markdown format. Start with a "### Diagnosis" heading, followed by a "### Recommendations" heading. Ensure the response is well-formatted for HTML display.`;
-        
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
-        
-        const formattedText = response.text
-            .replace(/### (.*?)\n/g, '<h3 style="color: var(--accent-cyan); font-weight: bold; margin-top: 1rem;">$1</h3>')
-            .replace(/\* (.*?)\n/g, '<li style="margin-left: 1.5rem;">$1</li>')
-            .replace(/\n/g, '<br/>');
-            
-        responseContainer.innerHTML = `<ul>${formattedText}</ul>`;
-        responseContainer.classList.remove('hidden');
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = dataUrl;
+  });
+};
 
-    } catch (error) {
-        console.error("Gemini API Error:", error);
-        responseContainer.innerHTML = `<p style="color: var(--danger);">Failed to get diagnosis. Please check your API key and try again.</p>`;
-        responseContainer.classList.remove('hidden');
-    } finally {
-        btn.disabled = false;
-        spinner.classList.add('hidden');
-        btnText.textContent = 'Ask AI Master Tech';
-    }
-    }
+// Export data as JSON file
+const exportJSON = (data, filename) => {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
-    async function getAIDuctAnalysis() {
-        const btn = $('get-ai-duct-analysis-btn');
-        const spinner = $('get-ai-duct-analysis-spinner');
-        const btnText = $('get-ai-duct-analysis-btn-text');
-        const responseContainer = $('ai-duct-analysis-response');
-
-        btn.disabled = true;
-        spinner.classList.remove('hidden');
-        btnText.textContent = 'Analyzing Design...';
-        responseContainer.classList.add('hidden');
-        responseContainer.innerHTML = '';
-        
-        try {
-            const tonnage = $('duct-tonnage').value;
-            const systemCFM = $('duct-system-cfm').value;
-            const airflowIssues = $('duct-airflow-issues').value;
-            const totalBranchCFM = ductDesignRooms.reduce((acc, room) => acc + room.cfm, 0);
-            const systemBalance = systemCFM > 0 ? (totalBranchCFM / parseFloat(systemCFM)) * 100 : 0;
-
-            const prompt = `As an HVAC design expert, analyze this duct design.
-                System Info: - Tonnage: ${tonnage} tons (${systemCFM} CFM) - Known Issues: "${airflowIssues}"
-                Room Breakdown: ${ductDesignRooms.map(r => `- ${r.name} (${r.length}x${r.width}ft): Requires ${r.cfm} CFM, designed with a ${r.ductSize} duct.`).join('\n')}
-                Total Designed Branch CFM: ${totalBranchCFM}
-                System Balance: ${systemBalance.toFixed(1)}%
-                Provide a concise analysis focusing on: 1. **Overall Balance:** Is it well-balanced? 2. **Addressing Issues:** How does the design address the known issue? Any suggestions? 3. **Potential Problems:** Any red flags or potential noise/comfort issues? Respond in markdown format with clear headings.`;
-
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-            const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
-            
-            const formattedText = response.text
-                .replace(/### (.*?)\n/g, '<h3 style="color: var(--accent-cyan); font-weight: bold; margin-top: 1rem;">$1</h3>')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\* (.*?)\n/g, '<li style="margin-left: 1.5rem;">$1</li>')
-                .replace(/\n/g, '<br/>');
-
-            responseContainer.innerHTML = `<ul>${formattedText}</ul>`;
-            responseContainer.classList.remove('hidden');
-
-        } catch (error) {
-            console.error("Gemini API Error:", error);
-            responseContainer.innerHTML = `<p style="color: var(--danger);">Failed to get analysis. Please check your API key and try again.</p>`;
-            responseContainer.classList.remove('hidden');
-        } finally {
-            btn.disabled = false;
-            spinner.classList.add('hidden');
-            btnText.textContent = 'Get AI Recommendations';
-        }
-    }
-
-    // ==================== DUCT DESIGN LOGIC ====================
-    function updateDuctSystemCFM() {
-        const tonnage = parseFloat($('duct-tonnage').value);
-        const cfm = tonnage ? tonnage * 400 : 0;
-        $('duct-system-cfm').value = cfm;
-        updateDuctTotals();
-    }
-
-    function addDuctRoom(name = 'New Room', length = 10, width = 10) {
-        const room = { id: Date.now(), name, length, width, height: 8, ductLength: 20, location: 'Ceiling' };
-        ductDesignRooms.push(calculateRoomMetrics(room));
-        renderDuctRooms();
-    }
-
-    function removeDuctRoom(id) {
-        ductDesignRooms = ductDesignRooms.filter(r => r.id !== id);
-        renderDuctRooms();
-    }
-
-    function handleRoomInputChange(id, field, value) {
-        const roomIndex = ductDesignRooms.findIndex(r => r.id === id);
-        if (roomIndex === -1) return;
-        const room = { ...ductDesignRooms[roomIndex], [field]: value };
-        ductDesignRooms[roomIndex] = calculateRoomMetrics(room);
-        renderDuctRooms();
-    }
-
-    function calculateRoomMetrics(room) {
-        const length = parseFloat(room.length) || 0;
-        const width = parseFloat(room.width) || 0;
-        const height = parseFloat(room.height) || 8;
-        const volume = length * width * height;
-        const cfm = Math.round((volume * 6) / 60); // 6 ACH
-        room.cfm = cfm;
-        const area = (cfm * 144) / 700; // Target 700 FPM
-        const diameter = 2 * Math.sqrt(area / Math.PI);
-        const standardSizes = [4, 5, 6, 7, 8, 9, 10, 12, 14, 16];
-        const standardDiameter = standardSizes.find(size => size >= diameter) || standardSizes[standardSizes.length - 1];
-        room.ductSize = `${standardDiameter}" Round`;
-        if (cfm < 75) room.registerSize = '4x10'; else if (cfm < 125) room.registerSize = '6x10'; else if (cfm < 175) room.registerSize = '6x12'; else room.registerSize = '8x10';
-        return room;
-    }
-
-    function renderDuctRooms() {
-        const container = $('duct-rooms-container');
-        if (!container) return;
-        container.innerHTML = ductDesignRooms.map(room => `
-            <div class="card" style="background: var(--bg-tertiary);">
-                <div class="card-header" style="padding: 1rem;">
-                    <input value="${room.name}" onchange="handleRoomInputChange(${room.id}, 'name', this.value)" style="background: transparent; border: none; font-size: 1.125rem; font-weight: 700; color: var(--accent-cyan); padding: 0; outline: none;">
-                    <button class="btn btn-danger btn-sm" onclick="removeDuctRoom(${room.id})">🗑️</button>
-                </div>
-                <div class="card-body form-grid form-grid-4">
-                    <div class="form-group"><label>Length (ft)</label><input type="number" class="input" value="${room.length}" oninput="handleRoomInputChange(${room.id}, 'length', this.value)"></div>
-                    <div class="form-group"><label>Width (ft)</label><input type="number" class="input" value="${room.width}" oninput="handleRoomInputChange(${room.id}, 'width', this.value)"></div>
-                    <div class="form-group"><label>CFM (req.)</label><input class="input" readonly value="${room.cfm}"></div>
-                    <div class="form-group"><label>Duct Size</label><input class="input" readonly value="${room.ductSize}"></div>
-                </div>
-            </div>
-        `).join('');
-        updateDuctTotals();
-    }
-
-    function updateDuctTotals() {
-        const systemCFM = parseFloat($('duct-system-cfm').value) || 0;
-        const totalBranchCFM = ductDesignRooms.reduce((acc, room) => acc + (room.cfm || 0), 0);
-        const balance = systemCFM > 0 ? (totalBranchCFM / systemCFM) * 100 : 0;
-        $('balance-system-cfm').textContent = systemCFM;
-        $('balance-branch-cfm').textContent = totalBranchCFM;
-        const balanceEl = $('balance-percentage');
-        balanceEl.textContent = `${balance.toFixed(1)}%`;
-        balanceEl.style.color = balance > 110 || balance < 90 ? 'var(--danger)' : balance > 105 || balance < 95 ? 'var(--warning)' : 'var(--success)';
-    }
-
-    function generateDuctDesign() {
-        const trunkSize = '14" Round';
-        let schematicHTML = `<div class="duct-tree"><div class="duct-trunk">Main Supply Trunk (${trunkSize})</div>${ductDesignRooms.map((r, i) => `<div class="duct-branch">${i === ductDesignRooms.length - 1 ? '└─' : '├─'} ${r.name}: ${r.ductSize}, ${r.cfm} CFM</div>`).join('')}</div>`;
-        let materialsHTML = `<ul style="list-style: none;"><li><strong>Main Trunk:</strong> 1x ${trunkSize} Flex Duct</li>${ductDesignRooms.map(r => `<li><strong>${r.name}:</strong> 1x ${r.ductSize} Flex, 1x ${r.registerSize} Register</li>`).join('')}</ul>`;
-        $('duct-design-output').innerHTML = `<div class="card"><div class="card-header"><h3 class="card-title">Schematic</h3></div><div class="card-body">${schematicHTML}</div></div><div class="card"><div class="card-header"><h3 class="card-title">Materials</h3></div><div class="card-body">${materialsHTML}</div></div>`;
-        $('duct-design-output').classList.remove('hidden');
-    }
-
-    // ==================== MATERIALS CATALOG LOGIC ====================
-    function initMaterialsCatalog() {
-      const container = $('materials-catalog-container');
-      let html = '';
-      for (const catKey in materialsCatalog) {
-        const category = materialsCatalog[catKey];
-        html += `
-          <div class="materials-category" data-catkey="${catKey}">
-            <div class="category-header">
-              <div class="category-title-group"><span class="category-icon">${category.icon}</span><span class="category-name">${category.name}</span></div>
-              <div class="category-meta">
-                <span class="category-selected hidden" id="cat-selected-${catKey}">0</span>
-                <span class="category-arrow">▼</span>
-              </div>
-            </div>
-            <div class="category-items">${category.items.map(item => `
-              <div class="material-item" data-search="${item.name.toLowerCase()}">
-                <input type="checkbox" id="mat-${catKey}-${item.id}" data-catkey="${catKey}" data-itemid="${item.id}">
-                <div class="material-info">
-                  <div class="material-name">${item.name}</div>
-                  <div class="material-spec">${item.sizes.slice(0, 3).join(', ')}${item.sizes.length > 3 ? '...' : ''}</div>
-                </div>
-              </div>`).join('')}
-            </div>
-          </div>`;
-      }
-      container.innerHTML = html;
-    }
-    
-    function updateSelectedMaterialsUI() {
-        const container = $('selected-materials-container');
-        if (selectedMaterials.length === 0) {
-            container.innerHTML = '<div class="status-card info">ℹ️ No materials selected yet.</div>';
-            $('selected-materials-count').textContent = '0 items';
-            return;
-        }
-
-        container.innerHTML = selectedMaterials.map((item, index) => `
-            <div class="selected-material">
-                <div class="selected-material-info">
-                    <div class="material-name">${item.name}</div>
-                </div>
-                <div class="selected-material-controls">
-                    ${item.allSpecs.length > 1 ? `<select data-index="${index}" class="material-spec-select">${item.allSpecs.map(s => `<option value="${s}" ${s === item.spec ? 'selected' : ''}>${s}</option>`).join('')}</select>` : `<input value="${item.spec}" readonly>`}
-                    <input type="number" value="${item.quantity}" min="1" data-index="${index}" class="material-qty-input">
-                    <span>${item.unit}</span>
-                    <button class="btn btn-danger btn-sm" data-index="${index}" onclick="removeMaterial(${index})">✕</button>
-                </div>
-            </div>`).join('');
-        
-        $('selected-materials-count').textContent = `${selectedMaterials.length} items`;
-    }
-
-    function handleMaterialToggle(catKey, itemId) {
-        const itemData = materialsCatalog[catKey].items.find(i => i.id === itemId);
-        const uniqueId = `${catKey}-${itemId}`;
-        const isSelected = selectedMaterials.some(m => m.id === uniqueId);
-        
-        if (isSelected) {
-            selectedMaterials = selectedMaterials.filter(m => m.id !== uniqueId);
-        } else {
-            selectedMaterials.push({
-                id: uniqueId, catKey, name: itemData.name, spec: itemData.spec || itemData.sizes[0],
-                allSpecs: itemData.sizes, unit: itemData.unit || 'ea', quantity: 1, catName: materialsCatalog[catKey].name,
-            });
-        }
-        updateSelectedMaterialsUI();
-        updateCategorySelectedCount(catKey);
-    }
-    
-    window.removeMaterial = (index) => {
-        const item = selectedMaterials[index];
-        const checkbox = $(`mat-${item.catKey}-${item.id.split('-')[1]}`);
-        if(checkbox) checkbox.checked = false;
-        selectedMaterials.splice(index, 1);
-        updateSelectedMaterialsUI();
-        updateCategorySelectedCount(item.catKey);
-    }
-
-    function updateCategorySelectedCount(catKey) {
-        const count = selectedMaterials.filter(m => m.catKey === catKey).length;
-        const badge = $(`cat-selected-${catKey}`);
-        badge.textContent = count;
-        badge.classList.toggle('hidden', count === 0);
-    }
-
-    function generateMaterialsReport() {
-        let report = `MATERIAL TAKEOFF LIST\nGenerated: ${new Date().toLocaleString()}\n\n`;
-        const grouped = selectedMaterials.reduce((acc, item) => { (acc[item.catName] = acc[item.catName] || []).push(item); return acc; }, {});
-        for (const catName in grouped) {
-            report += `--- ${catName.toUpperCase()} ---\n`;
-            grouped[catName].forEach(item => { report += `  - ${item.name} (${item.spec}): ${item.quantity} ${item.unit}\n`; });
-            report += '\n';
-        }
-        $('materials-report-output').innerHTML = `<div class="card"><div class="card-body"><pre style="white-space: pre-wrap;">${report}</pre></div></div>`;
-        $('materials-report-output').classList.remove('hidden');
-    }
-
-    // ==================== EVENT LISTENERS ====================
-    document.addEventListener('DOMContentLoaded', () => {
-      // Navigation
-      document.querySelectorAll('.nav-item[data-page], .dashboard-tile[data-page]').forEach(el => {
-        el.addEventListener('click', () => switchPage(el.dataset.page));
-      });
-      $('menu-toggle-btn').addEventListener('click', toggleMobileMenu);
-      $('mobile-menu-overlay').addEventListener('click', toggleMobileMenu);
-
-      // AI Buttons
-      $('ask-ai-btn').addEventListener('click', getAIDiagnosis);
-      $('get-ai-duct-analysis-btn').addEventListener('click', getAIDuctAnalysis);
-
-      // Duct Design
-      $('duct-tonnage').addEventListener('change', updateDuctSystemCFM);
-      $('add-duct-room-btn').addEventListener('click', () => addDuctRoom());
-      $('generate-design-btn').addEventListener('click', generateDuctDesign);
-      addDuctRoom('Master Bedroom', 14, 12);
-      addDuctRoom('Living Room', 20, 15);
-      renderDuctRooms();
-
-      // Materials Catalog
-      initMaterialsCatalog();
-      $('materials-catalog-container').addEventListener('click', e => {
-        const categoryHeader = e.target.closest('.category-header');
-        if (categoryHeader) {
-          categoryHeader.parentElement.classList.toggle('expanded');
-        }
-        const checkbox = e.target.closest('input[type="checkbox"]');
-        if (checkbox) {
-          handleMaterialToggle(checkbox.dataset.catkey, checkbox.dataset.itemid);
-        }
-      });
-      $('selected-materials-container').addEventListener('change', e => {
-        const target = e.target;
-        const index = parseInt(target.dataset.index);
-        if(target.classList.contains('material-spec-select')) {
-            selectedMaterials[index].spec = target.value;
-        } else if (target.classList.contains('material-qty-input')) {
-            selectedMaterials[index].quantity = parseInt(target.value) || 1;
-        }
-      });
-      $('expand-all-btn').addEventListener('click', () => document.querySelectorAll('.materials-category').forEach(el => el.classList.add('expanded')));
-      $('collapse-all-btn').addEventListener('click', () => document.querySelectorAll('.materials-category').forEach(el => el.classList.remove('expanded')));
-      $('material-search').addEventListener('input', e => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.material-item').forEach(item => {
-          item.style.display = item.dataset.search.includes(term) ? 'flex' : 'none';
-        });
-      });
-      $('generate-materials-report-btn').addEventListener('click', generateMaterialsReport);
+// Copy text to clipboard
+const copyToClipboard = (text) => {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Copied to clipboard!');
+    }).catch(() => {
+      showToast('Failed to copy', 'error');
     });
-
+  } else {
+    // Fallback
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast('Copied to clipboard!');
+  }
+};
+    
+    
+    
+    // ==================== [INJECTION POINT C: NAVIGATION SYSTEM] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT D: OFFLINE STORAGE] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT E: ISSUE TYPE SELECTOR] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT F: EQUIPMENT DATABASE] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT G: MEASUREMENTS HANDLER] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT H: SMART SUGGESTIONS ENGINE] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT I: PHOTO MANAGEMENT] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT J: MATERIAL PACKAGES] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT K: REPORT GENERATION] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT L: DATA EXPORT/IMPORT] ====================
+    
+    
+    
+    // ==================== [INJECTION POINT M: APP INITIALIZATION] ====================
+    
+    
+    
   </script>
 </body>
 </html>
