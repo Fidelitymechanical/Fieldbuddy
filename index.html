@@ -1587,15 +1587,1419 @@ const copyToClipboard = (text) => {
     
     
     // ==================== [INJECTION POINT C: NAVIGATION SYSTEM] ====================
-    
+    // ==================== NAVIGATION SYSTEM ====================
+
+// Switch between pages
+const switchPage = (pageName) => {
+  // Hide all pages
+  $$('.page-content').forEach(page => {
+    page.classList.add('hidden');
+  });
+  
+  // Show selected page
+  const targetPage = $(`page-${pageName}`);
+  if (targetPage) {
+    targetPage.classList.remove('hidden');
+  }
+  
+  // Update navigation active state
+  $$('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  
+  const activeNavItem = document.querySelector(`.nav-item[data-page="${pageName}"]`);
+  if (activeNavItem) {
+    activeNavItem.classList.add('active');
+  }
+  
+  // Update page title
+  const titleMap = {
+    'dashboard': 'Dashboard',
+    'new-job': 'New Service Call',
+    'continue': 'Continue Job',
+    'measurements': 'Quick Measurements',
+    'materials': 'Materials & Parts',
+    'photos': 'Photo Gallery',
+    'history': 'Job History',
+    'reports': 'Saved Reports',
+    'sync': 'Data Sync',
+    'settings': 'Settings'
+  };
+  
+  const pageTitle = $(titleMap[pageName]);
+  if (pageTitle) {
+    pageTitle.textContent = titleMap[pageName];
+  }
+  
+  // Update state
+  AppState.ui.currentPage = pageName;
+  
+  // Close mobile menu if open
+  closeMobileMenu();
+  
+  // Page-specific actions
+  onPageLoad(pageName);
+};
+
+// Handle page-specific load actions
+const onPageLoad = (pageName) => {
+  switch(pageName) {
+    case 'dashboard':
+      renderRecentJobs();
+      renderQuickStats();
+      break;
+    case 'new-job':
+      if (!AppState.currentJob) {
+        AppState.currentJob = createNewJob();
+      }
+      renderIssueTypeSelector();
+      break;
+    case 'continue':
+      renderContinueJob();
+      break;
+    case 'measurements':
+      renderQuickMeasurementsForm();
+      break;
+    case 'materials':
+      renderMaterialPackages();
+      break;
+    case 'photos':
+      renderPhotoGallery();
+      break;
+    case 'history':
+      renderJobHistory();
+      break;
+    case 'reports':
+      renderSavedReports();
+      break;
+  }
+};
+
+// Toggle mobile menu
+const toggleMobileMenu = () => {
+  const sidebar = $('sidebar');
+  const main = $('main');
+  
+  if (sidebar.classList.contains('open')) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+};
+
+// Open mobile menu
+const openMobileMenu = () => {
+  const sidebar = $('sidebar');
+  const main = $('main');
+  
+  sidebar.classList.remove('collapsed');
+  sidebar.classList.add('open');
+  main.classList.add('full-width');
+  AppState.ui.sidebarOpen = true;
+};
+
+// Close mobile menu
+const closeMobileMenu = () => {
+  const sidebar = $('sidebar');
+  const main = $('main');
+  
+  if (window.innerWidth <= 1024) {
+    sidebar.classList.add('collapsed');
+    sidebar.classList.remove('open');
+  }
+  
+  AppState.ui.sidebarOpen = false;
+};
+
+// Handle browser back/forward
+window.addEventListener('popstate', (e) => {
+  const page = e.state?.page || 'dashboard';
+  switchPage(page);
+});
+
+// Quick action handlers
+const handleQuickAction = (action) => {
+  switch(action) {
+    case 'new-job':
+      AppState.currentJob = createNewJob();
+      switchPage('new-job');
+      showToast('New job started');
+      break;
+      
+    case 'continue':
+      const lastJob = AppState.jobs
+        .filter(j => j.status === 'in_progress')
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))[0];
+      
+      if (lastJob) {
+        AppState.currentJob = lastJob;
+        switchPage('new-job');
+        showToast('Resuming job');
+      } else {
+        switchPage('continue');
+        showToast('No jobs in progress', 'warning');
+      }
+      break;
+      
+    case 'quick-measure':
+      switchPage('measurements');
+      break;
+  }
+};
     
     
     // ==================== [INJECTION POINT D: OFFLINE STORAGE] ====================
+    // ==================== OFFLINE STORAGE (IndexedDB) ====================
+
+// IndexedDB database name and version
+const DB_NAME = 'FieldBuddyPro';
+const DB_VERSION = 1;
+let db = null;
+
+// Initialize IndexedDB
+const initDB = () => {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
     
+    request.onerror = () => {
+      console.error('IndexedDB error:', request.error);
+      reject(request.error);
+    };
+    
+    request.onsuccess = () => {
+      db = request.result;
+      console.log('IndexedDB initialized');
+      resolve(db);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      db = event.target.result;
+      
+      // Create object stores
+      if (!db.objectStoreNames.contains('jobs')) {
+        const jobsStore = db.createObjectStore('jobs', { keyPath: 'id' });
+        jobsStore.createIndex('status', 'status', { unique: false });
+        jobsStore.createIndex('createdAt', 'createdAt', { unique: false });
+        jobsStore.createIndex('updatedAt', 'updatedAt', { unique: false });
+      }
+      
+      if (!db.objectStoreNames.contains('settings')) {
+        db.createObjectStore('settings', { keyPath: 'key' });
+      }
+      
+      if (!db.objectStoreNames.contains('photos')) {
+        const photosStore = db.createObjectStore('photos', { keyPath: 'id' });
+        photosStore.createIndex('jobId', 'jobId', { unique: false });
+      }
+      
+      console.log('IndexedDB schema created');
+    };
+  });
+};
+
+// Save current state to IndexedDB
+const saveToStorage = debounce(() => {
+  if (!db) {
+    console.warn('Database not initialized');
+    return;
+  }
+  
+  const transaction = db.transaction(['jobs', 'settings'], 'readwrite');
+  
+  // Save current job if exists
+  if (AppState.currentJob) {
+    const jobsStore = transaction.objectStore('jobs');
+    
+    // Check if job already exists
+    const existingJobIndex = AppState.jobs.findIndex(j => j.id === AppState.currentJob.id);
+    
+    if (existingJobIndex >= 0) {
+      AppState.jobs[existingJobIndex] = AppState.currentJob;
+    } else {
+      AppState.jobs.push(AppState.currentJob);
+    }
+    
+    jobsStore.put(AppState.currentJob);
+  }
+  
+  // Save settings
+  const settingsStore = transaction.objectStore('settings');
+  settingsStore.put({ key: 'appSettings', value: AppState.settings });
+  settingsStore.put({ key: 'techInfo', value: AppState.tech });
+  
+  transaction.oncomplete = () => {
+    AppState.ui.unsavedChanges = false;
+    updateSyncStatus();
+    console.log('Data saved to IndexedDB');
+  };
+  
+  transaction.onerror = () => {
+    console.error('Save failed:', transaction.error);
+    showToast('Failed to save data', 'error');
+  };
+}, 500); // Debounce 500ms
+
+// Load all data from IndexedDB
+const loadFromStorage = async () => {
+  if (!db) {
+    await initDB();
+  }
+  
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['jobs', 'settings'], 'readonly');
+    
+    // Load jobs
+    const jobsStore = transaction.objectStore('jobs');
+    const jobsRequest = jobsStore.getAll();
+    
+    jobsRequest.onsuccess = () => {
+      AppState.jobs = jobsRequest.result || [];
+      console.log(`Loaded ${AppState.jobs.length} jobs`);
+    };
+    
+    // Load settings
+    const settingsStore = transaction.objectStore('settings');
+    
+    const settingsRequest = settingsStore.get('appSettings');
+    settingsRequest.onsuccess = () => {
+      if (settingsRequest.result) {
+        AppState.settings = { ...AppState.settings, ...settingsRequest.result.value };
+      }
+    };
+    
+    const techRequest = settingsStore.get('techInfo');
+    techRequest.onsuccess = () => {
+      if (techRequest.result) {
+        AppState.tech = { ...AppState.tech, ...techRequest.result.value };
+      }
+    };
+    
+    transaction.oncomplete = () => {
+      console.log('Data loaded from IndexedDB');
+      resolve();
+    };
+    
+    transaction.onerror = () => {
+      console.error('Load failed:', transaction.error);
+      reject(transaction.error);
+    };
+  });
+};
+
+// Delete a job
+const deleteJob = (jobId) => {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['jobs'], 'readwrite');
+    const jobsStore = transaction.objectStore('jobs');
+    const request = jobsStore.delete(jobId);
+    
+    request.onsuccess = () => {
+      AppState.jobs = AppState.jobs.filter(j => j.id !== jobId);
+      
+      if (AppState.currentJob?.id === jobId) {
+        AppState.currentJob = null;
+      }
+      
+      showToast('Job deleted');
+      resolve();
+    };
+    
+    request.onerror = () => {
+      showToast('Failed to delete job', 'error');
+      reject(request.error);
+    };
+  });
+};
+
+// Export all data as JSON
+const exportAllData = () => {
+  const exportData = {
+    version: '5.0',
+    exportedAt: new Date().toISOString(),
+    tech: AppState.tech,
+    jobs: AppState.jobs,
+    settings: AppState.settings
+  };
+  
+  const filename = `field-buddy-backup-${new Date().toISOString().split('T')[0]}.json`;
+  exportJSON(exportData, filename);
+  showToast('Data exported successfully');
+};
+
+// Import data from JSON
+const importData = (file) => {
+  const reader = new FileReader();
+  
+  reader.onload = async (e) => {
+    try {
+      const importedData = JSON.parse(e.target.result);
+      
+      // Validate data structure
+      if (!importedData.jobs || !Array.isArray(importedData.jobs)) {
+        throw new Error('Invalid data format');
+      }
+      
+      // Merge imported jobs
+      importedData.jobs.forEach(importedJob => {
+        const existingIndex = AppState.jobs.findIndex(j => j.id === importedJob.id);
+        
+        if (existingIndex >= 0) {
+          // Update existing job if imported version is newer
+          if (new Date(importedJob.updatedAt) > new Date(AppState.jobs[existingIndex].updatedAt)) {
+            AppState.jobs[existingIndex] = importedJob;
+          }
+        } else {
+          // Add new job
+          AppState.jobs.push(importedJob);
+        }
+      });
+      
+      // Update settings if provided
+      if (importedData.settings) {
+        AppState.settings = { ...AppState.settings, ...importedData.settings };
+      }
+      
+      // Update tech info if provided
+      if (importedData.tech) {
+        AppState.tech = { ...AppState.tech, ...importedData.tech };
+      }
+      
+      // Save to IndexedDB
+      await saveAllJobs();
+      
+      showToast(`Imported ${importedData.jobs.length} jobs`);
+      renderJobHistory();
+      
+    } catch (error) {
+      console.error('Import error:', error);
+      showToast('Failed to import data', 'error');
+    }
+  };
+  
+  reader.readAsText(file);
+};
+
+// Save all jobs to IndexedDB (for import)
+const saveAllJobs = () => {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['jobs', 'settings'], 'readwrite');
+    const jobsStore = transaction.objectStore('jobs');
+    const settingsStore = transaction.objectStore('settings');
+    
+    // Clear existing jobs
+    jobsStore.clear();
+    
+    // Add all jobs
+    AppState.jobs.forEach(job => {
+      jobsStore.add(job);
+    });
+    
+    // Save settings
+    settingsStore.put({ key: 'appSettings', value: AppState.settings });
+    settingsStore.put({ key: 'techInfo', value: AppState.tech });
+    
+    transaction.oncomplete = () => {
+      console.log('All jobs saved');
+      resolve();
+    };
+    
+    transaction.onerror = () => {
+      console.error('Save all failed:', transaction.error);
+      reject(transaction.error);
+    };
+  });
+};
+
+// Update sync status indicator
+const updateSyncStatus = () => {
+  const syncBtn = $('sync-status');
+  const lastSaveTime = $('last-save-time');
+  
+  if (syncBtn) {
+    if (AppState.ui.unsavedChanges) {
+      syncBtn.textContent = '⏳';
+      syncBtn.title = 'Saving...';
+    } else {
+      syncBtn.textContent = '✓';
+      syncBtn.title = 'All data saved';
+    }
+  }
+  
+  if (lastSaveTime) {
+    lastSaveTime.textContent = formatDateTime(new Date().toISOString());
+  }
+};
+
+// Clear all data (with confirmation)
+const clearAllData = async () => {
+  const confirmed = confirm('⚠️ This will delete ALL jobs and data. Are you sure?');
+  
+  if (!confirmed) return;
+  
+  const doubleConfirm = confirm('This cannot be undone. Really delete everything?');
+  
+  if (!doubleConfirm) return;
+  
+  try {
+    const transaction = db.transaction(['jobs', 'settings', 'photos'], 'readwrite');
+    
+    transaction.objectStore('jobs').clear();
+    transaction.objectStore('settings').clear();
+    transaction.objectStore('photos').clear();
+    
+    transaction.oncomplete = () => {
+      AppState.jobs = [];
+      AppState.currentJob = null;
+      showToast('All data cleared');
+      switchPage('dashboard');
+    };
+    
+    transaction.onerror = () => {
+      showToast('Failed to clear data', 'error');
+    };
+  } catch (error) {
+    console.error('Clear data error:', error);
+    showToast('Failed to clear data', 'error');
+  }
+};
+```
+
+---
+
+# **SECTION E: ISSUE TYPE SELECTOR**
+
+**PASTE THIS INTO `[INJECTION POINT E: ISSUE TYPE SELECTOR]`**
+
+```javascript
+// ==================== ISSUE TYPE SELECTOR ====================
+
+// Issue types with smart follow-up questions
+const issueTypes = [
+  {
+    id: 'no_cool',
+    icon: '🔥',
+    label: 'No Cooling',
+    description: 'System running but not cooling',
+    gradient: 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)',
+    questions: ['Is the outdoor unit running?', 'Is air blowing from vents?', 'Any unusual sounds?']
+  },
+  {
+    id: 'no_heat',
+    icon: '❄️',
+    label: 'No Heating',
+    description: 'System running but not heating',
+    gradient: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+    questions: ['Is furnace igniting?', 'Any error codes?', 'Blower running?']
+  },
+  {
+    id: 'poor_performance',
+    icon: '📉',
+    label: 'Poor Performance',
+    description: 'System works but not well',
+    gradient: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+    questions: ['Which rooms affected?', 'Recent changes?', 'Filter condition?']
+  },
+  {
+    id: 'noise',
+    icon: '🔊',
+    label: 'Strange Noises',
+    description: 'Unusual sounds from system',
+    gradient: 'linear-gradient(135deg, #A855F7 0%, #7C3AED 100%)',
+    questions: ['What type of sound?', 'When does it occur?', 'Indoor or outdoor unit?']
+  },
+  {
+    id: 'leak',
+    icon: '💧',
+    label: 'Water Leak',
+    description: 'Water leaking from unit',
+    gradient: 'linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)',
+    questions: ['Where is leak?', 'How much water?', 'Constant or intermittent?']
+  },
+  {
+    id: 'maintenance',
+    icon: '🔧',
+    label: 'Scheduled Maintenance',
+    description: 'Routine service call',
+    gradient: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+    questions: ['Last service date?', 'Any concerns?', 'Seasonal prep?']
+  }
+];
+
+// Render issue type selector
+const renderIssueTypeSelector = () => {
+  const container = $('issue-type-container');
+  if (!container) return;
+  
+  const selectedIssue = AppState.currentJob?.issue.type;
+  
+  let html = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">What's the issue?</div>
+      </div>
+      <div class="card-body">
+        <div class="quick-actions">
+  `;
+  
+  issueTypes.forEach(issue => {
+    const isSelected = selectedIssue === issue.id ? 'selected' : '';
+    
+    html += `
+      <div class="action-card ${isSelected}" 
+           data-issue="${issue.id}"
+           onclick="selectIssueType('${issue.id}')"
+           style="border-color: ${isSelected ? 'var(--cyan)' : 'var(--glass-border)'};">
+        <div class="action-icon" style="background: ${issue.gradient};">${issue.icon}</div>
+        <div class="action-title">${issue.label}</div>
+        <div class="action-description">${issue.description}</div>
+      </div>
+    `;
+  });
+  
+  html += `
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Show follow-up questions if issue selected
+  if (selectedIssue) {
+    const issue = issueTypes.find(i => i.id === selectedIssue);
+    
+    html += `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Tell me more...</div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>Customer Description</label>
+            <textarea 
+              id="issue-description" 
+              placeholder="What did the customer report?"
+              oninput="updateIssueDescription(this.value)"
+              rows="3"
+            >${AppState.currentJob?.issue.description || ''}</textarea>
+          </div>
+          
+          <div class="section-title mt-lg">Quick Questions</div>
+          ${issue.questions.map((q, i) => `
+            <div class="form-group">
+              <label>${q}</label>
+              <input 
+                type="text" 
+                id="issue-q-${i}"
+                placeholder="Answer..."
+              >
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+};
+
+// Select issue type
+const selectIssueType = (issueId) => {
+  if (!AppState.currentJob) return;
+  
+  AppState.currentJob.issue.type = issueId;
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  
+  // Re-render to show follow-up questions
+  renderIssueTypeSelector();
+  
+  // Show equipment selector
+  renderEquipmentSelector();
+  
+  // Auto-save
+  saveToStorage();
+  
+  showToast('Issue type selected');
+};
+
+// Update issue description
+const updateIssueDescription = (description) => {
+  if (!AppState.currentJob) return;
+  
+  AppState.currentJob.issue.description = description;
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  AppState.ui.unsavedChanges = true;
+  
+  saveToStorage();
+};
     
     
     // ==================== [INJECTION POINT E: ISSUE TYPE SELECTOR] ====================
+    // ==================== EQUIPMENT DATABASE & SELECTOR ====================
+
+// Equipment types with common brands and models
+const equipmentDatabase = {
+  split_system: {
+    label: 'Split System',
+    icon: '🏠',
+    description: 'Separate indoor/outdoor units',
+    brands: ['Carrier', 'Trane', 'Lennox', 'Rheem', 'Goodman', 'York', 'Bryant', 'American Standard', 'Daikin', 'Mitsubishi'],
+    commonModels: {
+      'Carrier': ['24ACC3', '24APB6', '24VNA0', 'FE4A', 'FB4C'],
+      'Trane': ['4TTR3', '4TWR3', '4TTR6', 'TEM4', 'TAM7'],
+      'Lennox': ['13ACX', 'EL16XC1', 'XC25', 'CBX27UH', 'CBA38MV'],
+      'Rheem': ['RA14', 'RA16', 'RA20', 'RH1T', 'RH2T'],
+      'Goodman': ['GSX13', 'GSX14', 'GSX16', 'ARUF', 'AVPTC']
+    },
+    specs: {
+      refrigerant: ['R-410A', 'R-22', 'R-454B', 'R-32'],
+      tonnage: ['1.5', '2', '2.5', '3', '3.5', '4', '5'],
+      seer: ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22']
+    }
+  },
+  
+  package_unit: {
+    label: 'Package Unit',
+    icon: '📦',
+    description: 'All-in-one rooftop or ground unit',
+    brands: ['Carrier', 'Trane', 'Lennox', 'Rheem', 'Goodman', 'York'],
+    commonModels: {
+      'Carrier': ['50ZPA', '50ZPB', '48TCED'],
+      'Trane': ['4WCC3', '4YCC3', '4WHZ3'],
+      'Lennox': ['LRP14', 'LRP16', 'LGH'],
+      'Rheem': ['RQNL', 'RQPM', 'RQRM'],
+      'Goodman': ['GPG13', 'GPG14', 'GPC14']
+    },
+    specs: {
+      refrigerant: ['R-410A', 'R-22'],
+      tonnage: ['2', '3', '4', '5', '7.5', '10'],
+      seer: ['13', '14', '15', '16']
+    }
+  },
+  
+  heat_pump: {
+    label: 'Heat Pump',
+    icon: '🔄',
+    description: 'Heating and cooling in one',
+    brands: ['Carrier', 'Trane', 'Lennox', 'Rheem', 'Goodman', 'York', 'Mitsubishi', 'Daikin'],
+    commonModels: {
+      'Carrier': ['25VNA8', '25HCB6', '25HNB6'],
+      'Trane': ['4TWZ8', '4TWV8', '4WCZ8'],
+      'Lennox': ['XP25', 'XP21', 'HP26'],
+      'Rheem': ['RP16', 'RP17', 'RP20'],
+      'Goodman': ['GSZC18', 'DSXC18', 'GSZ14']
+    },
+    specs: {
+      refrigerant: ['R-410A', 'R-454B'],
+      tonnage: ['2', '2.5', '3', '3.5', '4', '5'],
+      seer: ['14', '15', '16', '17', '18', '19', '20', '21', '22'],
+      hspf: ['8', '8.5', '9', '9.5', '10', '10.5', '11', '12', '13']
+    }
+  },
+  
+  furnace: {
+    label: 'Gas Furnace',
+    icon: '🔥',
+    description: 'Gas or electric heating',
+    brands: ['Carrier', 'Trane', 'Lennox', 'Rheem', 'Goodman', 'York', 'American Standard'],
+    commonModels: {
+      'Carrier': ['59SP5', '59TP6', '59MN7'],
+      'Trane': ['S9V2', 'S9X2', 'XV95'],
+      'Lennox': ['SLP98V', 'EL296V', 'ML296V'],
+      'Rheem': ['R96V', 'R97V', 'R98V'],
+      'Goodman': ['GMVC96', 'GCVC96', 'GMSS96']
+    },
+    specs: {
+      btu: ['40K', '60K', '80K', '100K', '120K'],
+      afue: ['80', '92', '93', '95', '96', '97', '98'],
+      stages: ['Single', 'Two-Stage', 'Modulating']
+    }
+  },
+  
+  mini_split: {
+    label: 'Mini-Split',
+    icon: '❄️',
+    description: 'Ductless wall-mounted units',
+    brands: ['Mitsubishi', 'Daikin', 'Fujitsu', 'LG', 'Samsung', 'Carrier', 'Trane'],
+    commonModels: {
+      'Mitsubishi': ['MSZ-FH', 'MSZ-GL', 'MUZ-FH'],
+      'Daikin': ['FTXS', 'FTXM', 'RXS'],
+      'Fujitsu': ['ASU9RLF1', 'ASU12RLF1', 'AOU9RLF1'],
+      'LG': ['LSN090HXV', 'LSN120HXV', 'LSU120HXV'],
+      'Samsung': ['AR09TXHZAWK', 'AR12TXHZAWK']
+    },
+    specs: {
+      refrigerant: ['R-410A', 'R-32'],
+      btu: ['9K', '12K', '18K', '24K', '30K', '36K'],
+      seer: ['16', '18', '20', '22', '24', '26', '30']
+    }
+  }
+};
+
+// Render equipment selector
+const renderEquipmentSelector = () => {
+  const container = $('equipment-info-container');
+  if (!container) return;
+  
+  const selectedType = AppState.currentJob?.equipment.type;
+  
+  let html = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Equipment Type</div>
+      </div>
+      <div class="card-body">
+        <div class="quick-actions">
+  `;
+  
+  // Equipment type cards
+  Object.keys(equipmentDatabase).forEach(typeKey => {
+    const type = equipmentDatabase[typeKey];
+    const isSelected = selectedType === typeKey;
     
+    html += `
+      <div class="action-card ${isSelected ? 'selected' : ''}" 
+           onclick="selectEquipmentType('${typeKey}')"
+           style="min-height: 150px;">
+        <div class="action-icon">${type.icon}</div>
+        <div class="action-title">${type.label}</div>
+        <div class="action-description">${type.description}</div>
+      </div>
+    `;
+  });
+  
+  html += `
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Show equipment details form if type selected
+  if (selectedType) {
+    const equipment = equipmentDatabase[selectedType];
+    const job = AppState.currentJob;
+    
+    html += `
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Equipment Details</div>
+        </div>
+        <div class="card-body">
+          
+          <!-- Indoor Unit -->
+          ${selectedType !== 'package_unit' ? `
+          <div class="card-section">
+            <div class="section-title">Indoor Unit</div>
+            <div class="form-grid form-grid-2">
+              <div class="form-group">
+                <label>Brand</label>
+                <select id="indoor-brand" onchange="updateEquipmentField('indoor', 'brand', this.value); populateModels('indoor')">
+                  <option value="">Select brand...</option>
+                  ${equipment.brands.map(brand => `
+                    <option value="${brand}" ${job.equipment.indoor.brand === brand ? 'selected' : ''}>
+                      ${brand}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>Model Number</label>
+                <input 
+                  type="text" 
+                  id="indoor-model" 
+                  list="indoor-models"
+                  value="${job.equipment.indoor.model || ''}"
+                  onchange="updateEquipmentField('indoor', 'model', this.value)"
+                  placeholder="e.g., FE4A">
+                <datalist id="indoor-models"></datalist>
+              </div>
+              
+              <div class="form-group">
+                <label>Serial Number</label>
+                <input 
+                  type="text" 
+                  id="indoor-serial"
+                  value="${job.equipment.indoor.serial || ''}"
+                  onchange="updateEquipmentField('indoor', 'serial', this.value)"
+                  placeholder="Serial #">
+              </div>
+            </div>
+          </div>
+          ` : ''}
+          
+          <!-- Outdoor Unit -->
+          ${selectedType !== 'furnace' && selectedType !== 'package_unit' ? `
+          <div class="card-section">
+            <div class="section-title">Outdoor Unit</div>
+            <div class="form-grid form-grid-2">
+              <div class="form-group">
+                <label>Brand</label>
+                <select id="outdoor-brand" onchange="updateEquipmentField('outdoor', 'brand', this.value); populateModels('outdoor')">
+                  <option value="">Select brand...</option>
+                  ${equipment.brands.map(brand => `
+                    <option value="${brand}" ${job.equipment.outdoor.brand === brand ? 'selected' : ''}>
+                      ${brand}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>Model Number</label>
+                <input 
+                  type="text" 
+                  id="outdoor-model"
+                  list="outdoor-models"
+                  value="${job.equipment.outdoor.model || ''}"
+                  onchange="updateEquipmentField('outdoor', 'model', this.value)"
+                  placeholder="e.g., 24ACC3">
+                <datalist id="outdoor-models"></datalist>
+              </div>
+              
+              <div class="form-group">
+                <label>Serial Number</label>
+                <input 
+                  type="text" 
+                  id="outdoor-serial"
+                  value="${job.equipment.outdoor.serial || ''}"
+                  onchange="updateEquipmentField('outdoor', 'serial', this.value)"
+                  placeholder="Serial #">
+              </div>
+            </div>
+          </div>
+          ` : ''}
+          
+          <!-- System Specs -->
+          <div class="card-section">
+            <div class="section-title">System Specifications</div>
+            <div class="form-grid form-grid-3">
+              
+              ${equipment.specs.tonnage ? `
+              <div class="form-group">
+                <label>Tonnage</label>
+                <select id="equipment-tonnage" onchange="updateEquipmentTonnage(this.value)">
+                  <option value="">Select...</option>
+                  ${equipment.specs.tonnage.map(ton => `
+                    <option value="${ton}" ${job.equipment.tonnage === ton ? 'selected' : ''}>
+                      ${ton} Ton
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+              ` : ''}
+              
+              ${equipment.specs.btu ? `
+              <div class="form-group">
+                <label>BTU Rating</label>
+                <select id="equipment-btu">
+                  <option value="">Select...</option>
+                  ${equipment.specs.btu.map(btu => `
+                    <option value="${btu}">${btu} BTU</option>
+                  `).join('')}
+                </select>
+              </div>
+              ` : ''}
+              
+              ${equipment.specs.refrigerant ? `
+              <div class="form-group">
+                <label>Refrigerant Type</label>
+                <select id="equipment-refrigerant" onchange="updateEquipmentField(null, 'refrigerant', this.value)">
+                  ${equipment.specs.refrigerant.map(ref => `
+                    <option value="${ref}" ${job.equipment.refrigerant === ref ? 'selected' : ''}>
+                      ${ref}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+              ` : ''}
+              
+              <div class="form-group">
+                <label>Filter Size</label>
+                <input 
+                  type="text" 
+                  id="filter-size"
+                  value="${job.equipment.filterSize || ''}"
+                  onchange="updateEquipmentField(null, 'filterSize', this.value)"
+                  placeholder="e.g., 16x25x1">
+              </div>
+              
+              <div class="form-group">
+                <label>Age (Years)</label>
+                <input 
+                  type="number" 
+                  id="equipment-age"
+                  value="${job.equipment.ageYears || ''}"
+                  onchange="updateEquipmentField(null, 'ageYears', parseInt(this.value))"
+                  placeholder="Age">
+              </div>
+              
+              ${equipment.specs.seer ? `
+              <div class="form-group">
+                <label>SEER Rating</label>
+                <select id="equipment-seer">
+                  <option value="">Select...</option>
+                  ${equipment.specs.seer.map(seer => `
+                    <option value="${seer}">${seer} SEER</option>
+                  `).join('')}
+                </select>
+              </div>
+              ` : ''}
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    `;
+  }
+  
+  container.innerHTML = html;
+  
+  // Populate model suggestions if brand already selected
+  if (selectedType) {
+    populateModels('indoor');
+    populateModels('outdoor');
+  }
+};
+
+// Select equipment type
+const selectEquipmentType = (typeKey) => {
+  if (!AppState.currentJob) return;
+  
+  AppState.currentJob.equipment.type = typeKey;
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  
+  renderEquipmentSelector();
+  saveToStorage();
+  
+  // Show measurements section
+  renderMeasurementsSection();
+  
+  showToast('Equipment type selected');
+};
+
+// Update equipment field
+const updateEquipmentField = (unit, field, value) => {
+  if (!AppState.currentJob) return;
+  
+  if (unit) {
+    // Update indoor/outdoor unit field
+    AppState.currentJob.equipment[unit][field] = value;
+  } else {
+    // Update main equipment field
+    AppState.currentJob.equipment[field] = value;
+  }
+  
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  AppState.ui.unsavedChanges = true;
+  
+  saveToStorage();
+};
+
+// Update tonnage (special handler for calculations)
+const updateEquipmentTonnage = (tonnage) => {
+  if (!AppState.currentJob) return;
+  
+  AppState.currentJob.equipment.tonnage = tonnage;
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  
+  // Auto-calculate expected CFM
+  const expectedCFM = parseFloat(tonnage) * 400;
+  
+  showToast(`Equipment: ${tonnage} ton (${expectedCFM} CFM nominal)`);
+  
+  saveToStorage();
+};
+
+// Populate model suggestions based on brand
+const populateModels = (unit) => {
+  const brandSelect = $(`${unit}-brand`);
+  const modelDatalist = $(`${unit}-models`);
+  
+  if (!brandSelect || !modelDatalist) return;
+  
+  const brand = brandSelect.value;
+  const equipmentType = AppState.currentJob?.equipment.type;
+  
+  if (!brand || !equipmentType) return;
+  
+  const equipment = equipmentDatabase[equipmentType];
+  const models = equipment.commonModels[brand] || [];
+  
+  modelDatalist.innerHTML = models.map(model => 
+    `<option value="${model}">${model}</option>`
+  ).join('');
+};
+```
+
+---
+
+# **SECTION G: MEASUREMENTS HANDLER**
+
+**PASTE THIS INTO `[INJECTION POINT G: MEASUREMENTS HANDLER]`**
+
+```javascript
+// ==================== MEASUREMENTS HANDLER ====================
+
+// Measurement field definitions
+const measurementFields = {
+  cooling: {
+    temperatures: [
+      { id: 'outdoor-ambient', label: 'Outdoor Ambient', unit: '°F', type: 'temp', min: 50, max: 120 },
+      { id: 'return-air', label: 'Return Air', unit: '°F', type: 'temp', min: 60, max: 90 },
+      { id: 'supply-air', label: 'Supply Air', unit: '°F', type: 'temp', min: 40, max: 70 },
+      { id: 'suction-line', label: 'Suction Line Temp', unit: '°F', type: 'temp', min: 30, max: 80 },
+      { id: 'liquid-line', label: 'Liquid Line Temp', unit: '°F', type: 'temp', min: 60, max: 120 }
+    ],
+    pressures: [
+      { id: 'suction-pressure', label: 'Suction Pressure', unit: 'PSI', type: 'pressure', min: 50, max: 150 },
+      { id: 'head-pressure', label: 'Head Pressure', unit: 'PSI', type: 'pressure', min: 150, max: 450 }
+    ],
+    electrical: [
+      { id: 'voltage', label: 'Supply Voltage', unit: 'V', type: 'voltage', min: 200, max: 250 },
+      { id: 'compressor-amps', label: 'Compressor Amps', unit: 'A', type: 'amperage', min: 0, max: 50 },
+      { id: 'condenser-fan-amps', label: 'Cond. Fan Amps', unit: 'A', type: 'amperage', min: 0, max: 10 }
+    ]
+  },
+  
+  heating: {
+    temperatures: [
+      { id: 'return-air-heat', label: 'Return Air', unit: '°F', type: 'temp', min: 60, max: 80 },
+      { id: 'supply-air-heat', label: 'Supply Air', unit: '°F', type: 'temp', min: 90, max: 160 }
+    ],
+    gas: [
+      { id: 'manifold-pressure', label: 'Manifold Pressure', unit: 'in w.c.', type: 'pressure', min: 2, max: 12 },
+      { id: 'supply-gas-pressure', label: 'Supply Gas Pressure', unit: 'in w.c.', type: 'pressure', min: 4, max: 14 }
+    ],
+    electrical: [
+      { id: 'voltage-heat', label: 'Supply Voltage', unit: 'V', type: 'voltage', min: 105, max: 125 },
+      { id: 'inducer-amps', label: 'Inducer Amps', unit: 'A', type: 'amperage', min: 0, max: 5 },
+      { id: 'blower-amps', label: 'Blower Amps', unit: 'A', type: 'amperage', min: 0, max: 15 }
+    ]
+  }
+};
+
+// Render measurements section
+const renderMeasurementsSection = () => {
+  const container = $('measurements-container');
+  if (!container) return;
+  
+  const issueType = AppState.currentJob?.issue.type;
+  const equipmentType = AppState.currentJob?.equipment.type;
+  
+  if (!issueType || !equipmentType) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  // Determine which measurements to show
+  let mode = 'cooling';
+  if (issueType === 'no_heat' || equipmentType === 'furnace') {
+    mode = 'heating';
+  }
+  
+  const fields = measurementFields[mode];
+  
+  let html = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📏 Diagnostic Measurements</div>
+        <button class="btn btn-secondary btn-sm" onclick="clearAllMeasurements()">
+          Clear All
+        </button>
+      </div>
+      <div class="card-body">
+  `;
+  
+  // Temperature section
+  if (fields.temperatures) {
+    html += `
+      <div class="card-section">
+        <div class="section-title">Temperatures</div>
+        <div class="form-grid form-grid-3">
+    `;
+    
+    fields.temperatures.forEach(field => {
+      const lastValue = getLastMeasurementValue(field.id);
+      
+      html += `
+        <div class="form-group">
+          <label>${field.label}</label>
+          <div style="position: relative;">
+            <input 
+              type="number" 
+              step="0.1"
+              id="${field.id}"
+              value="${lastValue || ''}"
+              onchange="handleMeasurementInput('${field.id}', this.value, '${field.unit}', '${field.label}', ${field.min}, ${field.max})"
+              placeholder="Enter ${field.unit}">
+            ${lastValue ? `<span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 0.75rem;">${field.unit}</span>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `
+        </div>
+      </div>
+    `;
+  }
+  
+  // Pressure section
+  if (fields.pressures) {
+    html += `
+      <div class="card-section">
+        <div class="section-title">Pressures</div>
+        <div class="form-grid form-grid-3">
+    `;
+    
+    fields.pressures.forEach(field => {
+      const lastValue = getLastMeasurementValue(field.id);
+      
+      html += `
+        <div class="form-group">
+          <label>${field.label}</label>
+          <div style="position: relative;">
+            <input 
+              type="number" 
+              step="0.1"
+              id="${field.id}"
+              value="${lastValue || ''}"
+              onchange="handleMeasurementInput('${field.id}', this.value, '${field.unit}', '${field.label}', ${field.min}, ${field.max})"
+              placeholder="Enter ${field.unit}">
+            ${lastValue ? `<span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 0.75rem;">${field.unit}</span>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `
+        </div>
+      </div>
+    `;
+  }
+  
+  // Gas section (heating only)
+  if (fields.gas) {
+    html += `
+      <div class="card-section">
+        <div class="section-title">Gas Measurements</div>
+        <div class="form-grid form-grid-3">
+    `;
+    
+    fields.gas.forEach(field => {
+      const lastValue = getLastMeasurementValue(field.id);
+      
+      html += `
+        <div class="form-group">
+          <label>${field.label}</label>
+          <div style="position: relative;">
+            <input 
+              type="number" 
+              step="0.01"
+              id="${field.id}"
+              value="${lastValue || ''}"
+              onchange="handleMeasurementInput('${field.id}', this.value, '${field.unit}', '${field.label}', ${field.min}, ${field.max})"
+              placeholder="Enter ${field.unit}">
+            ${lastValue ? `<span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 0.75rem;">${field.unit}</span>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `
+        </div>
+      </div>
+    `;
+  }
+  
+  // Electrical section
+  if (fields.electrical) {
+    html += `
+      <div class="card-section">
+        <div class="section-title">Electrical</div>
+        <div class="form-grid form-grid-3">
+    `;
+    
+    fields.electrical.forEach(field => {
+      const lastValue = getLastMeasurementValue(field.id);
+      
+      html += `
+        <div class="form-group">
+          <label>${field.label}</label>
+          <div style="position: relative;">
+            <input 
+              type="number" 
+              step="0.1"
+              id="${field.id}"
+              value="${lastValue || ''}"
+              onchange="handleMeasurementInput('${field.id}', this.value, '${field.unit}', '${field.label}', ${field.min}, ${field.max})"
+              placeholder="Enter ${field.unit}">
+            ${lastValue ? `<span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-tertiary); font-size: 0.75rem;">${field.unit}</span>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `
+        </div>
+      </div>
+    `;
+  }
+  
+  // Calculated values
+  html += `
+      <div class="card-section">
+        <div class="section-title">Calculated Values</div>
+        <div class="form-grid form-grid-3" id="calculated-values">
+          <!-- Auto-populated by diagnostic engine -->
+        </div>
+      </div>
+      
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+  
+  // Run diagnostics if measurements exist
+  if (AppState.currentJob?.measurements.length > 0) {
+    runDiagnosticEngine();
+  }
+};
+
+// Handle measurement input
+const handleMeasurementInput = (fieldId, value, unit, label, min, max) => {
+  if (!value || value === '') return;
+  
+  const numValue = parseFloat(value);
+  
+  // Validate range
+  const input = $(fieldId);
+  if (numValue < min || numValue > max) {
+    input.classList.add('warning');
+    showToast(`${label} seems unusual (expected ${min}-${max} ${unit})`, 'warning');
+  } else {
+    input.classList.remove('warning');
+    input.classList.add('success');
+  }
+  
+  // Add measurement to job
+  addMeasurement('measurement', numValue, unit, label);
+  
+  // Run diagnostic engine
+  runDiagnosticEngine();
+  
+  // Show suggestions
+  renderSmartSuggestions();
+};
+
+// Get last measurement value for a field
+const getLastMeasurementValue = (fieldId) => {
+  if (!AppState.currentJob) return null;
+  
+  const measurements = AppState.currentJob.measurements
+    .filter(m => m.field.toLowerCase().includes(fieldId.replace(/-/g, ' ')))
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  
+  return measurements[0]?.value || null;
+};
+
+// Clear all measurements
+const clearAllMeasurements = () => {
+  if (!AppState.currentJob) return;
+  
+  const confirmed = confirm('Clear all measurements?');
+  if (!confirmed) return;
+  
+  AppState.currentJob.measurements = [];
+  AppState.currentJob.updatedAt = new Date().toISOString();
+  
+  saveToStorage();
+  renderMeasurementsSection();
+  renderSmartSuggestions();
+  
+  showToast('Measurements cleared');
+};
+
+// Render quick measurements form (standalone page)
+const renderQuickMeasurementsForm = () => {
+  const container = $('quick-measurements-form');
+  if (!container) return;
+  
+  let html = `
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Quick Entry</div>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-lg">Record measurements without creating a full job</p>
+        
+        <div class="form-group">
+          <label>Measurement Type</label>
+          <select id="quick-meas-type">
+            <option value="">Select type...</option>
+            <option value="temp">Temperature</option>
+            <option value="pressure">Pressure</option>
+            <option value="voltage">Voltage</option>
+            <option value="amperage">Amperage</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>Value</label>
+          <input type="number" step="0.1" id="quick-meas-value" placeholder="Enter value">
+        </div>
+        
+        <div class="form-group">
+          <label>Notes (Optional)</label>
+          <textarea id="quick-meas-notes" rows="2" placeholder="Additional context..."></textarea>
+        </div>
+        
+        <button class="btn btn-primary" onclick="saveQuickMeasurement()">
+          ✓ Save Measurement
+        </button>
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+};
+
+// Save quick measurement
+const saveQuickMeasurement = () => {
+  const type = $('quick-meas-type')?.value;
+  const value = $('quick-meas-value')?.value;
+  const notes = $('quick-meas-notes')?.value;
+  
+  if (!type || !value) {
+    showToast('Please fill in type and value', 'warning');
+    return;
+  }
+  
+  // Create standalone measurement (not tied to job)
+  const measurement = {
+    id: generateUUID(),
+    timestamp: new Date().toISOString(),
+    type,
+    value: parseFloat(value),
+    notes
+  };
+  
+  // Save to a separate quick measurements array
+  if (!AppState.quickMeasurements) {
+    AppState.quickMeasurements = [];
+  }
+  
+  AppState.quickMeasurements.push(measurement);
+  
+  // Clear form
+  $('quick-meas-type').value = '';
+  $('quick-meas-value').value = '';
+  $('quick-meas-notes').value = '';
+  
+  showToast('Measurement saved');
+  saveToStorage();
+};
     
     
     // ==================== [INJECTION POINT F: EQUIPMENT DATABASE] ====================
@@ -1607,7 +3011,425 @@ const copyToClipboard = (text) => {
     
     
     // ==================== [INJECTION POINT H: SMART SUGGESTIONS ENGINE] ====================
+    // ==================== SMART SUGGESTIONS ENGINE ====================
+
+// R-410A Pressure-Temperature Chart (simplified)
+const R410A_PT = {
+  118: 40, 125: 45, 133: 50, 140: 55, 148: 60,
+  156: 65, 164: 70, 173: 75, 181: 80, 190: 85,
+  200: 90, 210: 95, 220: 100, 230: 105, 241: 110,
+  252: 115, 263: 120, 275: 125, 287: 130, 299: 135,
+  312: 140, 325: 145, 338: 150
+};
+
+// Get saturation temperature from pressure
+const getSaturationTemp = (pressure) => {
+  const pressures = Object.keys(R410A_PT).map(Number);
+  const closest = pressures.reduce((prev, curr) => 
+    Math.abs(curr - pressure) < Math.abs(prev - pressure) ? curr : prev
+  );
+  return R410A_PT[closest];
+};
+
+// Diagnostic rules database
+const diagnosticRules = {
+  // Refrigerant Charge Issues
+  undercharged: {
+    conditions: (data) => {
+      return data.superheat > 15 && data.subcool < 8;
+    },
+    diagnosis: 'System Undercharged - Refrigerant Leak Likely',
+    confidence: 'high',
+    evidence: ['High superheat', 'Low subcool', 'Reduced cooling capacity'],
+    nextSteps: [
+      'Perform leak check on evaporator coil',
+      'Check all brazed joints and fittings',
+      'Inspect line set connections',
+      'Check service valve cores',
+      'After leak repair, evacuate and recharge by weight'
+    ],
+    partsLikely: ['R-410A refrigerant', 'Filter drier', 'Leak seal'],
+    safetyNotes: []
+  },
+  
+  overcharged: {
+    conditions: (data) => {
+      return data.subcool > 15 && data.headPressure > 350;
+    },
+    diagnosis: 'System Overcharged',
+    confidence: 'high',
+    evidence: ['High subcool', 'Elevated head pressure', 'High amp draw'],
+    nextSteps: [
+      'Verify charge was not added incorrectly',
+      'Check for non-condensables in system',
+      'Recover excess refrigerant',
+      'Recharge to manufacturer specifications'
+    ],
+    partsLikely: [],
+    safetyNotes: ['High pressures - risk of compressor damage']
+  },
+  
+  txv_restricted: {
+    conditions: (data) => {
+      return data.superheat > 20 && data.subcool >= 8 && data.subcool <= 12;
+    },
+    diagnosis: 'TXV Restricted or Sensing Bulb Issue',
+    confidence: 'high',
+    evidence: ['Very high superheat', 'Normal subcool', 'Low suction pressure'],
+    nextSteps: [
+      'Check TXV sensing bulb placement and contact',
+      'Verify bulb insulation is intact',
+      'Check for kinked liquid line before TXV',
+      'Inspect filter drier for restriction',
+      'Consider TXV replacement'
+    ],
+    partsLikely: ['TXV valve', 'Sensing bulb', 'Filter drier'],
+    safetyNotes: []
+  },
+  
+  // Airflow Issues
+  low_airflow: {
+    conditions: (data) => {
+      return data.deltaT > 24 || data.staticPressure > 0.6;
+    },
+    diagnosis: 'Restricted Airflow - Low CFM',
+    confidence: 'high',
+    evidence: ['High temperature split', 'Elevated static pressure', 'Possible frozen coil'],
+    nextSteps: [
+      'CRITICAL: Replace air filter immediately',
+      'Inspect evaporator coil for dirt/restrictions',
+      'Check blower speed and motor',
+      'Verify ductwork is properly sized',
+      'Measure total external static pressure',
+      'Check for closed/blocked supply vents'
+    ],
+    partsLikely: ['Air filter', 'Blower motor', 'Capacitor'],
+    safetyNotes: ['Risk of frozen evaporator coil']
+  },
+  
+  excessive_airflow: {
+    conditions: (data) => {
+      return data.deltaT < 14;
+    },
+    diagnosis: 'Excessive Airflow or Low Refrigerant',
+    confidence: 'medium',
+    evidence: ['Low temperature split', 'Reduced dehumidification'],
+    nextSteps: [
+      'Check blower speed setting',
+      'Verify ductwork design CFM',
+      'Check for refrigerant undercharge',
+      'Measure actual CFM at registers'
+    ],
+    partsLikely: [],
+    safetyNotes: []
+  },
+  
+  // Condenser Issues
+  dirty_condenser: {
+    conditions: (data) => {
+      return data.headPressure > 350 && data.outdoorAmbient < 95;
+    },
+    diagnosis: 'Restricted Condenser Airflow - Dirty Coil',
+    confidence: 'high',
+    evidence: ['High head pressure', 'Normal outdoor temp', 'High amp draw'],
+    nextSteps: [
+      'Clean condenser coil thoroughly',
+      'Check condenser fan operation',
+      'Verify condenser fan motor amps',
+      'Inspect for debris or obstructions',
+      'Check fin condition'
+    ],
+    partsLikely: ['Coil cleaner', 'Condenser fan motor', 'Fan blade'],
+    safetyNotes: ['High head pressure - monitor compressor']
+  },
+  
+  // Electrical Issues
+  low_voltage: {
+    conditions: (data) => {
+      return data.voltage < 207 || data.voltage > 253;
+    },
+    diagnosis: 'Supply Voltage Out of Range',
+    confidence: 'high',
+    evidence: ['Voltage outside ±10% of rated', 'Possible compressor damage'],
+    nextSteps: [
+      'Check voltage at disconnect',
+      'Inspect wire connections for looseness',
+      'Contact utility company if persistently low',
+      'Consider voltage stabilizer'
+    ],
+    partsLikely: ['Voltage regulator/stabilizer'],
+    safetyNotes: ['Low voltage can damage compressor']
+  },
+  
+  high_amp_draw: {
+    conditions: (data) => {
+      return data.rla && data.compressorAmps > (data.rla * 1.1);
+    },
+    diagnosis: 'Compressor Drawing Excessive Current',
+    confidence: 'high',
+    evidence: ['Amps exceed RLA by >10%', 'Possible failing compressor'],
+    nextSteps: [
+      'Check supply voltage (low voltage increases amps)',
+      'Verify capacitor is within spec',
+      'Check for refrigerant overcharge',
+      'Inspect for restricted airflow',
+      'Monitor compressor temperature'
+    ],
+    partsLikely: ['Run capacitor', 'Compressor'],
+    safetyNotes: ['High amps - compressor may fail soon']
+  },
+  
+  // Heating Issues
+  low_temp_rise: {
+    conditions: (data) => {
+      return data.tempRise && data.tempRise < 35;
+    },
+    diagnosis: 'Low Temperature Rise - Insufficient Heating',
+    confidence: 'high',
+    evidence: ['Temp rise below 35°F', 'Reduced heating output'],
+    nextSteps: [
+      'Check gas manifold pressure (3.3-3.8" w.c.)',
+      'Inspect burners for proper flame pattern',
+      'Verify all burners are igniting',
+      'Check for excessive airflow (blower too fast)',
+      'Inspect gas valve operation'
+    ],
+    partsLikely: ['Gas valve', 'Orifices', 'Igniter'],
+    safetyNotes: []
+  },
+  
+  high_temp_rise: {
+    conditions: (data) => {
+      return data.tempRise && data.tempRise > 70;
+    },
+    diagnosis: 'High Temperature Rise - Airflow Restriction',
+    confidence: 'high',
+    evidence: ['Temp rise above 70°F', 'Risk of heat exchanger damage'],
+    nextSteps: [
+      'CRITICAL: Check airflow restriction immediately',
+      'Replace air filter',
+      'Verify blower speed is correct',
+      'Inspect heat exchanger for restrictions',
+      'Check limit switches for cycling'
+    ],
+    partsLikely: ['Air filter', 'Blower motor', 'Limit switch'],
+    safetyNotes: ['CRITICAL: High temp rise can crack heat exchanger']
+  }
+};
+
+// Run diagnostic engine
+const runDiagnosticEngine = () => {
+  if (!AppState.currentJob) return;
+  
+  const measurements = AppState.currentJob.measurements;
+  if (measurements.length === 0) return;
+  
+  // Extract key measurements
+  const data = {
+    outdoorAmbient: getLastMeasurementValue('outdoor-ambient'),
+    returnAir: getLastMeasurementValue('return-air'),
+    supplyAir: getLastMeasurementValue('supply-air'),
+    suctionPressure: getLastMeasurementValue('suction-pressure'),
+    suctionTemp: getLastMeasurementValue('suction-line'),
+    headPressure: getLastMeasurementValue('head-pressure'),
+    liquidTemp: getLastMeasurementValue('liquid-line'),
+    voltage: getLastMeasurementValue('voltage'),
+    compressorAmps: getLastMeasurementValue('compressor-amps'),
+    staticPressure: getLastMeasurementValue('static-pressure'),
+    rla: AppState.currentJob.equipment.rla,
+    tempRise: null,
+    deltaT: null,
+    superheat: null,
+    subcool: null
+  };
+  
+  // Calculate derived values
+  if (data.returnAir && data.supplyAir) {
+    data.deltaT = data.returnAir - data.supplyAir;
+  }
+  
+  if (data.suctionPressure && data.suctionTemp) {
+    const satTemp = getSaturationTemp(data.suctionPressure);
+    data.superheat = data.suctionTemp - satTemp;
+  }
+  
+  if (data.headPressure && data.liquidTemp) {
+    const satTemp = getSaturationTemp(data.headPressure);
+    data.subcool = satTemp - data.liquidTemp;
+  }
+  
+  // For heating
+  const returnHeat = getLastMeasurementValue('return-air-heat');
+  const supplyHeat = getLastMeasurementValue('supply-air-heat');
+  if (returnHeat && supplyHeat) {
+    data.tempRise = supplyHeat - returnHeat;
+  }
+  
+  // Update calculated values display
+  updateCalculatedValues(data);
+  
+  // Run diagnostic rules
+  const suggestions = [];
+  
+  Object.keys(diagnosticRules).forEach(ruleKey => {
+    const rule = diagnosticRules[ruleKey];
     
+    if (rule.conditions(data)) {
+      suggestions.push({
+        id: ruleKey,
+        ...rule,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+  
+  // Store suggestions in job
+  AppState.currentJob.suggestions = suggestions;
+  
+  // Render suggestions
+  renderSmartSuggestions();
+};
+
+// Update calculated values display
+const updateCalculatedValues = (data) => {
+  const container = $('calculated-values');
+  if (!container) return;
+  
+  let html = '';
+  
+  // Delta-T
+  if (data.deltaT !== null) {
+    const deltaClass = data.deltaT >= 16 && data.deltaT <= 22 ? 'success' : 'warning';
+    html += `
+      <div class="form-group">
+        <label>Delta-T (Return - Supply)</label>
+        <input type="text" class="${deltaClass}" readonly value="${data.deltaT.toFixed(1)}°F">
+      </div>
+    `;
+  }
+  
+  // Superheat
+  if (data.superheat !== null) {
+    const shClass = data.superheat >= 8 && data.superheat <= 15 ? 'success' : 'warning';
+    html += `
+      <div class="form-group">
+        <label>Superheat</label>
+        <input type="text" class="${shClass}" readonly value="${data.superheat.toFixed(1)}°F">
+      </div>
+    `;
+  }
+  
+  // Subcool
+  if (data.subcool !== null) {
+    const scClass = data.subcool >= 8 && data.subcool <= 12 ? 'success' : 'warning';
+    html += `
+      <div class="form-group">
+        <label>Subcool</label>
+        <input type="text" class="${scClass}" readonly value="${data.subcool.toFixed(1)}°F">
+      </div>
+    `;
+  }
+  
+  // Temperature Rise (heating)
+  if (data.tempRise !== null) {
+    const trClass = data.tempRise >= 35 && data.tempRise <= 65 ? 'success' : 'warning';
+    html += `
+      <div class="form-group">
+        <label>Temperature Rise</label>
+        <input type="text" class="${trClass}" readonly value="${data.tempRise.toFixed(1)}°F">
+      </div>
+    `;
+  }
+  
+  if (html === '') {
+    html = '<p class="text-muted">Enter measurements to see calculated values</p>';
+  }
+  
+  container.innerHTML = html;
+};
+
+// Render smart suggestions
+const renderSmartSuggestions = () => {
+  const container = $('suggestions-container');
+  if (!container) return;
+  
+  const suggestions = AppState.currentJob?.suggestions || [];
+  
+  if (suggestions.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  let html = `
+    <div class="card" style="border: 2px solid var(--cyan); background: rgba(0, 217, 255, 0.05);">
+      <div class="card-header" style="background: rgba(0, 217, 255, 0.1);">
+        <div class="card-title">💡 Smart Diagnostic Suggestions</div>
+      </div>
+      <div class="card-body">
+  `;
+  
+  suggestions.forEach(suggestion => {
+    const confidenceColor = suggestion.confidence === 'high' ? 'var(--success)' : 'var(--warning)';
+    
+    html += `
+      <div style="background: var(--bg-elevated); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: var(--space-xl); margin-bottom: var(--space-lg);">
+        
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md);">
+          <h3 style="font-size: 1.125rem; font-weight: 700; color: var(--text-primary); margin: 0;">
+            ${suggestion.diagnosis}
+          </h3>
+          <span style="padding: 4px 12px; background: ${confidenceColor}; color: white; border-radius: 20px; font-size: 0.6875rem; font-weight: 700; text-transform: uppercase;">
+            ${suggestion.confidence} confidence
+          </span>
+        </div>
+        
+        ${suggestion.safetyNotes.length > 0 ? `
+          <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger); padding: var(--space-md); margin-bottom: var(--space-md); border-radius: var(--radius);">
+            <strong style="color: var(--danger);">⚠️ Safety Alert:</strong>
+            <ul style="margin: var(--space-sm) 0 0 var(--space-lg); color: var(--text-secondary);">
+              ${suggestion.safetyNotes.map(note => `<li>${note}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+        
+        <div style="margin-bottom: var(--space-md);">
+          <strong style="color: var(--cyan); font-size: 0.875rem;">Evidence:</strong>
+          <ul style="margin: var(--space-sm) 0 0 var(--space-lg); color: var(--text-secondary); font-size: 0.875rem;">
+            ${suggestion.evidence.map(item => `<li>${item}</li>`).join('')}
+          </ul>
+        </div>
+        
+        <div style="margin-bottom: var(--space-md);">
+          <strong style="color: var(--cyan); font-size: 0.875rem;">Next Steps:</strong>
+          <ol style="margin: var(--space-sm) 0 0 var(--space-lg); color: var(--text-secondary); font-size: 0.875rem;">
+            ${suggestion.nextSteps.map(step => `<li style="margin: var(--space-sm) 0;">${step}</li>`).join('')}
+          </ol>
+        </div>
+        
+        ${suggestion.partsLikely.length > 0 ? `
+          <div>
+            <strong style="color: var(--cyan); font-size: 0.875rem;">Parts Likely Needed:</strong>
+            <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap; margin-top: var(--space-sm);">
+              ${suggestion.partsLikely.map(part => `
+                <span style="background: var(--bg-tertiary); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; color: var(--text-secondary);">
+                  ${part}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+        
+      </div>
+    `;
+  });
+  
+  html += `
+      </div>
+    </div>
+  `;
+  
+  container.innerHTML = html;
+};
     
     
     // ==================== [INJECTION POINT I: PHOTO MANAGEMENT] ====================
