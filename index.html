@@ -42,16 +42,17 @@
             background: #4b5563;
             border-radius: 3px;
         }
-        .modal {
+        .modal-overlay {
             display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
         }
-        .modal.show {
+        .modal-overlay.show {
             display: flex;
-        }
-        @media print {
-            body { background: white; }
-            #app > *:not(#printArea) { display: none; }
-            #printArea { display: block !important; }
         }
     </style>
 </head>
@@ -65,11 +66,11 @@
                     <p class="text-xs text-gray-400">Scale: 1/4" = 1' | Grid: 1 ft squares</p>
                 </div>
                 <div class="flex gap-2">
-                    <button id="btnUndo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Z">↶</button>
-                    <button id="btnRedo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Y">↷</button>
+                    <button id="btnUndo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Z">↶ Undo</button>
+                    <button id="btnRedo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Y">↷ Redo</button>
                     <button id="btnSave" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">💾 Save</button>
                     <button id="btnLoad" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">📂 Load</button>
-                    <button id="btnExport" class="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-xs">📄 Export</button>
+                    <button id="btnExport" class="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-xs">📄 Export PNG</button>
                     <button id="btnClear" class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs">🗑️ Clear</button>
                 </div>
             </div>
@@ -105,19 +106,16 @@
                 <!-- Fittings -->
                 <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Fittings</div>
                 <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ELBOW90">
-                    <span class="w-3 h-3 text-blue-400">∟</span>90° Elbow
+                    <span class="w-3 h-3 text-blue-400 font-bold">∟</span>90° Elbow
                 </button>
                 <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ELBOW45">
-                    <span class="w-3 h-3 text-blue-400">∠</span>45° Elbow
+                    <span class="w-3 h-3 text-blue-400 font-bold">∠</span>45° Elbow
                 </button>
                 <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TEE">
-                    <span class="w-3 h-3 text-blue-400">⊥</span>Tee
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="REDUCER">
-                    <span class="w-3 h-3 text-blue-400">◇</span>Reducer
+                    <span class="w-3 h-3 text-blue-400 font-bold">⊥</span>Tee
                 </button>
                 <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TAKEOFF">
-                    <span class="w-3 h-3 text-blue-400">⊢</span>Takeoff
+                    <span class="w-3 h-3 text-blue-400 font-bold">⊢</span>Takeoff
                 </button>
 
                 <!-- Terminals -->
@@ -144,10 +142,7 @@
                 <!-- Tools -->
                 <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Tools</div>
                 <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="SELECT">
-                    <span class="w-3 h-3">↖</span>Select/Edit
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="NOTE">
-                    <span class="w-3 h-3">📝</span>Add Note
+                    <span class="w-3 h-3">↖</span>Select/Delete
                 </button>
 
                 <!-- Settings -->
@@ -155,10 +150,6 @@
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" id="snapGrid" checked class="rounded w-3 h-3">
                         <span>Snap to Grid</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="snapEndpoint" checked class="rounded w-3 h-3">
-                        <span>Snap to Endpoints</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" id="showGrid" checked class="rounded w-3 h-3">
@@ -178,23 +169,19 @@
                 <div class="mt-2 pt-2 border-t border-gray-700">
                     <label class="text-[10px] font-semibold text-gray-400 uppercase">Duct Size</label>
                     <select id="ductSize" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-1 py-1 text-xs">
-                        <option value="4">4" Round</option>
-                        <option value="5">5" Round</option>
-                        <option value="6">6" Round</option>
-                        <option value="7">7" Round</option>
-                        <option value="8" selected>8" Round</option>
-                        <option value="9">9" Round</option>
-                        <option value="10">10" Round</option>
-                        <option value="12">12" Round</option>
-                        <option value="14">14" Round</option>
-                        <option value="8x8">8"×8"</option>
+                        <option value="4">4"</option>
+                        <option value="5">5"</option>
+                        <option value="6">6"</option>
+                        <option value="7">7"</option>
+                        <option value="8" selected>8"</option>
+                        <option value="10">10"</option>
+                        <option value="12">12"</option>
+                        <option value="14">14"</option>
                         <option value="10x8">10"×8"</option>
                         <option value="12x8">12"×8"</option>
                         <option value="14x8">14"×8"</option>
                         <option value="16x8">16"×8"</option>
-                        <option value="18x8">18"×8"</option>
                         <option value="20x8">20"×8"</option>
-                        <option value="24x8">24"×8"</option>
                     </select>
                 </div>
 
@@ -208,9 +195,12 @@
                 <!-- Fitting Rotation -->
                 <div class="mt-2">
                     <label class="text-[10px] font-semibold text-gray-400 uppercase">Fitting Rotation</label>
-                    <input type="range" id="fittingRotation" min="0" max="270" step="90" value="0"
-                           class="mt-1 w-full">
-                    <div class="text-center text-gray-400" id="rotationDisplay">0°</div>
+                    <select id="fittingRotation" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-1 py-1 text-xs">
+                        <option value="0">0°</option>
+                        <option value="90">90°</option>
+                        <option value="180">180°</option>
+                        <option value="270">270°</option>
+                    </select>
                 </div>
             </div>
 
@@ -220,24 +210,12 @@
                 
                 <!-- Mode indicator -->
                 <div id="modeIndicator" class="absolute top-2 left-2 panel px-2 py-1 rounded text-xs font-medium">
-                    <span id="currentMode" class="text-green-400">WALL</span>
-                </div>
-
-                <!-- Coordinates display -->
-                <div id="coordsDisplay" class="absolute top-2 right-2 panel px-2 py-1 rounded text-xs">
-                    <span id="coords">0, 0</span>
+                    Mode: <span id="currentMode" class="text-green-400">WALL</span>
                 </div>
 
                 <!-- Measurement display -->
                 <div id="measureDisplay" class="absolute bottom-2 left-2 panel px-2 py-1 rounded text-xs hidden">
-                    <span id="liveLength">0</span> ft | <span id="liveAngle">0</span>°
-                </div>
-
-                <!-- Zoom controls -->
-                <div class="absolute bottom-2 right-2 panel rounded flex">
-                    <button id="zoomOut" class="px-2 py-1 hover:bg-gray-700 rounded-l text-sm">−</button>
-                    <span id="zoomLevel" class="px-2 py-1 text-xs">100%</span>
-                    <button id="zoomIn" class="px-2 py-1 hover:bg-gray-700 rounded-r text-sm">+</button>
+                    <span id="liveLength">0</span> ft
                 </div>
             </div>
 
@@ -303,7 +281,6 @@
                                     <span>90° Elbows:</span><span id="elbow90Count" class="text-right">0</span>
                                     <span>45° Elbows:</span><span id="elbow45Count" class="text-right">0</span>
                                     <span>Tees:</span><span id="teeCount" class="text-right">0</span>
-                                    <span>Reducers:</span><span id="reducerCount" class="text-right">0</span>
                                     <span>Takeoffs:</span><span id="takeoffCount" class="text-right">0</span>
                                 </div>
                             </div>
@@ -322,62 +299,51 @@
                     <div id="tab-pressure" class="tab-content hidden">
                         <div class="space-y-2">
                             <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Static Pressure Calculator</div>
+                                <div class="font-semibold mb-1">System Settings</div>
                                 <div class="space-y-1">
-                                    <div class="flex justify-between">
+                                    <div class="flex justify-between items-center">
                                         <span>System CFM:</span>
-                                        <input type="number" id="systemCFM" value="1200" class="w-20 bg-gray-600 rounded px-1 text-right">
+                                        <input type="number" id="systemCFM" value="1200" class="w-16 bg-gray-600 rounded px-1 text-right">
                                     </div>
-                                    <div class="flex justify-between">
-                                        <span>Filter (in. w.c.):</span>
-                                        <input type="number" id="filterDrop" value="0.10" step="0.01" class="w-20 bg-gray-600 rounded px-1 text-right">
+                                    <div class="flex justify-between items-center">
+                                        <span>Filter Drop:</span>
+                                        <input type="number" id="filterDrop" value="0.10" step="0.01" class="w-16 bg-gray-600 rounded px-1 text-right">
                                     </div>
-                                    <div class="flex justify-between">
-                                        <span>Coil (in. w.c.):</span>
-                                        <input type="number" id="coilDrop" value="0.20" step="0.01" class="w-20 bg-gray-600 rounded px-1 text-right">
+                                    <div class="flex justify-between items-center">
+                                        <span>Coil Drop:</span>
+                                        <input type="number" id="coilDrop" value="0.20" step="0.01" class="w-16 bg-gray-600 rounded px-1 text-right">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Calculated Losses</div>
+                                <div class="font-semibold mb-1">Calculated Losses (in. w.c.)</div>
                                 <div class="space-y-1">
                                     <div class="flex justify-between">
                                         <span>Supply Duct:</span>
-                                        <span id="supplyLoss">0.00"</span>
+                                        <span id="supplyLoss">0.00</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span>Supply Fittings:</span>
-                                        <span id="supplyFittingLoss">0.00"</span>
+                                        <span id="supplyFittingLoss">0.00</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span>Return Duct:</span>
-                                        <span id="returnLoss">0.00"</span>
+                                        <span id="returnLoss">0.00</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>Return Fittings:</span>
-                                        <span id="returnFittingLoss">0.00"</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Registers/Grilles:</span>
-                                        <span id="terminalLoss">0.00"</span>
+                                        <span>Terminals:</span>
+                                        <span id="terminalLoss">0.00</span>
                                     </div>
                                     <div class="flex justify-between mt-1 pt-1 border-t border-gray-600 font-bold">
                                         <span>Total ESP:</span>
-                                        <span id="totalESP">0.00"</span>
+                                        <span id="totalESP">0.30</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Velocity Check</div>
-                                <div id="velocityWarnings" class="space-y-1 text-[10px]">
-                                    <div class="text-gray-500">Draw ducts to see velocity analysis</div>
                                 </div>
                             </div>
 
                             <button id="calcPressure" class="w-full bg-blue-600 hover:bg-blue-700 rounded py-1.5 text-xs font-medium">
-                                Recalculate Pressure
+                                Calculate Pressure
                             </button>
                         </div>
                     </div>
@@ -400,30 +366,15 @@
                             </div>
 
                             <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Terminals List</div>
-                                <div id="terminalsList" class="space-y-1 text-[10px]">
-                                    <div class="text-gray-500 italic">No terminals placed</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-700 rounded p-2">
                                 <div class="font-semibold mb-1">Estimated Materials</div>
                                 <div class="space-y-1">
                                     <div class="flex justify-between">
-                                        <span>Sheet Metal (lbs):</span>
-                                        <span id="sheetMetalLbs">0</span>
+                                        <span>Sheet Metal:</span>
+                                        <span id="sheetMetalLbs">0 lbs</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>Flex Duct (ft):</span>
-                                        <span id="flexDuctFt">0</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Duct Tape (rolls):</span>
-                                        <span id="tapeRolls">0</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Mastic (gal):</span>
-                                        <span id="masticGal">0</span>
+                                        <span>Flex Duct:</span>
+                                        <span id="flexDuctFt">0 ft</span>
                                     </div>
                                     <div class="flex justify-between">
                                         <span>Hangers:</span>
@@ -431,10 +382,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <button id="printMaterials" class="w-full bg-green-600 hover:bg-green-700 rounded py-1.5 text-xs font-medium">
-                                Print Material List
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -443,7 +390,7 @@
     </div>
 
     <!-- Room Label Modal -->
-    <div id="roomModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+    <div id="roomModal" class="modal-overlay">
         <div class="bg-gray-800 rounded-lg p-4 w-80">
             <h3 class="font-bold mb-3">Room Details</h3>
             <div class="space-y-2">
@@ -467,26 +414,13 @@
         </div>
     </div>
 
-    <!-- Note Modal -->
-    <div id="noteModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-lg p-4 w-80">
-            <h3 class="font-bold mb-3">Add Note</h3>
-            <textarea id="noteText" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm h-24" placeholder="Enter note text..."></textarea>
-            <div class="flex gap-2 mt-4">
-                <button id="noteCancel" class="flex-1 bg-gray-600 hover:bg-gray-500 rounded py-1.5 text-sm">Cancel</button>
-                <button id="noteSave" class="flex-1 bg-green-600 hover:bg-green-700 rounded py-1.5 text-sm">Save</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Hidden file input -->
     <input type="file" id="fileInput" accept=".json" class="hidden">
 
-    <!-- Print area -->
-    <div id="printArea" class="hidden"></div>
-
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        (function() {
+            'use strict';
+            
             const canvas = document.getElementById('designCanvas');
             const ctx = canvas.getContext('2d');
 
@@ -496,20 +430,14 @@
             let redoStack = [];
             let currentMode = 'WALL';
             let isDrawing = false;
-            let startPoint = { x: 0, y: 0 };
+            let startX = 0;
+            let startY = 0;
             let currentElement = null;
             let selectedElement = null;
-            let hoveredElement = null;
-            let zoom = 1;
-            let pan = { x: 0, y: 0 };
-            let pendingRoom = null;
-            let pendingNote = null;
+            let pendingRoomCoords = null;
 
-            // Settings
-            const GRID_SIZE = 20;
-            const PIXELS_PER_FOOT = GRID_SIZE;
-
-            // Colors
+            // Constants
+            const GRID_SIZE = 20; // pixels per foot
             const COLORS = {
                 WALL: '#6b7280',
                 TRUNK: '#1d4ed8',
@@ -524,183 +452,120 @@
                 ELBOW90: '#60a5fa',
                 ELBOW45: '#60a5fa',
                 TEE: '#60a5fa',
-                REDUCER: '#60a5fa',
                 TAKEOFF: '#60a5fa',
                 ROOM: '#fbbf24',
-                NOTE: '#f472b6',
                 GRID: '#374151',
                 SELECTED: '#fbbf24'
             };
 
-            // Equivalent lengths for fittings (in feet)
+            // Equivalent lengths for pressure calc
             const EQUIV_LENGTHS = {
                 ELBOW90: 15,
                 ELBOW45: 7,
                 TEE: 30,
-                REDUCER: 5,
-                TAKEOFF: 35,
-                REGISTER: 10,
-                RETURN_GRILLE: 10,
-                DIFFUSER: 15
+                TAKEOFF: 35
             };
 
-            // Canvas sizing
-            const resizeCanvas = () => {
+            // Resize canvas
+            function resizeCanvas() {
                 const container = canvas.parentElement;
                 canvas.width = container.clientWidth;
                 canvas.height = container.clientHeight;
                 draw();
-            };
+            }
 
-            resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
 
-            // Coordinate transforms
-            const screenToWorld = (x, y) => ({
-                x: (x - pan.x) / zoom,
-                y: (y - pan.y) / zoom
-            });
+            // Snap to grid
+            function snap(val) {
+                if (!document.getElementById('snapGrid').checked) return val;
+                return Math.round(val / GRID_SIZE) * GRID_SIZE;
+            }
 
-            const worldToScreen = (x, y) => ({
-                x: x * zoom + pan.x,
-                y: y * zoom + pan.y
-            });
-
-            // Grid snapping
-            const snapToGrid = (x, y) => {
-                if (!document.getElementById('snapGrid').checked) return { x, y };
-                return {
-                    x: Math.round(x / GRID_SIZE) * GRID_SIZE,
-                    y: Math.round(y / GRID_SIZE) * GRID_SIZE
-                };
-            };
-
-            // Endpoint snapping
-            const snapToEndpoint = (x, y, threshold = 10) => {
-                if (!document.getElementById('snapEndpoint').checked) return null;
+            // Get mouse/touch coordinates relative to canvas
+            function getCanvasCoords(e) {
+                const rect = canvas.getBoundingClientRect();
+                let clientX, clientY;
                 
-                for (const el of elements) {
-                    if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
-                        if (Math.hypot(x - el.startX, y - el.startY) < threshold) {
-                            return { x: el.startX, y: el.startY };
-                        }
-                        if (Math.hypot(x - el.endX, y - el.endY) < threshold) {
-                            return { x: el.endX, y: el.endY };
-                        }
-                    }
-                }
-                return null;
-            };
-
-            // Ortho lock
-            const applyOrthoLock = (start, end) => {
-                if (!document.getElementById('orthoLock').checked) return end;
-                
-                const dx = Math.abs(end.x - start.x);
-                const dy = Math.abs(end.y - start.y);
-                
-                if (dx > dy) {
-                    return { x: end.x, y: start.y };
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
                 } else {
-                    return { x: start.x, y: end.y };
+                    clientX = e.clientX;
+                    clientY = e.clientY;
                 }
-            };
+                
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
 
             // Calculate length in feet
-            const calcLength = (el) => {
+            function calcLength(el) {
+                if (!el.endX) return 0;
                 const dx = el.endX - el.startX;
                 const dy = el.endY - el.startY;
-                return Math.sqrt(dx * dx + dy * dy) / PIXELS_PER_FOOT;
-            };
-
-            // Calculate angle
-            const calcAngle = (el) => {
-                const dx = el.endX - el.startX;
-                const dy = el.endY - el.startY;
-                return Math.round(Math.atan2(dy, dx) * 180 / Math.PI);
-            };
-
-            // Get duct area in sq inches
-            const getDuctArea = (size) => {
-                if (typeof size === 'string' && size.includes('x')) {
-                    const [w, h] = size.split('x').map(Number);
-                    return w * h;
-                }
-                const d = parseInt(size) || 8;
-                return Math.PI * (d / 2) ** 2;
-            };
+                return Math.sqrt(dx * dx + dy * dy) / GRID_SIZE;
+            }
 
             // Draw grid
-            const drawGrid = () => {
+            function drawGrid() {
                 if (!document.getElementById('showGrid').checked) return;
                 
                 ctx.strokeStyle = COLORS.GRID;
                 ctx.lineWidth = 0.5;
 
-                const startX = Math.floor(-pan.x / zoom / GRID_SIZE) * GRID_SIZE;
-                const startY = Math.floor(-pan.y / zoom / GRID_SIZE) * GRID_SIZE;
-                const endX = startX + canvas.width / zoom + GRID_SIZE * 2;
-                const endY = startY + canvas.height / zoom + GRID_SIZE * 2;
-
-                for (let x = startX; x <= endX; x += GRID_SIZE) {
-                    const screen = worldToScreen(x, 0);
+                for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
                     ctx.beginPath();
-                    ctx.moveTo(screen.x, 0);
-                    ctx.lineTo(screen.x, canvas.height);
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
                     ctx.stroke();
                 }
 
-                for (let y = startY; y <= endY; y += GRID_SIZE) {
-                    const screen = worldToScreen(0, y);
+                for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
                     ctx.beginPath();
-                    ctx.moveTo(0, screen.y);
-                    ctx.lineTo(canvas.width, screen.y);
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
                     ctx.stroke();
                 }
-            };
+            }
 
-            // Draw element
-            const drawElement = (el, isPreview = false) => {
+            // Draw a single element
+            function drawElement(el, isPreview) {
                 const alpha = isPreview ? 0.5 : 1;
                 const isSelected = el === selectedElement;
-                const isHovered = el === hoveredElement;
 
                 ctx.save();
                 ctx.globalAlpha = alpha;
 
-                // Transform coordinates
-                const start = worldToScreen(el.startX, el.startY);
-                const end = el.endX !== undefined ? worldToScreen(el.endX, el.endY) : start;
-
-                if (el.type === 'WALL') {
-                    ctx.strokeStyle = isSelected ? COLORS.SELECTED : COLORS.WALL;
-                    ctx.lineWidth = 8 * zoom;
-                    ctx.lineCap = 'round';
-                    ctx.beginPath();
-                    ctx.moveTo(start.x, start.y);
-                    ctx.lineTo(end.x, end.y);
-                    ctx.stroke();
-                } 
-                else if (['TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
-                    const color = COLORS[el.type];
-                    let width = el.type === 'FLEX' ? 6 : (el.type === 'TRUNK' ? 14 : 10);
+                // Line-based elements (walls, ducts)
+                if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
+                    let color = COLORS[el.type];
+                    let width = 8;
                     
+                    if (el.type === 'TRUNK') width = 14;
+                    else if (el.type === 'SUPPLY') width = 10;
+                    else if (el.type === 'RETURN') width = 10;
+                    else if (el.type === 'FLEX') width = 6;
+
                     ctx.strokeStyle = isSelected ? COLORS.SELECTED : color;
-                    ctx.lineWidth = width * zoom;
+                    ctx.lineWidth = width;
                     ctx.lineCap = 'round';
                     ctx.beginPath();
-                    ctx.moveTo(start.x, start.y);
-                    ctx.lineTo(end.x, end.y);
+                    ctx.moveTo(el.startX, el.startY);
+                    ctx.lineTo(el.endX, el.endY);
                     ctx.stroke();
 
-                    // Center line
-                    if (el.type !== 'FLEX') {
+                    // Center line for ducts
+                    if (el.type !== 'WALL' && el.type !== 'FLEX') {
                         ctx.strokeStyle = 'rgba(255,255,255,0.3)';
                         ctx.lineWidth = 1;
                         ctx.setLineDash([4, 4]);
                         ctx.beginPath();
-                        ctx.moveTo(start.x, start.y);
-                        ctx.lineTo(end.x, end.y);
+                        ctx.moveTo(el.startX, el.startY);
+                        ctx.lineTo(el.endX, el.endY);
                         ctx.stroke();
                         ctx.setLineDash([]);
                     }
@@ -708,44 +573,44 @@
                     // Measurement label
                     if (document.getElementById('showMeasure').checked && !isPreview) {
                         const len = calcLength(el).toFixed(1);
-                        const midX = (start.x + end.x) / 2;
-                        const midY = (start.y + end.y) / 2;
+                        const midX = (el.startX + el.endX) / 2;
+                        const midY = (el.startY + el.endY) / 2;
                         
                         ctx.fillStyle = 'white';
-                        ctx.font = `${10 * zoom}px sans-serif`;
+                        ctx.font = '10px sans-serif';
                         ctx.textAlign = 'center';
                         ctx.globalAlpha = 1;
-                        ctx.fillText(`${len}'`, midX, midY - 8 * zoom);
-                        if (el.size) {
-                            ctx.font = `${8 * zoom}px sans-serif`;
-                            ctx.fillText(el.size + '"', midX, midY + 10 * zoom);
+                        ctx.fillText(len + "'", midX, midY - 10);
+                        
+                        if (el.size && el.type !== 'WALL') {
+                            ctx.font = '8px sans-serif';
+                            ctx.fillText(el.size + '"', midX, midY + 12);
                         }
                     }
                 }
-                else if (['ELBOW90', 'ELBOW45', 'TEE', 'REDUCER', 'TAKEOFF'].includes(el.type)) {
-                    const size = 12 * zoom;
+                // Fittings
+                else if (['ELBOW90', 'ELBOW45', 'TEE', 'TAKEOFF'].includes(el.type)) {
+                    const size = 12;
                     const rotation = (el.rotation || 0) * Math.PI / 180;
                     
-                    ctx.translate(start.x, start.y);
+                    ctx.translate(el.startX, el.startY);
                     ctx.rotate(rotation);
                     
-                    ctx.fillStyle = isSelected ? COLORS.SELECTED : COLORS[el.type];
-                    ctx.strokeStyle = 'white';
-                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = isSelected ? COLORS.SELECTED : COLORS[el.type];
+                    ctx.lineWidth = 4;
+                    ctx.lineCap = 'round';
 
                     if (el.type === 'ELBOW90') {
                         ctx.beginPath();
                         ctx.moveTo(-size, 0);
                         ctx.lineTo(0, 0);
                         ctx.lineTo(0, -size);
-                        ctx.lineWidth = 4 * zoom;
                         ctx.stroke();
                     } else if (el.type === 'ELBOW45') {
                         ctx.beginPath();
                         ctx.moveTo(-size, 0);
                         ctx.lineTo(0, 0);
                         ctx.lineTo(size * 0.7, -size * 0.7);
-                        ctx.lineWidth = 4 * zoom;
                         ctx.stroke();
                     } else if (el.type === 'TEE') {
                         ctx.beginPath();
@@ -753,147 +618,301 @@
                         ctx.lineTo(size, 0);
                         ctx.moveTo(0, 0);
                         ctx.lineTo(0, -size);
-                        ctx.lineWidth = 4 * zoom;
-                        ctx.stroke();
-                    } else if (el.type === 'REDUCER') {
-                        ctx.beginPath();
-                        ctx.moveTo(-size, -size/2);
-                        ctx.lineTo(size, -size/3);
-                        ctx.lineTo(size, size/3);
-                        ctx.lineTo(-size, size/2);
-                        ctx.closePath();
-                        ctx.fill();
                         ctx.stroke();
                     } else if (el.type === 'TAKEOFF') {
                         ctx.beginPath();
-                        ctx.moveTo(-size, -size/3);
-                        ctx.lineTo(size, -size/3);
-                        ctx.lineTo(size, size/3);
-                        ctx.lineTo(-size, size/3);
-                        ctx.closePath();
-                        ctx.fill();
-                        ctx.moveTo(0, -size/3);
+                        ctx.moveTo(-size, 0);
+                        ctx.lineTo(size, 0);
+                        ctx.moveTo(0, 0);
                         ctx.lineTo(0, -size);
-                        ctx.lineWidth = 3 * zoom;
                         ctx.stroke();
+                        // Add circle at takeoff point
+                        ctx.beginPath();
+                        ctx.arc(0, -size, 3, 0, Math.PI * 2);
+                        ctx.fillStyle = ctx.strokeStyle;
+                        ctx.fill();
                     }
-                    
-                    ctx.setTransform(1, 0, 0, 1, 0, 0);
                 }
+                // Terminals (registers, grilles, diffusers)
                 else if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(el.type)) {
                     const color = COLORS[el.type];
-                    const size = 14 * zoom;
+                    const size = 14;
+                    
+                    ctx.fillStyle = isSelected ? COLORS.SELECTED : color;
                     
                     if (el.type === 'DIFFUSER') {
                         ctx.beginPath();
-                        ctx.arc(start.x, start.y, size/2, 0, Math.PI * 2);
-                        ctx.fillStyle = isSelected ? COLORS.SELECTED : color;
+                        ctx.arc(el.startX, el.startY, size / 2, 0, Math.PI * 2);
                         ctx.fill();
-                        ctx.strokeStyle = 'white';
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
                     } else {
-                        ctx.fillStyle = isSelected ? COLORS.SELECTED : color;
-                        ctx.fillRect(start.x - size/2, start.y - size/2, size, size);
-                        ctx.strokeStyle = 'white';
-                        ctx.lineWidth = 1;
-                        ctx.strokeRect(start.x - size/2, start.y - size/2, size, size);
+                        ctx.fillRect(el.startX - size/2, el.startY - size/2, size, size);
                     }
                     
                     // CFM label
                     if (el.cfm) {
                         ctx.fillStyle = 'white';
-                        ctx.font = `bold ${8 * zoom}px sans-serif`;
+                        ctx.font = 'bold 8px sans-serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
-                        ctx.fillText(el.cfm, start.x, start.y);
+                        ctx.fillText(el.cfm, el.startX, el.startY);
                     }
                 }
+                // Equipment
                 else if (el.type === 'AHU' || el.type === 'FURNACE') {
-                    const width = 50 * zoom;
-                    const height = 35 * zoom;
+                    const width = 50;
+                    const height = 35;
                     
                     ctx.fillStyle = isSelected ? COLORS.SELECTED : COLORS[el.type];
-                    ctx.fillRect(start.x - width/2, start.y - height/2, width, height);
+                    ctx.fillRect(el.startX - width/2, el.startY - height/2, width, height);
                     
                     ctx.strokeStyle = 'white';
                     ctx.lineWidth = 1;
-                    ctx.strokeRect(start.x - width/2, start.y - height/2, width, height);
+                    ctx.strokeRect(el.startX - width/2, el.startY - height/2, width, height);
                     
                     ctx.fillStyle = 'white';
-                    ctx.font = `bold ${9 * zoom}px sans-serif`;
+                    ctx.font = 'bold 9px sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(el.type === 'AHU' ? 'AHU' : 'FURN', start.x, start.y);
+                    ctx.fillText(el.type === 'AHU' ? 'AHU' : 'FURN', el.startX, el.startY);
                 }
+                // Room labels
                 else if (el.type === 'ROOM') {
                     ctx.fillStyle = COLORS.ROOM;
-                    ctx.font = `bold ${11 * zoom}px sans-serif`;
+                    ctx.font = 'bold 11px sans-serif';
                     ctx.textAlign = 'center';
-                    ctx.fillText(el.name || 'Room', start.x, start.y);
+                    ctx.fillText(el.name || 'Room', el.startX, el.startY);
                     
                     if (el.sqft || el.cfm) {
-                        ctx.font = `${9 * zoom}px sans-serif`;
+                        ctx.font = '9px sans-serif';
                         let label = [];
                         if (el.sqft) label.push(el.sqft + ' sf');
                         if (el.cfm) label.push(el.cfm + ' CFM');
-                        ctx.fillText(label.join(' | '), start.x, start.y + 12 * zoom);
+                        ctx.fillText(label.join(' | '), el.startX, el.startY + 12);
                     }
-                }
-                else if (el.type === 'NOTE') {
-                    ctx.fillStyle = COLORS.NOTE;
-                    ctx.font = `${9 * zoom}px sans-serif`;
-                    ctx.textAlign = 'left';
-                    
-                    const lines = (el.text || '').split('\n');
-                    lines.forEach((line, i) => {
-                        ctx.fillText(line, start.x, start.y + i * 12 * zoom);
-                    });
-                }
-
-                // Selection highlight
-                if ((isHovered || isSelected) && currentMode === 'SELECT') {
-                    ctx.strokeStyle = COLORS.SELECTED;
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([4, 4]);
-                    
-                    if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
-                        ctx.beginPath();
-                        ctx.moveTo(start.x, start.y);
-                        ctx.lineTo(end.x, end.y);
-                        ctx.stroke();
-                    } else {
-                        const bounds = getElementBounds(el);
-                        const screenBounds = worldToScreen(bounds.x, bounds.y);
-                        ctx.strokeRect(screenBounds.x - 4, screenBounds.y - 4, 
-                                      bounds.w * zoom + 8, bounds.h * zoom + 8);
-                    }
-                    ctx.setLineDash([]);
                 }
 
                 ctx.restore();
-            };
+            }
 
-            // Get element bounds
-            const getElementBounds = (el) => {
-                if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
-                    return {
-                        x: Math.min(el.startX, el.endX),
-                        y: Math.min(el.startY, el.endY),
-                        w: Math.abs(el.endX - el.startX) || 10,
-                        h: Math.abs(el.endY - el.startY) || 10
-                    };
-                } else if (el.type === 'AHU' || el.type === 'FURNACE') {
-                    return { x: el.startX - 25, y: el.startY - 17.5, w: 50, h: 35 };
-                } else if (el.type === 'ROOM' || el.type === 'NOTE') {
-                    return { x: el.startX - 30, y: el.startY - 10, w: 60, h: 20 };
-                } else {
-                    return { x: el.startX - 7, y: el.startY - 7, w: 14, h: 14 };
+            // Main draw function
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGrid();
+
+                // Draw all saved elements
+                for (let i = 0; i < elements.length; i++) {
+                    drawElement(elements[i], false);
                 }
-            };
 
-            // Point near line test
-            const pointNearLine = (px, py, x1, y1, x2, y2, threshold = 10) => {
+                // Draw current element being created
+                if (isDrawing && currentElement) {
+                    drawElement(currentElement, true);
+                }
+
+                updateSummary();
+            }
+
+            // Update summary panels
+            function updateSummary() {
+                let trunkLen = 0, supplyLen = 0, returnLen = 0, flexLen = 0;
+                let registerCount = 0, returnGrilleCount = 0, diffuserCount = 0;
+                let supplyCFM = 0, returnCFM = 0;
+                let elbow90Count = 0, elbow45Count = 0, teeCount = 0, takeoffCount = 0;
+                
+                const ductBySizeMap = {};
+                const fittingsMap = {};
+                const rooms = [];
+
+                elements.forEach(el => {
+                    const len = calcLength(el);
+                    
+                    if (el.type === 'TRUNK') {
+                        trunkLen += len;
+                        const key = 'Trunk ' + (el.size || '14') + '"';
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+                    if (el.type === 'SUPPLY') {
+                        supplyLen += len;
+                        const key = 'Supply ' + (el.size || '8') + '"';
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+                    if (el.type === 'RETURN') {
+                        returnLen += len;
+                        const key = 'Return ' + (el.size || '8') + '"';
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+                    if (el.type === 'FLEX') {
+                        flexLen += len;
+                        const key = 'Flex ' + (el.size || '6') + '"';
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+
+                    if (el.type === 'REGISTER') {
+                        registerCount++;
+                        supplyCFM += el.cfm || 0;
+                    }
+                    if (el.type === 'RETURN_GRILLE') {
+                        returnGrilleCount++;
+                        returnCFM += el.cfm || 0;
+                    }
+                    if (el.type === 'DIFFUSER') {
+                        diffuserCount++;
+                        supplyCFM += el.cfm || 0;
+                    }
+
+                    if (el.type === 'ELBOW90') {
+                        elbow90Count++;
+                        const key = '90° Elbow ' + (el.size || '8') + '"';
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+                    if (el.type === 'ELBOW45') {
+                        elbow45Count++;
+                        const key = '45° Elbow ' + (el.size || '8') + '"';
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+                    if (el.type === 'TEE') {
+                        teeCount++;
+                        const key = 'Tee ' + (el.size || '8') + '"';
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+                    if (el.type === 'TAKEOFF') {
+                        takeoffCount++;
+                        const key = 'Takeoff ' + (el.size || '6') + '"';
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+
+                    if (el.type === 'ROOM') {
+                        rooms.push(el);
+                    }
+                });
+
+                // Update summary tab
+                document.getElementById('totalSupplyCFM').textContent = supplyCFM + ' CFM';
+                document.getElementById('totalReturnCFM').textContent = returnCFM + ' CFM';
+                
+                const balance = supplyCFM - returnCFM;
+                const balanceEl = document.getElementById('cfmBalance');
+                balanceEl.textContent = (balance >= 0 ? '+' : '') + balance + ' CFM';
+                balanceEl.className = 'font-bold ' + (balance === 0 ? 'text-green-400' : 
+                                     Math.abs(balance) <= supplyCFM * 0.1 ? 'text-yellow-400' : 'text-red-400');
+
+                document.getElementById('trunkTotal').textContent = trunkLen.toFixed(1) + ' ft';
+                document.getElementById('supplyTotal').textContent = supplyLen.toFixed(1) + ' ft';
+                document.getElementById('returnTotal').textContent = returnLen.toFixed(1) + ' ft';
+                document.getElementById('flexTotal').textContent = flexLen.toFixed(1) + ' ft';
+
+                document.getElementById('registerCount').textContent = registerCount;
+                document.getElementById('returnGrilleCount').textContent = returnGrilleCount;
+                document.getElementById('diffuserCount').textContent = diffuserCount;
+                document.getElementById('elbow90Count').textContent = elbow90Count;
+                document.getElementById('elbow45Count').textContent = elbow45Count;
+                document.getElementById('teeCount').textContent = teeCount;
+                document.getElementById('takeoffCount').textContent = takeoffCount;
+
+                // Room list
+                const roomList = document.getElementById('roomList');
+                if (rooms.length === 0) {
+                    roomList.innerHTML = '<div class="text-gray-500 italic">No rooms defined</div>';
+                } else {
+                    roomList.innerHTML = rooms.map(r => 
+                        '<div class="flex justify-between"><span>' + (r.name || 'Room') + '</span><span>' + (r.cfm || 0) + ' CFM</span></div>'
+                    ).join('');
+                }
+
+                // Materials tab - duct by size
+                const ductBySize = document.getElementById('ductBySize');
+                const ductKeys = Object.keys(ductBySizeMap);
+                if (ductKeys.length === 0) {
+                    ductBySize.innerHTML = '<div class="text-gray-500 italic">No ducts placed</div>';
+                } else {
+                    ductBySize.innerHTML = ductKeys.map(k => 
+                        '<div class="flex justify-between"><span>' + k + '</span><span>' + ductBySizeMap[k].toFixed(1) + ' ft</span></div>'
+                    ).join('');
+                }
+
+                // Materials tab - fittings
+                const fittingsList = document.getElementById('fittingsList');
+                const fittingKeys = Object.keys(fittingsMap);
+                if (fittingKeys.length === 0) {
+                    fittingsList.innerHTML = '<div class="text-gray-500 italic">No fittings placed</div>';
+                } else {
+                    fittingsList.innerHTML = fittingKeys.map(k => 
+                        '<div class="flex justify-between"><span>' + k + '</span><span>×' + fittingsMap[k] + '</span></div>'
+                    ).join('');
+                }
+
+                // Estimated materials
+                const totalDuct = trunkLen + supplyLen + returnLen;
+                document.getElementById('sheetMetalLbs').textContent = Math.ceil(totalDuct * 2.5) + ' lbs';
+                document.getElementById('flexDuctFt').textContent = flexLen.toFixed(0) + ' ft';
+                document.getElementById('hangerCount').textContent = Math.ceil(totalDuct / 4);
+            }
+
+            // Calculate static pressure
+            function calculatePressure() {
+                const filterDrop = parseFloat(document.getElementById('filterDrop').value) || 0.1;
+                const coilDrop = parseFloat(document.getElementById('coilDrop').value) || 0.2;
+
+                let supplyDuctLoss = 0;
+                let returnDuctLoss = 0;
+                let supplyFittingLoss = 0;
+                let terminalLoss = 0;
+
+                elements.forEach(el => {
+                    const len = calcLength(el);
+                    
+                    // Duct friction (0.08" per 100 ft typical)
+                    if (el.type === 'TRUNK' || el.type === 'SUPPLY') {
+                        supplyDuctLoss += len * 0.08 / 100;
+                    }
+                    if (el.type === 'RETURN') {
+                        returnDuctLoss += len * 0.08 / 100;
+                    }
+                    if (el.type === 'FLEX') {
+                        supplyDuctLoss += len * 0.15 / 100; // Flex has higher friction
+                    }
+
+                    // Fitting equivalent lengths
+                    if (EQUIV_LENGTHS[el.type]) {
+                        supplyFittingLoss += EQUIV_LENGTHS[el.type] * 0.08 / 100;
+                    }
+
+                    // Terminal losses
+                    if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(el.type)) {
+                        terminalLoss += 0.03;
+                    }
+                });
+
+                const totalESP = filterDrop + coilDrop + supplyDuctLoss + supplyFittingLoss + 
+                                returnDuctLoss + terminalLoss;
+
+                document.getElementById('supplyLoss').textContent = supplyDuctLoss.toFixed(3);
+                document.getElementById('supplyFittingLoss').textContent = supplyFittingLoss.toFixed(3);
+                document.getElementById('returnLoss').textContent = returnDuctLoss.toFixed(3);
+                document.getElementById('terminalLoss').textContent = terminalLoss.toFixed(3);
+                document.getElementById('totalESP').textContent = totalESP.toFixed(3);
+            }
+
+            // Save state for undo
+            function saveState() {
+                undoStack.push(JSON.stringify(elements));
+                if (undoStack.length > 50) undoStack.shift();
+                redoStack = [];
+            }
+
+            // Check if element type is point-based (single click)
+            function isPointElement(mode) {
+                return ['REGISTER', 'RETURN_GRILLE', 'DIFFUSER', 'AHU', 'FURNACE', 
+                        'ELBOW90', 'ELBOW45', 'TEE', 'TAKEOFF'].includes(mode);
+            }
+
+            // Check if element type is line-based (click and drag)
+            function isLineElement(mode) {
+                return ['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(mode);
+            }
+
+            // Point near line for selection
+            function pointNearLine(px, py, x1, y1, x2, y2, threshold) {
                 const A = px - x1;
                 const B = py - y1;
                 const C = x2 - x1;
@@ -908,434 +927,169 @@
                 else if (param > 1) { xx = x2; yy = y2; }
                 else { xx = x1 + param * C; yy = y1 + param * D; }
 
-                return Math.hypot(px - xx, py - yy) < threshold;
-            };
+                const dx = px - xx;
+                const dy = py - yy;
+                return Math.sqrt(dx * dx + dy * dy) < threshold;
+            }
 
-            // Find element at point
-            const findElementAt = (x, y) => {
+            // Find element at coordinates
+            function findElementAt(x, y) {
                 for (let i = elements.length - 1; i >= 0; i--) {
                     const el = elements[i];
-                    if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
-                        if (pointNearLine(x, y, el.startX, el.startY, el.endX, el.endY, 12 / zoom)) {
+                    
+                    if (isLineElement(el.type)) {
+                        if (pointNearLine(x, y, el.startX, el.startY, el.endX, el.endY, 12)) {
                             return el;
                         }
                     } else {
-                        const bounds = getElementBounds(el);
-                        if (x >= bounds.x && x <= bounds.x + bounds.w &&
-                            y >= bounds.y && y <= bounds.y + bounds.h) {
+                        // Point elements - check distance from center
+                        const dx = x - el.startX;
+                        const dy = y - el.startY;
+                        if (Math.sqrt(dx * dx + dy * dy) < 20) {
                             return el;
                         }
                     }
                 }
                 return null;
-            };
+            }
 
-            // Main draw function
-            const draw = () => {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawGrid();
+            // EVENT HANDLERS
 
-                elements.forEach(el => drawElement(el));
-
-                if (isDrawing && currentElement) {
-                    drawElement(currentElement, true);
-                }
-
-                updateSummary();
-            };
-
-            // Update all summaries
-            const updateSummary = () => {
-                let trunkLen = 0, supplyLen = 0, returnLen = 0, flexLen = 0;
-                let registerCount = 0, returnGrilleCount = 0, diffuserCount = 0;
-                let supplyCFM = 0, returnCFM = 0;
-                let elbow90Count = 0, elbow45Count = 0, teeCount = 0, reducerCount = 0, takeoffCount = 0;
-                
-                const ductBySizeMap = {};
-                const fittingsMap = {};
-                const terminalsMap = {};
-                const rooms = [];
-
-                elements.forEach(el => {
-                    // Lengths
-                    if (el.type === 'TRUNK') {
-                        const len = calcLength(el);
-                        trunkLen += len;
-                        const key = `Trunk ${el.size || '14'}"`;
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-                    if (el.type === 'SUPPLY') {
-                        const len = calcLength(el);
-                        supplyLen += len;
-                        const key = `Supply ${el.size || '8'}"`;
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-                    if (el.type === 'RETURN') {
-                        const len = calcLength(el);
-                        returnLen += len;
-                        const key = `Return ${el.size || '8'}"`;
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-                    if (el.type === 'FLEX') {
-                        const len = calcLength(el);
-                        flexLen += len;
-                        const key = `Flex ${el.size || '6'}"`;
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-
-                    // Terminals
-                    if (el.type === 'REGISTER') {
-                        registerCount++;
-                        supplyCFM += el.cfm || 0;
-                        terminalsMap['Supply Register'] = (terminalsMap['Supply Register'] || 0) + 1;
-                    }
-                    if (el.type === 'RETURN_GRILLE') {
-                        returnGrilleCount++;
-                        returnCFM += el.cfm || 0;
-                        terminalsMap['Return Grille'] = (terminalsMap['Return Grille'] || 0) + 1;
-                    }
-                    if (el.type === 'DIFFUSER') {
-                        diffuserCount++;
-                        supplyCFM += el.cfm || 0;
-                        terminalsMap['Ceiling Diffuser'] = (terminalsMap['Ceiling Diffuser'] || 0) + 1;
-                    }
-
-                    // Fittings
-                    if (el.type === 'ELBOW90') {
-                        elbow90Count++;
-                        const key = `90° Elbow ${el.size || '8'}"`;
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-                    if (el.type === 'ELBOW45') {
-                        elbow45Count++;
-                        const key = `45° Elbow ${el.size || '8'}"`;
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-                    if (el.type === 'TEE') {
-                        teeCount++;
-                        const key = `Tee ${el.size || '8'}"`;
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-                    if (el.type === 'REDUCER') {
-                        reducerCount++;
-                        fittingsMap['Reducer'] = (fittingsMap['Reducer'] || 0) + 1;
-                    }
-                    if (el.type === 'TAKEOFF') {
-                        takeoffCount++;
-                        const key = `Takeoff ${el.size || '6'}"`;
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-
-                    // Rooms
-                    if (el.type === 'ROOM') {
-                        rooms.push(el);
-                    }
-                });
-
-                // Update Summary tab
-                document.getElementById('totalSupplyCFM').textContent = supplyCFM + ' CFM';
-                document.getElementById('totalReturnCFM').textContent = returnCFM + ' CFM';
-                
-                const balance = supplyCFM - returnCFM;
-                const balanceEl = document.getElementById('cfmBalance');
-                balanceEl.textContent = (balance >= 0 ? '+' : '') + balance + ' CFM';
-                balanceEl.className = balance === 0 ? 'font-bold text-green-400' : 
-                                     Math.abs(balance) <= supplyCFM * 0.1 ? 'font-bold text-yellow-400' : 
-                                     'font-bold text-red-400';
-
-                document.getElementById('trunkTotal').textContent = trunkLen.toFixed(1) + ' ft';
-                document.getElementById('supplyTotal').textContent = supplyLen.toFixed(1) + ' ft';
-                document.getElementById('returnTotal').textContent = returnLen.toFixed(1) + ' ft';
-                document.getElementById('flexTotal').textContent = flexLen.toFixed(1) + ' ft';
-
-                document.getElementById('registerCount').textContent = registerCount;
-                document.getElementById('returnGrilleCount').textContent = returnGrilleCount;
-                document.getElementById('diffuserCount').textContent = diffuserCount;
-                document.getElementById('elbow90Count').textContent = elbow90Count;
-                document.getElementById('elbow45Count').textContent = elbow45Count;
-                document.getElementById('teeCount').textContent = teeCount;
-                document.getElementById('reducerCount').textContent = reducerCount;
-                document.getElementById('takeoffCount').textContent = takeoffCount;
-
-                // Room list
-                const roomList = document.getElementById('roomList');
-                if (rooms.length === 0) {
-                    roomList.innerHTML = '<div class="text-gray-500 italic">No rooms defined</div>';
-                } else {
-                    roomList.innerHTML = rooms.map(r => 
-                        `<div class="flex justify-between"><span>${r.name || 'Room'}</span><span>${r.cfm || 0} CFM</span></div>`
-                    ).join('');
-                }
-
-                // Materials tab
-                const ductBySize = document.getElementById('ductBySize');
-                if (Object.keys(ductBySizeMap).length === 0) {
-                    ductBySize.innerHTML = '<div class="text-gray-500 italic">No ducts placed</div>';
-                } else {
-                    ductBySize.innerHTML = Object.entries(ductBySizeMap)
-                        .map(([k, v]) => `<div class="flex justify-between"><span>${k}</span><span>${v.toFixed(1)} ft</span></div>`)
-                        .join('');
-                }
-
-                const fittingsList = document.getElementById('fittingsList');
-                if (Object.keys(fittingsMap).length === 0) {
-                    fittingsList.innerHTML = '<div class="text-gray-500 italic">No fittings placed</div>';
-                } else {
-                    fittingsList.innerHTML = Object.entries(fittingsMap)
-                        .map(([k, v]) => `<div class="flex justify-between"><span>${k}</span><span>×${v}</span></div>`)
-                        .join('');
-                }
-
-                const terminalsList = document.getElementById('terminalsList');
-                if (Object.keys(terminalsMap).length === 0) {
-                    terminalsList.innerHTML = '<div class="text-gray-500 italic">No terminals placed</div>';
-                } else {
-                    terminalsList.innerHTML = Object.entries(terminalsMap)
-                        .map(([k, v]) => `<div class="flex justify-between"><span>${k}</span><span>×${v}</span></div>`)
-                        .join('');
-                }
-
-                // Estimated materials
-                const totalDuct = trunkLen + supplyLen + returnLen;
-                const sheetMetal = Math.ceil(totalDuct * 2.5); // ~2.5 lbs per foot average
-                const tapeRolls = Math.ceil(totalDuct / 50); // 1 roll per 50 ft
-                const mastic = Math.ceil(totalDuct / 100); // 1 gal per 100 ft
-                const hangers = Math.ceil(totalDuct / 4); // Every 4 ft
-
-                document.getElementById('sheetMetalLbs').textContent = sheetMetal;
-                document.getElementById('flexDuctFt').textContent = flexLen.toFixed(0);
-                document.getElementById('tapeRolls').textContent = tapeRolls;
-                document.getElementById('masticGal').textContent = mastic.toFixed(1);
-                document.getElementById('hangerCount').textContent = hangers;
-            };
-
-            // Calculate static pressure
-            const calculatePressure = () => {
-                const systemCFM = parseInt(document.getElementById('systemCFM').value) || 1200;
-                const filterDrop = parseFloat(document.getElementById('filterDrop').value) || 0.1;
-                const coilDrop = parseFloat(document.getElementById('coilDrop').value) || 0.2;
-
-                let supplyDuctLoss = 0;
-                let returnDuctLoss = 0;
-                let supplyFittingLoss = 0;
-                let returnFittingLoss = 0;
-                let terminalLoss = 0;
-
-                const warnings = [];
-
-                elements.forEach(el => {
-                    // Duct friction loss (simplified - 0.08" per 100 ft for standard velocity)
-                    if (['TRUNK', 'SUPPLY'].includes(el.type)) {
-                        const len = calcLength(el);
-                        supplyDuctLoss += len * 0.08 / 100;
-                        
-                        // Velocity check
-                        const area = getDuctArea(el.size || '8');
-                        const velocity = (systemCFM / (area / 144)) * (el.type === 'SUPPLY' ? 0.3 : 1);
-                        if (velocity > 900) {
-                            warnings.push(`${el.type} ${el.size || '8'}": ${Math.round(velocity)} FPM (high)`);
-                        }
-                    }
-                    if (el.type === 'RETURN') {
-                        const len = calcLength(el);
-                        returnDuctLoss += len * 0.08 / 100;
-                    }
-                    if (el.type === 'FLEX') {
-                        const len = calcLength(el);
-                        supplyDuctLoss += len * 0.15 / 100; // Flex has higher friction
-                    }
-
-                    // Fitting equivalent lengths
-                    if (['ELBOW90', 'ELBOW45', 'TEE', 'REDUCER', 'TAKEOFF'].includes(el.type)) {
-                        const equiv = EQUIV_LENGTHS[el.type] || 10;
-                        supplyFittingLoss += equiv * 0.08 / 100;
-                    }
-
-                    // Terminal losses
-                    if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(el.type)) {
-                        terminalLoss += 0.03; // Typical register/grille loss
-                    }
-                });
-
-                const totalESP = filterDrop + coilDrop + supplyDuctLoss + supplyFittingLoss + 
-                                returnDuctLoss + returnFittingLoss + terminalLoss;
-
-                document.getElementById('supplyLoss').textContent = supplyDuctLoss.toFixed(3) + '"';
-                document.getElementById('supplyFittingLoss').textContent = supplyFittingLoss.toFixed(3) + '"';
-                document.getElementById('returnLoss').textContent = returnDuctLoss.toFixed(3) + '"';
-                document.getElementById('returnFittingLoss').textContent = returnFittingLoss.toFixed(3) + '"';
-                document.getElementById('terminalLoss').textContent = terminalLoss.toFixed(3) + '"';
-                document.getElementById('totalESP').textContent = totalESP.toFixed(3) + '"';
-
-                // Velocity warnings
-                const warningsEl = document.getElementById('velocityWarnings');
-                if (warnings.length === 0) {
-                    warningsEl.innerHTML = '<div class="text-green-400">All velocities within range</div>';
-                } else {
-                    warningsEl.innerHTML = warnings.map(w => 
-                        `<div class="text-yellow-400">⚠ ${w}</div>`
-                    ).join('');
-                }
-            };
-
-            // Save state for undo
-            const saveState = () => {
-                undoStack.push(JSON.stringify(elements));
-                if (undoStack.length > 50) undoStack.shift();
-                redoStack = [];
-            };
-
-            // Get coordinates
-            const getCoords = (e) => {
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return screenToWorld(clientX - rect.left, clientY - rect.top);
-            };
-
-            // Mouse handlers
-            const handleStart = (e) => {
+            // Mouse/touch down
+            function handlePointerDown(e) {
                 e.preventDefault();
-                let coords = getCoords(e);
                 
-                // Try endpoint snap first
-                const endpointSnap = snapToEndpoint(coords.x, coords.y);
-                if (endpointSnap) {
-                    coords = endpointSnap;
-                } else {
-                    coords = snapToGrid(coords.x, coords.y);
-                }
+                const coords = getCanvasCoords(e);
+                const x = snap(coords.x);
+                const y = snap(coords.y);
 
-                // Update coords display
-                document.getElementById('coords').textContent = 
-                    `${(coords.x / PIXELS_PER_FOOT).toFixed(1)}', ${(coords.y / PIXELS_PER_FOOT).toFixed(1)}'`;
-
+                // Select mode
                 if (currentMode === 'SELECT') {
                     selectedElement = findElementAt(coords.x, coords.y);
                     draw();
                     return;
                 }
 
+                // Room mode - show modal
                 if (currentMode === 'ROOM') {
-                    pendingRoom = coords;
+                    pendingRoomCoords = { x: x, y: y };
                     document.getElementById('roomModal').classList.add('show');
                     document.getElementById('roomName').focus();
                     return;
                 }
 
-                if (currentMode === 'NOTE') {
-                    pendingNote = coords;
-                    document.getElementById('noteModal').classList.add('show');
-                    document.getElementById('noteText').focus();
-                    return;
-                }
-
-                // Point elements
-                if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER', 'AHU', 'FURNACE', 
-                     'ELBOW90', 'ELBOW45', 'TEE', 'REDUCER', 'TAKEOFF'].includes(currentMode)) {
+                // Point elements - place immediately
+                if (isPointElement(currentMode)) {
                     saveState();
-                    const cfm = parseInt(document.getElementById('registerCFM').value) || 100;
-                    const rotation = parseInt(document.getElementById('fittingRotation').value) || 0;
-                    const size = document.getElementById('ductSize').value;
                     
-                    elements.push({
+                    const newElement = {
                         type: currentMode,
-                        startX: coords.x,
-                        startY: coords.y,
-                        cfm: ['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(currentMode) ? cfm : null,
-                        rotation: rotation,
-                        size: size
-                    });
+                        startX: x,
+                        startY: y,
+                        size: document.getElementById('ductSize').value,
+                        rotation: parseInt(document.getElementById('fittingRotation').value) || 0
+                    };
+                    
+                    // Add CFM for terminals
+                    if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(currentMode)) {
+                        newElement.cfm = parseInt(document.getElementById('registerCFM').value) || 100;
+                    }
+                    
+                    elements.push(newElement);
                     draw();
                     return;
                 }
 
-                // Line elements
-                isDrawing = true;
-                startPoint = coords;
-
-                currentElement = {
-                    type: currentMode,
-                    startX: coords.x,
-                    startY: coords.y,
-                    endX: coords.x,
-                    endY: coords.y,
-                    size: document.getElementById('ductSize').value
-                };
-            };
-
-            const handleMove = (e) => {
-                let coords = getCoords(e);
-                
-                // Update coords display
-                document.getElementById('coords').textContent = 
-                    `${(coords.x / PIXELS_PER_FOOT).toFixed(1)}', ${(coords.y / PIXELS_PER_FOOT).toFixed(1)}'`;
-
-                if (currentMode === 'SELECT') {
-                    hoveredElement = findElementAt(coords.x, coords.y);
-                    canvas.style.cursor = hoveredElement ? 'pointer' : 'default';
+                // Line elements - start drawing
+                if (isLineElement(currentMode)) {
+                    isDrawing = true;
+                    startX = x;
+                    startY = y;
+                    
+                    currentElement = {
+                        type: currentMode,
+                        startX: x,
+                        startY: y,
+                        endX: x,
+                        endY: y,
+                        size: document.getElementById('ductSize').value
+                    };
+                    
                     draw();
-                    return;
                 }
+            }
 
-                if (!isDrawing) return;
+            // Mouse/touch move
+            function handlePointerMove(e) {
+                if (!isDrawing || !currentElement) return;
                 e.preventDefault();
 
-                // Snapping
-                const endpointSnap = snapToEndpoint(coords.x, coords.y);
-                if (endpointSnap) {
-                    coords = endpointSnap;
-                } else {
-                    coords = snapToGrid(coords.x, coords.y);
-                }
+                const coords = getCanvasCoords(e);
+                let x = snap(coords.x);
+                let y = snap(coords.y);
 
                 // Ortho lock
-                coords = applyOrthoLock(startPoint, coords);
+                if (document.getElementById('orthoLock').checked) {
+                    const dx = Math.abs(x - startX);
+                    const dy = Math.abs(y - startY);
+                    if (dx > dy) {
+                        y = startY;
+                    } else {
+                        x = startX;
+                    }
+                }
 
-                currentElement.endX = coords.x;
-                currentElement.endY = coords.y;
+                currentElement.endX = x;
+                currentElement.endY = y;
 
-                // Live measurement
+                // Update live measurement
                 const len = calcLength(currentElement).toFixed(1);
-                const angle = calcAngle(currentElement);
                 document.getElementById('liveLength').textContent = len;
-                document.getElementById('liveAngle').textContent = angle;
                 document.getElementById('measureDisplay').classList.remove('hidden');
 
                 draw();
-            };
+            }
 
-            const handleEnd = () => {
+            // Mouse/touch up
+            function handlePointerUp(e) {
                 if (!isDrawing || !currentElement) return;
+                
                 isDrawing = false;
+                document.getElementById('measureDisplay').classList.add('hidden');
 
-                const length = calcLength(currentElement);
-                if (length > 0.25) {
+                // Only save if element has meaningful length
+                const len = calcLength(currentElement);
+                if (len > 0.25) {
                     saveState();
                     elements.push(currentElement);
                 }
 
                 currentElement = null;
-                document.getElementById('measureDisplay').classList.add('hidden');
                 draw();
-            };
+            }
 
-            // Canvas events
-            canvas.addEventListener('mousedown', handleStart);
-            canvas.addEventListener('mousemove', handleMove);
-            document.addEventListener('mouseup', handleEnd);
-            canvas.addEventListener('touchstart', handleStart);
-            canvas.addEventListener('touchmove', handleMove);
-            document.addEventListener('touchend', handleEnd);
+            // Canvas event listeners
+            canvas.addEventListener('mousedown', handlePointerDown);
+            canvas.addEventListener('mousemove', handlePointerMove);
+            document.addEventListener('mouseup', handlePointerUp);
 
-            // Tool buttons
+            canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+            canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+            document.addEventListener('touchend', handlePointerUp);
+
+            // Tool selection
             document.querySelectorAll('[data-mode]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    currentMode = btn.dataset.mode;
+                btn.addEventListener('click', function() {
+                    currentMode = this.dataset.mode;
                     document.getElementById('currentMode').textContent = currentMode;
+                    
+                    // Update active button
                     document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
+                    this.classList.add('active');
+                    
+                    // Update cursor
                     canvas.style.cursor = currentMode === 'SELECT' ? 'default' : 'crosshair';
+                    
                     selectedElement = null;
                     draw();
                 });
@@ -1343,21 +1097,44 @@
 
             // Tab switching
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
+                btn.addEventListener('click', function() {
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
+                    this.classList.add('active');
+                    
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-                    document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+                    document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
                 });
             });
 
-            // Rotation slider
-            document.getElementById('fittingRotation').addEventListener('input', (e) => {
-                document.getElementById('rotationDisplay').textContent = e.target.value + '°';
+            // Room modal handlers
+            document.getElementById('roomSave').addEventListener('click', function() {
+                if (!pendingRoomCoords) return;
+                
+                saveState();
+                elements.push({
+                    type: 'ROOM',
+                    startX: pendingRoomCoords.x,
+                    startY: pendingRoomCoords.y,
+                    name: document.getElementById('roomName').value || 'Room',
+                    sqft: parseInt(document.getElementById('roomSqft').value) || null,
+                    cfm: parseInt(document.getElementById('roomCFM').value) || null
+                });
+                
+                document.getElementById('roomModal').classList.remove('show');
+                document.getElementById('roomName').value = '';
+                document.getElementById('roomSqft').value = '';
+                document.getElementById('roomCFM').value = '';
+                pendingRoomCoords = null;
+                draw();
             });
 
-            // Undo/Redo
-            document.getElementById('btnUndo').addEventListener('click', () => {
+            document.getElementById('roomCancel').addEventListener('click', function() {
+                document.getElementById('roomModal').classList.remove('show');
+                pendingRoomCoords = null;
+            });
+
+            // Undo
+            document.getElementById('btnUndo').addEventListener('click', function() {
                 if (undoStack.length === 0) return;
                 redoStack.push(JSON.stringify(elements));
                 elements = JSON.parse(undoStack.pop());
@@ -1365,7 +1142,8 @@
                 draw();
             });
 
-            document.getElementById('btnRedo').addEventListener('click', () => {
+            // Redo
+            document.getElementById('btnRedo').addEventListener('click', function() {
                 if (redoStack.length === 0) return;
                 undoStack.push(JSON.stringify(elements));
                 elements = JSON.parse(redoStack.pop());
@@ -1373,7 +1151,7 @@
             });
 
             // Clear
-            document.getElementById('btnClear').addEventListener('click', () => {
+            document.getElementById('btnClear').addEventListener('click', function() {
                 if (elements.length === 0) return;
                 if (confirm('Clear all elements?')) {
                     saveState();
@@ -1383,28 +1161,31 @@
                 }
             });
 
-            // Save/Load
-            document.getElementById('btnSave').addEventListener('click', () => {
-                const data = JSON.stringify({ elements, version: 1 });
+            // Save
+            document.getElementById('btnSave').addEventListener('click', function() {
+                const data = JSON.stringify({ elements: elements, version: 1 });
                 const blob = new Blob([data], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'ductwork-design.json';
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             });
 
-            document.getElementById('btnLoad').addEventListener('click', () => {
+            // Load
+            document.getElementById('btnLoad').addEventListener('click', function() {
                 document.getElementById('fileInput').click();
             });
 
-            document.getElementById('fileInput').addEventListener('change', (e) => {
+            document.getElementById('fileInput').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
                 
                 const reader = new FileReader();
-                reader.onload = (evt) => {
+                reader.onload = function(evt) {
                     try {
                         const data = JSON.parse(evt.target.result);
                         if (data.elements) {
@@ -1420,9 +1201,8 @@
                 e.target.value = '';
             });
 
-            // Export
-            document.getElementById('btnExport').addEventListener('click', () => {
-                // Create a temporary canvas for export
+            // Export PNG
+            document.getElementById('btnExport').addEventListener('click', function() {
                 const exportCanvas = document.createElement('canvas');
                 exportCanvas.width = canvas.width;
                 exportCanvas.height = canvas.height;
@@ -1431,112 +1211,23 @@
                 // White background
                 exportCtx.fillStyle = 'white';
                 exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-                
-                // Draw current canvas content
                 exportCtx.drawImage(canvas, 0, 0);
                 
-                // Download
                 const url = exportCanvas.toDataURL('image/png');
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'ductwork-design.png';
+                document.body.appendChild(a);
                 a.click();
-            });
-
-            // Zoom
-            document.getElementById('zoomIn').addEventListener('click', () => {
-                zoom = Math.min(zoom * 1.2, 3);
-                document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
-                draw();
-            });
-
-            document.getElementById('zoomOut').addEventListener('click', () => {
-                zoom = Math.max(zoom / 1.2, 0.5);
-                document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
-                draw();
+                document.body.removeChild(a);
             });
 
             // Calculate pressure button
             document.getElementById('calcPressure').addEventListener('click', calculatePressure);
 
-            // Print materials
-            document.getElementById('printMaterials').addEventListener('click', () => {
-                const printArea = document.getElementById('printArea');
-                printArea.innerHTML = `
-                    <div style="padding: 20px; font-family: sans-serif;">
-                        <h1 style="margin-bottom: 10px;">HVAC Ductwork Material List</h1>
-                        <p style="color: #666; margin-bottom: 20px;">Generated: ${new Date().toLocaleString()}</p>
-                        
-                        <h2>Duct by Size</h2>
-                        <div>${document.getElementById('ductBySize').innerHTML}</div>
-                        
-                        <h2 style="margin-top: 20px;">Fittings</h2>
-                        <div>${document.getElementById('fittingsList').innerHTML}</div>
-                        
-                        <h2 style="margin-top: 20px;">Terminals</h2>
-                        <div>${document.getElementById('terminalsList').innerHTML}</div>
-                        
-                        <h2 style="margin-top: 20px;">Estimated Materials</h2>
-                        <ul>
-                            <li>Sheet Metal: ${document.getElementById('sheetMetalLbs').textContent} lbs</li>
-                            <li>Flex Duct: ${document.getElementById('flexDuctFt').textContent} ft</li>
-                            <li>Duct Tape: ${document.getElementById('tapeRolls').textContent} rolls</li>
-                            <li>Mastic: ${document.getElementById('masticGal').textContent} gal</li>
-                            <li>Hangers: ${document.getElementById('hangerCount').textContent}</li>
-                        </ul>
-                    </div>
-                `;
-                window.print();
-            });
-
-            // Room modal
-            document.getElementById('roomSave').addEventListener('click', () => {
-                if (!pendingRoom) return;
-                saveState();
-                elements.push({
-                    type: 'ROOM',
-                    startX: pendingRoom.x,
-                    startY: pendingRoom.y,
-                    name: document.getElementById('roomName').value || 'Room',
-                    sqft: parseInt(document.getElementById('roomSqft').value) || null,
-                    cfm: parseInt(document.getElementById('roomCFM').value) || null
-                });
-                document.getElementById('roomModal').classList.remove('show');
-                document.getElementById('roomName').value = '';
-                document.getElementById('roomSqft').value = '';
-                document.getElementById('roomCFM').value = '';
-                pendingRoom = null;
-                draw();
-            });
-
-            document.getElementById('roomCancel').addEventListener('click', () => {
-                document.getElementById('roomModal').classList.remove('show');
-                pendingRoom = null;
-            });
-
-            // Note modal
-            document.getElementById('noteSave').addEventListener('click', () => {
-                if (!pendingNote) return;
-                saveState();
-                elements.push({
-                    type: 'NOTE',
-                    startX: pendingNote.x,
-                    startY: pendingNote.y,
-                    text: document.getElementById('noteText').value || 'Note'
-                });
-                document.getElementById('noteModal').classList.remove('show');
-                document.getElementById('noteText').value = '';
-                pendingNote = null;
-                draw();
-            });
-
-            document.getElementById('noteCancel').addEventListener('click', () => {
-                document.getElementById('noteModal').classList.remove('show');
-                pendingNote = null;
-            });
-
             // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
+            document.addEventListener('keydown', function(e) {
+                // Ignore if typing in input
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 
                 if (e.ctrlKey && e.key === 'z') {
@@ -1561,19 +1252,20 @@
                     isDrawing = false;
                     currentElement = null;
                     document.getElementById('roomModal').classList.remove('show');
-                    document.getElementById('noteModal').classList.remove('show');
                     draw();
                 }
             });
 
-            // Settings checkboxes
-            ['snapGrid', 'snapEndpoint', 'showGrid', 'showMeasure', 'orthoLock'].forEach(id => {
+            // Settings changes trigger redraw
+            ['snapGrid', 'showGrid', 'showMeasure', 'orthoLock'].forEach(function(id) {
                 document.getElementById(id).addEventListener('change', draw);
             });
 
             // Initial draw
             draw();
-        });
+            
+            console.log('HVAC Ductwork Designer initialized');
+        })();
     </script>
 </body>
 </html>
