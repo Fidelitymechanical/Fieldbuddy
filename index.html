@@ -3,308 +3,1575 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ductwork Design Simulator</title>
+    <title>HVAC Ductwork Designer Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles for the drawing environment */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1f2937; /* Dark background */
-        }
-        #simulator-container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 1rem;
+            background-color: #111827;
         }
         #designCanvas {
             cursor: crosshair;
-            border: 2px solid #374151; /* Dark border */
-            background-color: #ffffff; /* White background for the floor plan area */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-            touch-action: none; /* Prevent browser touch behavior like scrolling/zooming */
+            touch-action: none;
         }
-        .tool-button {
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        .tool-btn {
+            transition: all 0.15s ease;
         }
-        .tool-button:hover {
+        .tool-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
         }
-        .tool-button.active {
-            border: 2px solid #10b981; /* Green active border */
-            background-color: #10b981;
-            color: white;
-            transform: scale(1.05);
+        .tool-btn.active {
+            background-color: #10b981 !important;
+            border-color: #10b981 !important;
+        }
+        .panel {
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(8px);
+        }
+        .tab-btn.active {
+            background-color: #374151;
+            border-bottom: 2px solid #10b981;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 3px;
+        }
+        .modal {
+            display: none;
+        }
+        .modal.show {
+            display: flex;
+        }
+        @media print {
+            body { background: white; }
+            #app > *:not(#printArea) { display: none; }
+            #printArea { display: block !important; }
         }
     </style>
 </head>
-<body class="min-h-screen">
-
-    <div id="simulator-container" class="space-y-4">
-        <header class="text-white text-center">
-            <h1 class="text-3xl font-bold mb-1">HVAC Ductwork Designer</h1>
-            <p class="text-sm text-gray-400">Draw floor plan walls and then lay duct branches.</p>
+<body class="min-h-screen text-white">
+    <div id="app" class="flex flex-col h-screen">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700 px-4 py-2">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-lg font-bold text-white">HVAC Ductwork Designer Pro</h1>
+                    <p class="text-xs text-gray-400">Scale: 1/4" = 1' | Grid: 1 ft squares</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btnUndo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Z">↶</button>
+                    <button id="btnRedo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Y">↷</button>
+                    <button id="btnSave" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">💾 Save</button>
+                    <button id="btnLoad" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">📂 Load</button>
+                    <button id="btnExport" class="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-xs">📄 Export</button>
+                    <button id="btnClear" class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs">🗑️ Clear</button>
+                </div>
+            </div>
         </header>
 
-        <!-- Tools/Controls -->
-        <div id="tools" class="flex flex-wrap gap-3 p-3 bg-gray-800 rounded-xl shadow-lg justify-center">
-            <button id="modeWall" class="tool-button px-4 py-2 rounded-lg bg-gray-600 text-white active" data-mode="WALLS">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2m-6 0h.01"></path></svg>
-                Wall Mode
-            </button>
-            <button id="modeDuct" class="tool-button px-4 py-2 rounded-lg bg-gray-600 text-white" data-mode="DUCT">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                Duct Mode
-            </button>
-            <button id="btnClear" class="tool-button px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                Clear All
-            </button>
-        </div>
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Left Toolbar -->
+            <div class="w-52 bg-gray-800 border-r border-gray-700 p-2 flex flex-col gap-1 overflow-y-auto text-xs">
+                <!-- Structure -->
+                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Structure</div>
+                <button class="tool-btn active flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="WALL">
+                    <span class="w-3 h-3 bg-gray-500 rounded-sm"></span>Wall
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ROOM">
+                    <span class="w-3 h-3 border border-yellow-400 rounded-sm"></span>Room Label
+                </button>
 
-        <!-- Canvas Drawing Area -->
-        <div class="relative rounded-xl overflow-hidden shadow-xl">
-            <canvas id="designCanvas"></canvas>
-            <div id="modeDisplay" class="absolute top-2 left-2 text-sm font-semibold p-2 rounded-lg bg-gray-900 text-yellow-300">
-                Mode: WALLS
+                <!-- Ductwork -->
+                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Ductwork</div>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TRUNK">
+                    <span class="w-3 h-3 bg-blue-700 rounded-sm"></span>Trunk Line
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="SUPPLY">
+                    <span class="w-3 h-3 bg-blue-500 rounded-sm"></span>Supply Branch
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="RETURN">
+                    <span class="w-3 h-3 bg-orange-500 rounded-sm"></span>Return Duct
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="FLEX">
+                    <span class="w-3 h-3 bg-green-500 rounded-sm"></span>Flex Duct
+                </button>
+
+                <!-- Fittings -->
+                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Fittings</div>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ELBOW90">
+                    <span class="w-3 h-3 text-blue-400">∟</span>90° Elbow
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ELBOW45">
+                    <span class="w-3 h-3 text-blue-400">∠</span>45° Elbow
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TEE">
+                    <span class="w-3 h-3 text-blue-400">⊥</span>Tee
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="REDUCER">
+                    <span class="w-3 h-3 text-blue-400">◇</span>Reducer
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TAKEOFF">
+                    <span class="w-3 h-3 text-blue-400">⊢</span>Takeoff
+                </button>
+
+                <!-- Terminals -->
+                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Terminals</div>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="REGISTER">
+                    <span class="w-3 h-3 border-2 border-cyan-400 rounded-sm"></span>Supply Register
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="RETURN_GRILLE">
+                    <span class="w-3 h-3 border-2 border-orange-400 rounded-sm"></span>Return Grille
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="DIFFUSER">
+                    <span class="w-3 h-3 border-2 border-purple-400 rounded-full"></span>Ceiling Diffuser
+                </button>
+
+                <!-- Equipment -->
+                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Equipment</div>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="AHU">
+                    <span class="w-3 h-3 bg-purple-500 rounded-sm"></span>Air Handler
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="FURNACE">
+                    <span class="w-3 h-3 bg-red-500 rounded-sm"></span>Furnace
+                </button>
+
+                <!-- Tools -->
+                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Tools</div>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="SELECT">
+                    <span class="w-3 h-3">↖</span>Select/Edit
+                </button>
+                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="NOTE">
+                    <span class="w-3 h-3">📝</span>Add Note
+                </button>
+
+                <!-- Settings -->
+                <div class="mt-3 pt-2 border-t border-gray-700 space-y-1">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="snapGrid" checked class="rounded w-3 h-3">
+                        <span>Snap to Grid</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="snapEndpoint" checked class="rounded w-3 h-3">
+                        <span>Snap to Endpoints</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="showGrid" checked class="rounded w-3 h-3">
+                        <span>Show Grid</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="showMeasure" checked class="rounded w-3 h-3">
+                        <span>Show Measurements</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="orthoLock" class="rounded w-3 h-3">
+                        <span>Ortho Lock (H/V)</span>
+                    </label>
+                </div>
+
+                <!-- Duct Size -->
+                <div class="mt-2 pt-2 border-t border-gray-700">
+                    <label class="text-[10px] font-semibold text-gray-400 uppercase">Duct Size</label>
+                    <select id="ductSize" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-1 py-1 text-xs">
+                        <option value="4">4" Round</option>
+                        <option value="5">5" Round</option>
+                        <option value="6">6" Round</option>
+                        <option value="7">7" Round</option>
+                        <option value="8" selected>8" Round</option>
+                        <option value="9">9" Round</option>
+                        <option value="10">10" Round</option>
+                        <option value="12">12" Round</option>
+                        <option value="14">14" Round</option>
+                        <option value="8x8">8"×8"</option>
+                        <option value="10x8">10"×8"</option>
+                        <option value="12x8">12"×8"</option>
+                        <option value="14x8">14"×8"</option>
+                        <option value="16x8">16"×8"</option>
+                        <option value="18x8">18"×8"</option>
+                        <option value="20x8">20"×8"</option>
+                        <option value="24x8">24"×8"</option>
+                    </select>
+                </div>
+
+                <!-- CFM Input -->
+                <div class="mt-2">
+                    <label class="text-[10px] font-semibold text-gray-400 uppercase">Terminal CFM</label>
+                    <input type="number" id="registerCFM" value="100" min="25" max="1000" step="25" 
+                           class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-1 py-1 text-xs">
+                </div>
+
+                <!-- Fitting Rotation -->
+                <div class="mt-2">
+                    <label class="text-[10px] font-semibold text-gray-400 uppercase">Fitting Rotation</label>
+                    <input type="range" id="fittingRotation" min="0" max="270" step="90" value="0"
+                           class="mt-1 w-full">
+                    <div class="text-center text-gray-400" id="rotationDisplay">0°</div>
+                </div>
+            </div>
+
+            <!-- Canvas Area -->
+            <div class="flex-1 relative overflow-hidden bg-gray-900">
+                <canvas id="designCanvas" class="absolute inset-0"></canvas>
+                
+                <!-- Mode indicator -->
+                <div id="modeIndicator" class="absolute top-2 left-2 panel px-2 py-1 rounded text-xs font-medium">
+                    <span id="currentMode" class="text-green-400">WALL</span>
+                </div>
+
+                <!-- Coordinates display -->
+                <div id="coordsDisplay" class="absolute top-2 right-2 panel px-2 py-1 rounded text-xs">
+                    <span id="coords">0, 0</span>
+                </div>
+
+                <!-- Measurement display -->
+                <div id="measureDisplay" class="absolute bottom-2 left-2 panel px-2 py-1 rounded text-xs hidden">
+                    <span id="liveLength">0</span> ft | <span id="liveAngle">0</span>°
+                </div>
+
+                <!-- Zoom controls -->
+                <div class="absolute bottom-2 right-2 panel rounded flex">
+                    <button id="zoomOut" class="px-2 py-1 hover:bg-gray-700 rounded-l text-sm">−</button>
+                    <span id="zoomLevel" class="px-2 py-1 text-xs">100%</span>
+                    <button id="zoomIn" class="px-2 py-1 hover:bg-gray-700 rounded-r text-sm">+</button>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="w-72 bg-gray-800 border-l border-gray-700 flex flex-col overflow-hidden">
+                <!-- Tabs -->
+                <div class="flex border-b border-gray-700">
+                    <button class="tab-btn active flex-1 px-2 py-2 text-xs hover:bg-gray-700" data-tab="summary">Summary</button>
+                    <button class="tab-btn flex-1 px-2 py-2 text-xs hover:bg-gray-700" data-tab="pressure">Pressure</button>
+                    <button class="tab-btn flex-1 px-2 py-2 text-xs hover:bg-gray-700" data-tab="materials">Materials</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="flex-1 overflow-y-auto p-2 text-xs">
+                    <!-- Summary Tab -->
+                    <div id="tab-summary" class="tab-content">
+                        <div class="space-y-2">
+                            <!-- Airflow Balance -->
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Airflow Balance</div>
+                                <div class="flex justify-between">
+                                    <span class="text-blue-400">Supply:</span>
+                                    <span id="totalSupplyCFM">0 CFM</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-orange-400">Return:</span>
+                                    <span id="totalReturnCFM">0 CFM</span>
+                                </div>
+                                <div class="flex justify-between mt-1 pt-1 border-t border-gray-600">
+                                    <span>Balance:</span>
+                                    <span id="cfmBalance" class="font-bold">0 CFM</span>
+                                </div>
+                            </div>
+
+                            <!-- Duct Lengths -->
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Duct Lengths</div>
+                                <div class="flex justify-between">
+                                    <span class="text-blue-700">Trunk:</span>
+                                    <span id="trunkTotal">0 ft</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-blue-400">Supply:</span>
+                                    <span id="supplyTotal">0 ft</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-orange-400">Return:</span>
+                                    <span id="returnTotal">0 ft</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-green-400">Flex:</span>
+                                    <span id="flexTotal">0 ft</span>
+                                </div>
+                            </div>
+
+                            <!-- Components -->
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Components</div>
+                                <div class="grid grid-cols-2 gap-1 text-[10px]">
+                                    <span>Registers:</span><span id="registerCount" class="text-right">0</span>
+                                    <span>Return Grilles:</span><span id="returnGrilleCount" class="text-right">0</span>
+                                    <span>Diffusers:</span><span id="diffuserCount" class="text-right">0</span>
+                                    <span>90° Elbows:</span><span id="elbow90Count" class="text-right">0</span>
+                                    <span>45° Elbows:</span><span id="elbow45Count" class="text-right">0</span>
+                                    <span>Tees:</span><span id="teeCount" class="text-right">0</span>
+                                    <span>Reducers:</span><span id="reducerCount" class="text-right">0</span>
+                                    <span>Takeoffs:</span><span id="takeoffCount" class="text-right">0</span>
+                                </div>
+                            </div>
+
+                            <!-- Rooms -->
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Rooms</div>
+                                <div id="roomList" class="space-y-1 text-[10px]">
+                                    <div class="text-gray-500 italic">No rooms defined</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pressure Tab -->
+                    <div id="tab-pressure" class="tab-content hidden">
+                        <div class="space-y-2">
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Static Pressure Calculator</div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between">
+                                        <span>System CFM:</span>
+                                        <input type="number" id="systemCFM" value="1200" class="w-20 bg-gray-600 rounded px-1 text-right">
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Filter (in. w.c.):</span>
+                                        <input type="number" id="filterDrop" value="0.10" step="0.01" class="w-20 bg-gray-600 rounded px-1 text-right">
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Coil (in. w.c.):</span>
+                                        <input type="number" id="coilDrop" value="0.20" step="0.01" class="w-20 bg-gray-600 rounded px-1 text-right">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Calculated Losses</div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between">
+                                        <span>Supply Duct:</span>
+                                        <span id="supplyLoss">0.00"</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Supply Fittings:</span>
+                                        <span id="supplyFittingLoss">0.00"</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Return Duct:</span>
+                                        <span id="returnLoss">0.00"</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Return Fittings:</span>
+                                        <span id="returnFittingLoss">0.00"</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Registers/Grilles:</span>
+                                        <span id="terminalLoss">0.00"</span>
+                                    </div>
+                                    <div class="flex justify-between mt-1 pt-1 border-t border-gray-600 font-bold">
+                                        <span>Total ESP:</span>
+                                        <span id="totalESP">0.00"</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Velocity Check</div>
+                                <div id="velocityWarnings" class="space-y-1 text-[10px]">
+                                    <div class="text-gray-500">Draw ducts to see velocity analysis</div>
+                                </div>
+                            </div>
+
+                            <button id="calcPressure" class="w-full bg-blue-600 hover:bg-blue-700 rounded py-1.5 text-xs font-medium">
+                                Recalculate Pressure
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Materials Tab -->
+                    <div id="tab-materials" class="tab-content hidden">
+                        <div class="space-y-2">
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Duct by Size</div>
+                                <div id="ductBySize" class="space-y-1 text-[10px]">
+                                    <div class="text-gray-500 italic">No ducts placed</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Fittings List</div>
+                                <div id="fittingsList" class="space-y-1 text-[10px]">
+                                    <div class="text-gray-500 italic">No fittings placed</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Terminals List</div>
+                                <div id="terminalsList" class="space-y-1 text-[10px]">
+                                    <div class="text-gray-500 italic">No terminals placed</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-700 rounded p-2">
+                                <div class="font-semibold mb-1">Estimated Materials</div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between">
+                                        <span>Sheet Metal (lbs):</span>
+                                        <span id="sheetMetalLbs">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Flex Duct (ft):</span>
+                                        <span id="flexDuctFt">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Duct Tape (rolls):</span>
+                                        <span id="tapeRolls">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Mastic (gal):</span>
+                                        <span id="masticGal">0</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Hangers:</span>
+                                        <span id="hangerCount">0</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button id="printMaterials" class="w-full bg-green-600 hover:bg-green-700 rounded py-1.5 text-xs font-medium">
+                                Print Material List
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Room Label Modal -->
+    <div id="roomModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-4 w-80">
+            <h3 class="font-bold mb-3">Room Details</h3>
+            <div class="space-y-2">
+                <div>
+                    <label class="text-xs text-gray-400">Room Name</label>
+                    <input type="text" id="roomName" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm" placeholder="e.g., Master Bedroom">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Square Footage</label>
+                    <input type="number" id="roomSqft" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm" placeholder="150">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Required CFM</label>
+                    <input type="number" id="roomCFM" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm" placeholder="100">
+                </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button id="roomCancel" class="flex-1 bg-gray-600 hover:bg-gray-500 rounded py-1.5 text-sm">Cancel</button>
+                <button id="roomSave" class="flex-1 bg-green-600 hover:bg-green-700 rounded py-1.5 text-sm">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-4 w-80">
+            <h3 class="font-bold mb-3">Add Note</h3>
+            <textarea id="noteText" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm h-24" placeholder="Enter note text..."></textarea>
+            <div class="flex gap-2 mt-4">
+                <button id="noteCancel" class="flex-1 bg-gray-600 hover:bg-gray-500 rounded py-1.5 text-sm">Cancel</button>
+                <button id="noteSave" class="flex-1 bg-green-600 hover:bg-green-700 rounded py-1.5 text-sm">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input -->
+    <input type="file" id="fileInput" accept=".json" class="hidden">
+
+    <!-- Print area -->
+    <div id="printArea" class="hidden"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const canvas = document.getElementById('designCanvas');
             const ctx = canvas.getContext('2d');
-            const tools = document.getElementById('tools');
-            const modeDisplay = document.getElementById('modeDisplay');
 
-            // --- State Variables ---
-            let elements = []; // Array to store drawn walls and ducts
-            let currentMode = 'WALLS';
+            // State
+            let elements = [];
+            let undoStack = [];
+            let redoStack = [];
+            let currentMode = 'WALL';
             let isDrawing = false;
             let startPoint = { x: 0, y: 0 };
             let currentElement = null;
+            let selectedElement = null;
+            let hoveredElement = null;
+            let zoom = 1;
+            let pan = { x: 0, y: 0 };
+            let pendingRoom = null;
+            let pendingNote = null;
 
-            // --- Configuration ---
-            const WALL_THICKNESS = 8;
-            const DUCT_SIZE = 15;
-            const DUCT_COLOR = 'rgba(0, 150, 255, 0.7)'; // Semi-transparent blue
-            const WALL_COLOR = '#374151'; // Dark wall color
+            // Settings
+            const GRID_SIZE = 20;
+            const PIXELS_PER_FOOT = GRID_SIZE;
 
-            // --- Initialization and Responsiveness ---
-
-            // Function to set canvas dimensions responsively
-            const setCanvasSize = () => {
-                const container = document.getElementById('simulator-container');
-                // Use the width of the container, and set a fixed max height for drawing
-                const size = Math.min(container.clientWidth - 32, 800); // 800px max, or container width
-                canvas.width = size;
-                canvas.height = Math.round(size * 0.75); // Maintain 4:3 aspect ratio
-                draw(); // Redraw everything after resize
+            // Colors
+            const COLORS = {
+                WALL: '#6b7280',
+                TRUNK: '#1d4ed8',
+                SUPPLY: '#3b82f6',
+                RETURN: '#f97316',
+                FLEX: '#22c55e',
+                REGISTER: '#06b6d4',
+                RETURN_GRILLE: '#fb923c',
+                DIFFUSER: '#a855f7',
+                AHU: '#9333ea',
+                FURNACE: '#dc2626',
+                ELBOW90: '#60a5fa',
+                ELBOW45: '#60a5fa',
+                TEE: '#60a5fa',
+                REDUCER: '#60a5fa',
+                TAKEOFF: '#60a5fa',
+                ROOM: '#fbbf24',
+                NOTE: '#f472b6',
+                GRID: '#374151',
+                SELECTED: '#fbbf24'
             };
 
-            // Initial size and event listener for window resize
-            setCanvasSize();
-            window.addEventListener('resize', setCanvasSize);
-
-            // --- Drawing Functions ---
-
-            // Function to draw a Wall element (a thick line)
-            const drawWall = (element) => {
-                ctx.beginPath();
-                ctx.strokeStyle = WALL_COLOR;
-                ctx.lineWidth = WALL_THICKNESS;
-                ctx.lineCap = 'round';
-                ctx.moveTo(element.startX, element.startY);
-                ctx.lineTo(element.endX, element.endY);
-                ctx.stroke();
+            // Equivalent lengths for fittings (in feet)
+            const EQUIV_LENGTHS = {
+                ELBOW90: 15,
+                ELBOW45: 7,
+                TEE: 30,
+                REDUCER: 5,
+                TAKEOFF: 35,
+                REGISTER: 10,
+                RETURN_GRILLE: 10,
+                DIFFUSER: 15
             };
 
-            // Function to draw a Duct element (a rectangular pipe section)
-            const drawDuct = (element) => {
-                const x = Math.min(element.startX, element.endX);
-                const y = Math.min(element.startY, element.endY);
-                const width = Math.abs(element.endX - element.startX);
-                const height = Math.abs(element.endY - element.startY);
-
-                // Draw main duct body
-                ctx.fillStyle = DUCT_COLOR;
-                ctx.fillRect(x, y, width, height);
-
-                // Add a highlight/border for definition
-                ctx.strokeStyle = DUCT_COLOR.replace('0.7', '1'); // Opaque version
-                ctx.lineWidth = 1;
-                ctx.strokeRect(x, y, width, height);
+            // Canvas sizing
+            const resizeCanvas = () => {
+                const container = canvas.parentElement;
+                canvas.width = container.clientWidth;
+                canvas.height = container.clientHeight;
+                draw();
             };
 
-            // Main render loop
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Coordinate transforms
+            const screenToWorld = (x, y) => ({
+                x: (x - pan.x) / zoom,
+                y: (y - pan.y) / zoom
+            });
+
+            const worldToScreen = (x, y) => ({
+                x: x * zoom + pan.x,
+                y: y * zoom + pan.y
+            });
+
+            // Grid snapping
+            const snapToGrid = (x, y) => {
+                if (!document.getElementById('snapGrid').checked) return { x, y };
+                return {
+                    x: Math.round(x / GRID_SIZE) * GRID_SIZE,
+                    y: Math.round(y / GRID_SIZE) * GRID_SIZE
+                };
+            };
+
+            // Endpoint snapping
+            const snapToEndpoint = (x, y, threshold = 10) => {
+                if (!document.getElementById('snapEndpoint').checked) return null;
+                
+                for (const el of elements) {
+                    if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
+                        if (Math.hypot(x - el.startX, y - el.startY) < threshold) {
+                            return { x: el.startX, y: el.startY };
+                        }
+                        if (Math.hypot(x - el.endX, y - el.endY) < threshold) {
+                            return { x: el.endX, y: el.endY };
+                        }
+                    }
+                }
+                return null;
+            };
+
+            // Ortho lock
+            const applyOrthoLock = (start, end) => {
+                if (!document.getElementById('orthoLock').checked) return end;
+                
+                const dx = Math.abs(end.x - start.x);
+                const dy = Math.abs(end.y - start.y);
+                
+                if (dx > dy) {
+                    return { x: end.x, y: start.y };
+                } else {
+                    return { x: start.x, y: end.y };
+                }
+            };
+
+            // Calculate length in feet
+            const calcLength = (el) => {
+                const dx = el.endX - el.startX;
+                const dy = el.endY - el.startY;
+                return Math.sqrt(dx * dx + dy * dy) / PIXELS_PER_FOOT;
+            };
+
+            // Calculate angle
+            const calcAngle = (el) => {
+                const dx = el.endX - el.startX;
+                const dy = el.endY - el.startY;
+                return Math.round(Math.atan2(dy, dx) * 180 / Math.PI);
+            };
+
+            // Get duct area in sq inches
+            const getDuctArea = (size) => {
+                if (typeof size === 'string' && size.includes('x')) {
+                    const [w, h] = size.split('x').map(Number);
+                    return w * h;
+                }
+                const d = parseInt(size) || 8;
+                return Math.PI * (d / 2) ** 2;
+            };
+
+            // Draw grid
+            const drawGrid = () => {
+                if (!document.getElementById('showGrid').checked) return;
+                
+                ctx.strokeStyle = COLORS.GRID;
+                ctx.lineWidth = 0.5;
+
+                const startX = Math.floor(-pan.x / zoom / GRID_SIZE) * GRID_SIZE;
+                const startY = Math.floor(-pan.y / zoom / GRID_SIZE) * GRID_SIZE;
+                const endX = startX + canvas.width / zoom + GRID_SIZE * 2;
+                const endY = startY + canvas.height / zoom + GRID_SIZE * 2;
+
+                for (let x = startX; x <= endX; x += GRID_SIZE) {
+                    const screen = worldToScreen(x, 0);
+                    ctx.beginPath();
+                    ctx.moveTo(screen.x, 0);
+                    ctx.lineTo(screen.x, canvas.height);
+                    ctx.stroke();
+                }
+
+                for (let y = startY; y <= endY; y += GRID_SIZE) {
+                    const screen = worldToScreen(0, y);
+                    ctx.beginPath();
+                    ctx.moveTo(0, screen.y);
+                    ctx.lineTo(canvas.width, screen.y);
+                    ctx.stroke();
+                }
+            };
+
+            // Draw element
+            const drawElement = (el, isPreview = false) => {
+                const alpha = isPreview ? 0.5 : 1;
+                const isSelected = el === selectedElement;
+                const isHovered = el === hoveredElement;
+
+                ctx.save();
+                ctx.globalAlpha = alpha;
+
+                // Transform coordinates
+                const start = worldToScreen(el.startX, el.startY);
+                const end = el.endX !== undefined ? worldToScreen(el.endX, el.endY) : start;
+
+                if (el.type === 'WALL') {
+                    ctx.strokeStyle = isSelected ? COLORS.SELECTED : COLORS.WALL;
+                    ctx.lineWidth = 8 * zoom;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(start.x, start.y);
+                    ctx.lineTo(end.x, end.y);
+                    ctx.stroke();
+                } 
+                else if (['TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
+                    const color = COLORS[el.type];
+                    let width = el.type === 'FLEX' ? 6 : (el.type === 'TRUNK' ? 14 : 10);
+                    
+                    ctx.strokeStyle = isSelected ? COLORS.SELECTED : color;
+                    ctx.lineWidth = width * zoom;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(start.x, start.y);
+                    ctx.lineTo(end.x, end.y);
+                    ctx.stroke();
+
+                    // Center line
+                    if (el.type !== 'FLEX') {
+                        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([4, 4]);
+                        ctx.beginPath();
+                        ctx.moveTo(start.x, start.y);
+                        ctx.lineTo(end.x, end.y);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+
+                    // Measurement label
+                    if (document.getElementById('showMeasure').checked && !isPreview) {
+                        const len = calcLength(el).toFixed(1);
+                        const midX = (start.x + end.x) / 2;
+                        const midY = (start.y + end.y) / 2;
+                        
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${10 * zoom}px sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.globalAlpha = 1;
+                        ctx.fillText(`${len}'`, midX, midY - 8 * zoom);
+                        if (el.size) {
+                            ctx.font = `${8 * zoom}px sans-serif`;
+                            ctx.fillText(el.size + '"', midX, midY + 10 * zoom);
+                        }
+                    }
+                }
+                else if (['ELBOW90', 'ELBOW45', 'TEE', 'REDUCER', 'TAKEOFF'].includes(el.type)) {
+                    const size = 12 * zoom;
+                    const rotation = (el.rotation || 0) * Math.PI / 180;
+                    
+                    ctx.translate(start.x, start.y);
+                    ctx.rotate(rotation);
+                    
+                    ctx.fillStyle = isSelected ? COLORS.SELECTED : COLORS[el.type];
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 1;
+
+                    if (el.type === 'ELBOW90') {
+                        ctx.beginPath();
+                        ctx.moveTo(-size, 0);
+                        ctx.lineTo(0, 0);
+                        ctx.lineTo(0, -size);
+                        ctx.lineWidth = 4 * zoom;
+                        ctx.stroke();
+                    } else if (el.type === 'ELBOW45') {
+                        ctx.beginPath();
+                        ctx.moveTo(-size, 0);
+                        ctx.lineTo(0, 0);
+                        ctx.lineTo(size * 0.7, -size * 0.7);
+                        ctx.lineWidth = 4 * zoom;
+                        ctx.stroke();
+                    } else if (el.type === 'TEE') {
+                        ctx.beginPath();
+                        ctx.moveTo(-size, 0);
+                        ctx.lineTo(size, 0);
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(0, -size);
+                        ctx.lineWidth = 4 * zoom;
+                        ctx.stroke();
+                    } else if (el.type === 'REDUCER') {
+                        ctx.beginPath();
+                        ctx.moveTo(-size, -size/2);
+                        ctx.lineTo(size, -size/3);
+                        ctx.lineTo(size, size/3);
+                        ctx.lineTo(-size, size/2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    } else if (el.type === 'TAKEOFF') {
+                        ctx.beginPath();
+                        ctx.moveTo(-size, -size/3);
+                        ctx.lineTo(size, -size/3);
+                        ctx.lineTo(size, size/3);
+                        ctx.lineTo(-size, size/3);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.moveTo(0, -size/3);
+                        ctx.lineTo(0, -size);
+                        ctx.lineWidth = 3 * zoom;
+                        ctx.stroke();
+                    }
+                    
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                }
+                else if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(el.type)) {
+                    const color = COLORS[el.type];
+                    const size = 14 * zoom;
+                    
+                    if (el.type === 'DIFFUSER') {
+                        ctx.beginPath();
+                        ctx.arc(start.x, start.y, size/2, 0, Math.PI * 2);
+                        ctx.fillStyle = isSelected ? COLORS.SELECTED : color;
+                        ctx.fill();
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    } else {
+                        ctx.fillStyle = isSelected ? COLORS.SELECTED : color;
+                        ctx.fillRect(start.x - size/2, start.y - size/2, size, size);
+                        ctx.strokeStyle = 'white';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(start.x - size/2, start.y - size/2, size, size);
+                    }
+                    
+                    // CFM label
+                    if (el.cfm) {
+                        ctx.fillStyle = 'white';
+                        ctx.font = `bold ${8 * zoom}px sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(el.cfm, start.x, start.y);
+                    }
+                }
+                else if (el.type === 'AHU' || el.type === 'FURNACE') {
+                    const width = 50 * zoom;
+                    const height = 35 * zoom;
+                    
+                    ctx.fillStyle = isSelected ? COLORS.SELECTED : COLORS[el.type];
+                    ctx.fillRect(start.x - width/2, start.y - height/2, width, height);
+                    
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(start.x - width/2, start.y - height/2, width, height);
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = `bold ${9 * zoom}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(el.type === 'AHU' ? 'AHU' : 'FURN', start.x, start.y);
+                }
+                else if (el.type === 'ROOM') {
+                    ctx.fillStyle = COLORS.ROOM;
+                    ctx.font = `bold ${11 * zoom}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(el.name || 'Room', start.x, start.y);
+                    
+                    if (el.sqft || el.cfm) {
+                        ctx.font = `${9 * zoom}px sans-serif`;
+                        let label = [];
+                        if (el.sqft) label.push(el.sqft + ' sf');
+                        if (el.cfm) label.push(el.cfm + ' CFM');
+                        ctx.fillText(label.join(' | '), start.x, start.y + 12 * zoom);
+                    }
+                }
+                else if (el.type === 'NOTE') {
+                    ctx.fillStyle = COLORS.NOTE;
+                    ctx.font = `${9 * zoom}px sans-serif`;
+                    ctx.textAlign = 'left';
+                    
+                    const lines = (el.text || '').split('\n');
+                    lines.forEach((line, i) => {
+                        ctx.fillText(line, start.x, start.y + i * 12 * zoom);
+                    });
+                }
+
+                // Selection highlight
+                if ((isHovered || isSelected) && currentMode === 'SELECT') {
+                    ctx.strokeStyle = COLORS.SELECTED;
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]);
+                    
+                    if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
+                        ctx.beginPath();
+                        ctx.moveTo(start.x, start.y);
+                        ctx.lineTo(end.x, end.y);
+                        ctx.stroke();
+                    } else {
+                        const bounds = getElementBounds(el);
+                        const screenBounds = worldToScreen(bounds.x, bounds.y);
+                        ctx.strokeRect(screenBounds.x - 4, screenBounds.y - 4, 
+                                      bounds.w * zoom + 8, bounds.h * zoom + 8);
+                    }
+                    ctx.setLineDash([]);
+                }
+
+                ctx.restore();
+            };
+
+            // Get element bounds
+            const getElementBounds = (el) => {
+                if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
+                    return {
+                        x: Math.min(el.startX, el.endX),
+                        y: Math.min(el.startY, el.endY),
+                        w: Math.abs(el.endX - el.startX) || 10,
+                        h: Math.abs(el.endY - el.startY) || 10
+                    };
+                } else if (el.type === 'AHU' || el.type === 'FURNACE') {
+                    return { x: el.startX - 25, y: el.startY - 17.5, w: 50, h: 35 };
+                } else if (el.type === 'ROOM' || el.type === 'NOTE') {
+                    return { x: el.startX - 30, y: el.startY - 10, w: 60, h: 20 };
+                } else {
+                    return { x: el.startX - 7, y: el.startY - 7, w: 14, h: 14 };
+                }
+            };
+
+            // Point near line test
+            const pointNearLine = (px, py, x1, y1, x2, y2, threshold = 10) => {
+                const A = px - x1;
+                const B = py - y1;
+                const C = x2 - x1;
+                const D = y2 - y1;
+
+                const dot = A * C + B * D;
+                const lenSq = C * C + D * D;
+                let param = lenSq !== 0 ? dot / lenSq : -1;
+
+                let xx, yy;
+                if (param < 0) { xx = x1; yy = y1; }
+                else if (param > 1) { xx = x2; yy = y2; }
+                else { xx = x1 + param * C; yy = y1 + param * D; }
+
+                return Math.hypot(px - xx, py - yy) < threshold;
+            };
+
+            // Find element at point
+            const findElementAt = (x, y) => {
+                for (let i = elements.length - 1; i >= 0; i--) {
+                    const el = elements[i];
+                    if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
+                        if (pointNearLine(x, y, el.startX, el.startY, el.endX, el.endY, 12 / zoom)) {
+                            return el;
+                        }
+                    } else {
+                        const bounds = getElementBounds(el);
+                        if (x >= bounds.x && x <= bounds.x + bounds.w &&
+                            y >= bounds.y && y <= bounds.y + bounds.h) {
+                            return el;
+                        }
+                    }
+                }
+                return null;
+            };
+
+            // Main draw function
             const draw = () => {
-                // Clear the canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGrid();
 
-                // Redraw all stored elements
-                elements.forEach(element => {
-                    if (element.type === 'WALLS') {
-                        drawWall(element);
-                    } else if (element.type === 'DUCT') {
-                        drawDuct(element);
+                elements.forEach(el => drawElement(el));
+
+                if (isDrawing && currentElement) {
+                    drawElement(currentElement, true);
+                }
+
+                updateSummary();
+            };
+
+            // Update all summaries
+            const updateSummary = () => {
+                let trunkLen = 0, supplyLen = 0, returnLen = 0, flexLen = 0;
+                let registerCount = 0, returnGrilleCount = 0, diffuserCount = 0;
+                let supplyCFM = 0, returnCFM = 0;
+                let elbow90Count = 0, elbow45Count = 0, teeCount = 0, reducerCount = 0, takeoffCount = 0;
+                
+                const ductBySizeMap = {};
+                const fittingsMap = {};
+                const terminalsMap = {};
+                const rooms = [];
+
+                elements.forEach(el => {
+                    // Lengths
+                    if (el.type === 'TRUNK') {
+                        const len = calcLength(el);
+                        trunkLen += len;
+                        const key = `Trunk ${el.size || '14'}"`;
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+                    if (el.type === 'SUPPLY') {
+                        const len = calcLength(el);
+                        supplyLen += len;
+                        const key = `Supply ${el.size || '8'}"`;
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+                    if (el.type === 'RETURN') {
+                        const len = calcLength(el);
+                        returnLen += len;
+                        const key = `Return ${el.size || '8'}"`;
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+                    if (el.type === 'FLEX') {
+                        const len = calcLength(el);
+                        flexLen += len;
+                        const key = `Flex ${el.size || '6'}"`;
+                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
+                    }
+
+                    // Terminals
+                    if (el.type === 'REGISTER') {
+                        registerCount++;
+                        supplyCFM += el.cfm || 0;
+                        terminalsMap['Supply Register'] = (terminalsMap['Supply Register'] || 0) + 1;
+                    }
+                    if (el.type === 'RETURN_GRILLE') {
+                        returnGrilleCount++;
+                        returnCFM += el.cfm || 0;
+                        terminalsMap['Return Grille'] = (terminalsMap['Return Grille'] || 0) + 1;
+                    }
+                    if (el.type === 'DIFFUSER') {
+                        diffuserCount++;
+                        supplyCFM += el.cfm || 0;
+                        terminalsMap['Ceiling Diffuser'] = (terminalsMap['Ceiling Diffuser'] || 0) + 1;
+                    }
+
+                    // Fittings
+                    if (el.type === 'ELBOW90') {
+                        elbow90Count++;
+                        const key = `90° Elbow ${el.size || '8'}"`;
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+                    if (el.type === 'ELBOW45') {
+                        elbow45Count++;
+                        const key = `45° Elbow ${el.size || '8'}"`;
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+                    if (el.type === 'TEE') {
+                        teeCount++;
+                        const key = `Tee ${el.size || '8'}"`;
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+                    if (el.type === 'REDUCER') {
+                        reducerCount++;
+                        fittingsMap['Reducer'] = (fittingsMap['Reducer'] || 0) + 1;
+                    }
+                    if (el.type === 'TAKEOFF') {
+                        takeoffCount++;
+                        const key = `Takeoff ${el.size || '6'}"`;
+                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
+                    }
+
+                    // Rooms
+                    if (el.type === 'ROOM') {
+                        rooms.push(el);
                     }
                 });
 
-                // Redraw the currently drawing element (while mouse is held down)
-                if (isDrawing && currentElement) {
-                    // Temporarily change style for the live drawing element
-                    if (currentElement.type === 'WALLS') {
-                        ctx.globalAlpha = 0.5; // Slightly transparent while drawing
-                        drawWall(currentElement);
-                        ctx.globalAlpha = 1.0;
-                    } else if (currentElement.type === 'DUCT') {
-                        ctx.globalAlpha = 0.5; // Slightly transparent while drawing
-                        drawDuct(currentElement);
-                        ctx.globalAlpha = 1.0;
-                    }
-                }
-            };
+                // Update Summary tab
+                document.getElementById('totalSupplyCFM').textContent = supplyCFM + ' CFM';
+                document.getElementById('totalReturnCFM').textContent = returnCFM + ' CFM';
+                
+                const balance = supplyCFM - returnCFM;
+                const balanceEl = document.getElementById('cfmBalance');
+                balanceEl.textContent = (balance >= 0 ? '+' : '') + balance + ' CFM';
+                balanceEl.className = balance === 0 ? 'font-bold text-green-400' : 
+                                     Math.abs(balance) <= supplyCFM * 0.1 ? 'font-bold text-yellow-400' : 
+                                     'font-bold text-red-400';
 
-            // --- Event Handlers ---
+                document.getElementById('trunkTotal').textContent = trunkLen.toFixed(1) + ' ft';
+                document.getElementById('supplyTotal').textContent = supplyLen.toFixed(1) + ' ft';
+                document.getElementById('returnTotal').textContent = returnLen.toFixed(1) + ' ft';
+                document.getElementById('flexTotal').textContent = flexLen.toFixed(1) + ' ft';
 
-            // Helper function to get correct canvas coordinates (handles touch and mouse)
-            const getCoords = (event) => {
-                const rect = canvas.getBoundingClientRect();
-                let clientX, clientY;
+                document.getElementById('registerCount').textContent = registerCount;
+                document.getElementById('returnGrilleCount').textContent = returnGrilleCount;
+                document.getElementById('diffuserCount').textContent = diffuserCount;
+                document.getElementById('elbow90Count').textContent = elbow90Count;
+                document.getElementById('elbow45Count').textContent = elbow45Count;
+                document.getElementById('teeCount').textContent = teeCount;
+                document.getElementById('reducerCount').textContent = reducerCount;
+                document.getElementById('takeoffCount').textContent = takeoffCount;
 
-                if (event.touches && event.touches.length > 0) {
-                    clientX = event.touches[0].clientX;
-                    clientY = event.touches[0].clientY;
+                // Room list
+                const roomList = document.getElementById('roomList');
+                if (rooms.length === 0) {
+                    roomList.innerHTML = '<div class="text-gray-500 italic">No rooms defined</div>';
                 } else {
-                    clientX = event.clientX;
-                    clientY = event.clientY;
+                    roomList.innerHTML = rooms.map(r => 
+                        `<div class="flex justify-between"><span>${r.name || 'Room'}</span><span>${r.cfm || 0} CFM</span></div>`
+                    ).join('');
                 }
 
-                return {
-                    x: clientX - rect.left,
-                    y: clientY - rect.top
-                };
+                // Materials tab
+                const ductBySize = document.getElementById('ductBySize');
+                if (Object.keys(ductBySizeMap).length === 0) {
+                    ductBySize.innerHTML = '<div class="text-gray-500 italic">No ducts placed</div>';
+                } else {
+                    ductBySize.innerHTML = Object.entries(ductBySizeMap)
+                        .map(([k, v]) => `<div class="flex justify-between"><span>${k}</span><span>${v.toFixed(1)} ft</span></div>`)
+                        .join('');
+                }
+
+                const fittingsList = document.getElementById('fittingsList');
+                if (Object.keys(fittingsMap).length === 0) {
+                    fittingsList.innerHTML = '<div class="text-gray-500 italic">No fittings placed</div>';
+                } else {
+                    fittingsList.innerHTML = Object.entries(fittingsMap)
+                        .map(([k, v]) => `<div class="flex justify-between"><span>${k}</span><span>×${v}</span></div>`)
+                        .join('');
+                }
+
+                const terminalsList = document.getElementById('terminalsList');
+                if (Object.keys(terminalsMap).length === 0) {
+                    terminalsList.innerHTML = '<div class="text-gray-500 italic">No terminals placed</div>';
+                } else {
+                    terminalsList.innerHTML = Object.entries(terminalsMap)
+                        .map(([k, v]) => `<div class="flex justify-between"><span>${k}</span><span>×${v}</span></div>`)
+                        .join('');
+                }
+
+                // Estimated materials
+                const totalDuct = trunkLen + supplyLen + returnLen;
+                const sheetMetal = Math.ceil(totalDuct * 2.5); // ~2.5 lbs per foot average
+                const tapeRolls = Math.ceil(totalDuct / 50); // 1 roll per 50 ft
+                const mastic = Math.ceil(totalDuct / 100); // 1 gal per 100 ft
+                const hangers = Math.ceil(totalDuct / 4); // Every 4 ft
+
+                document.getElementById('sheetMetalLbs').textContent = sheetMetal;
+                document.getElementById('flexDuctFt').textContent = flexLen.toFixed(0);
+                document.getElementById('tapeRolls').textContent = tapeRolls;
+                document.getElementById('masticGal').textContent = mastic.toFixed(1);
+                document.getElementById('hangerCount').textContent = hangers;
             };
 
-            // 1. Mouse/Touch Down (Start Drawing)
-            const handleStart = (event) => {
-                event.preventDefault();
+            // Calculate static pressure
+            const calculatePressure = () => {
+                const systemCFM = parseInt(document.getElementById('systemCFM').value) || 1200;
+                const filterDrop = parseFloat(document.getElementById('filterDrop').value) || 0.1;
+                const coilDrop = parseFloat(document.getElementById('coilDrop').value) || 0.2;
+
+                let supplyDuctLoss = 0;
+                let returnDuctLoss = 0;
+                let supplyFittingLoss = 0;
+                let returnFittingLoss = 0;
+                let terminalLoss = 0;
+
+                const warnings = [];
+
+                elements.forEach(el => {
+                    // Duct friction loss (simplified - 0.08" per 100 ft for standard velocity)
+                    if (['TRUNK', 'SUPPLY'].includes(el.type)) {
+                        const len = calcLength(el);
+                        supplyDuctLoss += len * 0.08 / 100;
+                        
+                        // Velocity check
+                        const area = getDuctArea(el.size || '8');
+                        const velocity = (systemCFM / (area / 144)) * (el.type === 'SUPPLY' ? 0.3 : 1);
+                        if (velocity > 900) {
+                            warnings.push(`${el.type} ${el.size || '8'}": ${Math.round(velocity)} FPM (high)`);
+                        }
+                    }
+                    if (el.type === 'RETURN') {
+                        const len = calcLength(el);
+                        returnDuctLoss += len * 0.08 / 100;
+                    }
+                    if (el.type === 'FLEX') {
+                        const len = calcLength(el);
+                        supplyDuctLoss += len * 0.15 / 100; // Flex has higher friction
+                    }
+
+                    // Fitting equivalent lengths
+                    if (['ELBOW90', 'ELBOW45', 'TEE', 'REDUCER', 'TAKEOFF'].includes(el.type)) {
+                        const equiv = EQUIV_LENGTHS[el.type] || 10;
+                        supplyFittingLoss += equiv * 0.08 / 100;
+                    }
+
+                    // Terminal losses
+                    if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(el.type)) {
+                        terminalLoss += 0.03; // Typical register/grille loss
+                    }
+                });
+
+                const totalESP = filterDrop + coilDrop + supplyDuctLoss + supplyFittingLoss + 
+                                returnDuctLoss + returnFittingLoss + terminalLoss;
+
+                document.getElementById('supplyLoss').textContent = supplyDuctLoss.toFixed(3) + '"';
+                document.getElementById('supplyFittingLoss').textContent = supplyFittingLoss.toFixed(3) + '"';
+                document.getElementById('returnLoss').textContent = returnDuctLoss.toFixed(3) + '"';
+                document.getElementById('returnFittingLoss').textContent = returnFittingLoss.toFixed(3) + '"';
+                document.getElementById('terminalLoss').textContent = terminalLoss.toFixed(3) + '"';
+                document.getElementById('totalESP').textContent = totalESP.toFixed(3) + '"';
+
+                // Velocity warnings
+                const warningsEl = document.getElementById('velocityWarnings');
+                if (warnings.length === 0) {
+                    warningsEl.innerHTML = '<div class="text-green-400">All velocities within range</div>';
+                } else {
+                    warningsEl.innerHTML = warnings.map(w => 
+                        `<div class="text-yellow-400">⚠ ${w}</div>`
+                    ).join('');
+                }
+            };
+
+            // Save state for undo
+            const saveState = () => {
+                undoStack.push(JSON.stringify(elements));
+                if (undoStack.length > 50) undoStack.shift();
+                redoStack = [];
+            };
+
+            // Get coordinates
+            const getCoords = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return screenToWorld(clientX - rect.left, clientY - rect.top);
+            };
+
+            // Mouse handlers
+            const handleStart = (e) => {
+                e.preventDefault();
+                let coords = getCoords(e);
+                
+                // Try endpoint snap first
+                const endpointSnap = snapToEndpoint(coords.x, coords.y);
+                if (endpointSnap) {
+                    coords = endpointSnap;
+                } else {
+                    coords = snapToGrid(coords.x, coords.y);
+                }
+
+                // Update coords display
+                document.getElementById('coords').textContent = 
+                    `${(coords.x / PIXELS_PER_FOOT).toFixed(1)}', ${(coords.y / PIXELS_PER_FOOT).toFixed(1)}'`;
+
+                if (currentMode === 'SELECT') {
+                    selectedElement = findElementAt(coords.x, coords.y);
+                    draw();
+                    return;
+                }
+
+                if (currentMode === 'ROOM') {
+                    pendingRoom = coords;
+                    document.getElementById('roomModal').classList.add('show');
+                    document.getElementById('roomName').focus();
+                    return;
+                }
+
+                if (currentMode === 'NOTE') {
+                    pendingNote = coords;
+                    document.getElementById('noteModal').classList.add('show');
+                    document.getElementById('noteText').focus();
+                    return;
+                }
+
+                // Point elements
+                if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER', 'AHU', 'FURNACE', 
+                     'ELBOW90', 'ELBOW45', 'TEE', 'REDUCER', 'TAKEOFF'].includes(currentMode)) {
+                    saveState();
+                    const cfm = parseInt(document.getElementById('registerCFM').value) || 100;
+                    const rotation = parseInt(document.getElementById('fittingRotation').value) || 0;
+                    const size = document.getElementById('ductSize').value;
+                    
+                    elements.push({
+                        type: currentMode,
+                        startX: coords.x,
+                        startY: coords.y,
+                        cfm: ['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(currentMode) ? cfm : null,
+                        rotation: rotation,
+                        size: size
+                    });
+                    draw();
+                    return;
+                }
+
+                // Line elements
                 isDrawing = true;
-                startPoint = getCoords(event);
+                startPoint = coords;
 
                 currentElement = {
                     type: currentMode,
-                    startX: startPoint.x,
-                    startY: startPoint.y,
-                    endX: startPoint.x,
-                    endY: startPoint.y,
+                    startX: coords.x,
+                    startY: coords.y,
+                    endX: coords.x,
+                    endY: coords.y,
+                    size: document.getElementById('ductSize').value
                 };
-
-                draw();
             };
 
-            // 2. Mouse/Touch Move (Live Update)
-            const handleMove = (event) => {
-                if (!isDrawing) return;
-                event.preventDefault();
+            const handleMove = (e) => {
+                let coords = getCoords(e);
+                
+                // Update coords display
+                document.getElementById('coords').textContent = 
+                    `${(coords.x / PIXELS_PER_FOOT).toFixed(1)}', ${(coords.y / PIXELS_PER_FOOT).toFixed(1)}'`;
 
-                const currentPoint = getCoords(event);
-
-                // Update the current element's end points
-                currentElement.endX = currentPoint.x;
-                currentElement.endY = currentPoint.y;
-
-                // For DUCT mode, enforce a minimum size (like a constant duct width)
-                if (currentMode === 'DUCT') {
-                     // Simple orthogonal approximation for cleaner ducts
-                     const dx = Math.abs(currentElement.endX - startPoint.x);
-                     const dy = Math.abs(currentElement.endY - startPoint.y);
-
-                     if (dx > dy) {
-                        currentElement.endY = startPoint.y + DUCT_SIZE;
-                        // Use a fixed DUCT_SIZE for the perpendicular axis
-                        if (currentElement.endX < startPoint.x) {
-                           // If dragging left, make sure x is correct
-                           currentElement.endX = currentPoint.x;
-                        } else {
-                           currentElement.endX = currentPoint.x;
-                        }
-                     } else {
-                        currentElement.endX = startPoint.x + DUCT_SIZE;
-                        if (currentElement.endY < startPoint.y) {
-                           currentElement.endY = currentPoint.y;
-                        } else {
-                           currentElement.endY = currentPoint.y;
-                        }
-                     }
+                if (currentMode === 'SELECT') {
+                    hoveredElement = findElementAt(coords.x, coords.y);
+                    canvas.style.cursor = hoveredElement ? 'pointer' : 'default';
+                    draw();
+                    return;
                 }
 
+                if (!isDrawing) return;
+                e.preventDefault();
+
+                // Snapping
+                const endpointSnap = snapToEndpoint(coords.x, coords.y);
+                if (endpointSnap) {
+                    coords = endpointSnap;
+                } else {
+                    coords = snapToGrid(coords.x, coords.y);
+                }
+
+                // Ortho lock
+                coords = applyOrthoLock(startPoint, coords);
+
+                currentElement.endX = coords.x;
+                currentElement.endY = coords.y;
+
+                // Live measurement
+                const len = calcLength(currentElement).toFixed(1);
+                const angle = calcAngle(currentElement);
+                document.getElementById('liveLength').textContent = len;
+                document.getElementById('liveAngle').textContent = angle;
+                document.getElementById('measureDisplay').classList.remove('hidden');
+
                 draw();
             };
 
-            // 3. Mouse/Touch Up (Finish Drawing)
             const handleEnd = () => {
-                if (!isDrawing) return;
+                if (!isDrawing || !currentElement) return;
                 isDrawing = false;
 
-                // Only save the element if it's drawn large enough
-                const length = Math.sqrt(
-                    Math.pow(currentElement.endX - currentElement.startX, 2) +
-                    Math.pow(currentElement.endY - currentElement.startY, 2)
-                );
-
-                if (length > 5) { // Minimum length threshold
+                const length = calcLength(currentElement);
+                if (length > 0.25) {
+                    saveState();
                     elements.push(currentElement);
                 }
 
                 currentElement = null;
+                document.getElementById('measureDisplay').classList.add('hidden');
                 draw();
             };
 
-            // Attach canvas listeners (supporting mouse and touch)
+            // Canvas events
             canvas.addEventListener('mousedown', handleStart);
             canvas.addEventListener('mousemove', handleMove);
-            document.addEventListener('mouseup', handleEnd); // Use document to catch releases outside canvas
-
+            document.addEventListener('mouseup', handleEnd);
             canvas.addEventListener('touchstart', handleStart);
             canvas.addEventListener('touchmove', handleMove);
             document.addEventListener('touchend', handleEnd);
 
-            // --- Tool Button Logic ---
-
-            // Function to set drawing mode
-            const setMode = (newMode) => {
-                currentMode = newMode;
-                modeDisplay.textContent = `Mode: ${newMode}`;
-
-                // Update button active state
-                document.querySelectorAll('.tool-button').forEach(btn => {
-                    btn.classList.remove('active');
-                    if (btn.getAttribute('data-mode') === newMode) {
-                        btn.classList.add('active');
-                    }
-                });
-            };
-
-            // Event listener for tool buttons
-            tools.addEventListener('click', (e) => {
-                const button = e.target.closest('.tool-button');
-                if (!button) return;
-
-                if (button.id === 'btnClear') {
-                    elements = [];
+            // Tool buttons
+            document.querySelectorAll('[data-mode]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentMode = btn.dataset.mode;
+                    document.getElementById('currentMode').textContent = currentMode;
+                    document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    canvas.style.cursor = currentMode === 'SELECT' ? 'default' : 'crosshair';
+                    selectedElement = null;
                     draw();
-                } else if (button.dataset.mode) {
-                    setMode(button.dataset.mode);
+                });
+            });
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                    document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+                });
+            });
+
+            // Rotation slider
+            document.getElementById('fittingRotation').addEventListener('input', (e) => {
+                document.getElementById('rotationDisplay').textContent = e.target.value + '°';
+            });
+
+            // Undo/Redo
+            document.getElementById('btnUndo').addEventListener('click', () => {
+                if (undoStack.length === 0) return;
+                redoStack.push(JSON.stringify(elements));
+                elements = JSON.parse(undoStack.pop());
+                selectedElement = null;
+                draw();
+            });
+
+            document.getElementById('btnRedo').addEventListener('click', () => {
+                if (redoStack.length === 0) return;
+                undoStack.push(JSON.stringify(elements));
+                elements = JSON.parse(redoStack.pop());
+                draw();
+            });
+
+            // Clear
+            document.getElementById('btnClear').addEventListener('click', () => {
+                if (elements.length === 0) return;
+                if (confirm('Clear all elements?')) {
+                    saveState();
+                    elements = [];
+                    selectedElement = null;
+                    draw();
                 }
             });
 
-            // Set initial mode
-            setMode('WALLS');
+            // Save/Load
+            document.getElementById('btnSave').addEventListener('click', () => {
+                const data = JSON.stringify({ elements, version: 1 });
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ductwork-design.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
 
-            // Initial Draw
+            document.getElementById('btnLoad').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+
+            document.getElementById('fileInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        const data = JSON.parse(evt.target.result);
+                        if (data.elements) {
+                            saveState();
+                            elements = data.elements;
+                            draw();
+                        }
+                    } catch (err) {
+                        alert('Invalid file format');
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            });
+
+            // Export
+            document.getElementById('btnExport').addEventListener('click', () => {
+                // Create a temporary canvas for export
+                const exportCanvas = document.createElement('canvas');
+                exportCanvas.width = canvas.width;
+                exportCanvas.height = canvas.height;
+                const exportCtx = exportCanvas.getContext('2d');
+                
+                // White background
+                exportCtx.fillStyle = 'white';
+                exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+                
+                // Draw current canvas content
+                exportCtx.drawImage(canvas, 0, 0);
+                
+                // Download
+                const url = exportCanvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ductwork-design.png';
+                a.click();
+            });
+
+            // Zoom
+            document.getElementById('zoomIn').addEventListener('click', () => {
+                zoom = Math.min(zoom * 1.2, 3);
+                document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
+                draw();
+            });
+
+            document.getElementById('zoomOut').addEventListener('click', () => {
+                zoom = Math.max(zoom / 1.2, 0.5);
+                document.getElementById('zoomLevel').textContent = Math.round(zoom * 100) + '%';
+                draw();
+            });
+
+            // Calculate pressure button
+            document.getElementById('calcPressure').addEventListener('click', calculatePressure);
+
+            // Print materials
+            document.getElementById('printMaterials').addEventListener('click', () => {
+                const printArea = document.getElementById('printArea');
+                printArea.innerHTML = `
+                    <div style="padding: 20px; font-family: sans-serif;">
+                        <h1 style="margin-bottom: 10px;">HVAC Ductwork Material List</h1>
+                        <p style="color: #666; margin-bottom: 20px;">Generated: ${new Date().toLocaleString()}</p>
+                        
+                        <h2>Duct by Size</h2>
+                        <div>${document.getElementById('ductBySize').innerHTML}</div>
+                        
+                        <h2 style="margin-top: 20px;">Fittings</h2>
+                        <div>${document.getElementById('fittingsList').innerHTML}</div>
+                        
+                        <h2 style="margin-top: 20px;">Terminals</h2>
+                        <div>${document.getElementById('terminalsList').innerHTML}</div>
+                        
+                        <h2 style="margin-top: 20px;">Estimated Materials</h2>
+                        <ul>
+                            <li>Sheet Metal: ${document.getElementById('sheetMetalLbs').textContent} lbs</li>
+                            <li>Flex Duct: ${document.getElementById('flexDuctFt').textContent} ft</li>
+                            <li>Duct Tape: ${document.getElementById('tapeRolls').textContent} rolls</li>
+                            <li>Mastic: ${document.getElementById('masticGal').textContent} gal</li>
+                            <li>Hangers: ${document.getElementById('hangerCount').textContent}</li>
+                        </ul>
+                    </div>
+                `;
+                window.print();
+            });
+
+            // Room modal
+            document.getElementById('roomSave').addEventListener('click', () => {
+                if (!pendingRoom) return;
+                saveState();
+                elements.push({
+                    type: 'ROOM',
+                    startX: pendingRoom.x,
+                    startY: pendingRoom.y,
+                    name: document.getElementById('roomName').value || 'Room',
+                    sqft: parseInt(document.getElementById('roomSqft').value) || null,
+                    cfm: parseInt(document.getElementById('roomCFM').value) || null
+                });
+                document.getElementById('roomModal').classList.remove('show');
+                document.getElementById('roomName').value = '';
+                document.getElementById('roomSqft').value = '';
+                document.getElementById('roomCFM').value = '';
+                pendingRoom = null;
+                draw();
+            });
+
+            document.getElementById('roomCancel').addEventListener('click', () => {
+                document.getElementById('roomModal').classList.remove('show');
+                pendingRoom = null;
+            });
+
+            // Note modal
+            document.getElementById('noteSave').addEventListener('click', () => {
+                if (!pendingNote) return;
+                saveState();
+                elements.push({
+                    type: 'NOTE',
+                    startX: pendingNote.x,
+                    startY: pendingNote.y,
+                    text: document.getElementById('noteText').value || 'Note'
+                });
+                document.getElementById('noteModal').classList.remove('show');
+                document.getElementById('noteText').value = '';
+                pendingNote = null;
+                draw();
+            });
+
+            document.getElementById('noteCancel').addEventListener('click', () => {
+                document.getElementById('noteModal').classList.remove('show');
+                pendingNote = null;
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+                
+                if (e.ctrlKey && e.key === 'z') {
+                    e.preventDefault();
+                    document.getElementById('btnUndo').click();
+                }
+                if (e.ctrlKey && e.key === 'y') {
+                    e.preventDefault();
+                    document.getElementById('btnRedo').click();
+                }
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    if (selectedElement && currentMode === 'SELECT') {
+                        e.preventDefault();
+                        saveState();
+                        elements = elements.filter(el => el !== selectedElement);
+                        selectedElement = null;
+                        draw();
+                    }
+                }
+                if (e.key === 'Escape') {
+                    selectedElement = null;
+                    isDrawing = false;
+                    currentElement = null;
+                    document.getElementById('roomModal').classList.remove('show');
+                    document.getElementById('noteModal').classList.remove('show');
+                    draw();
+                }
+            });
+
+            // Settings checkboxes
+            ['snapGrid', 'snapEndpoint', 'showGrid', 'showMeasure', 'orthoLock'].forEach(id => {
+                document.getElementById(id).addEventListener('change', draw);
+            });
+
+            // Initial draw
             draw();
         });
     </script>
