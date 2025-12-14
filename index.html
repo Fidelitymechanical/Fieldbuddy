@@ -1,1271 +1,946 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HVAC Ductwork Designer Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #111827;
-        }
-        #designCanvas {
-            cursor: crosshair;
-            touch-action: none;
-        }
-        .tool-btn {
-            transition: all 0.15s ease;
-        }
-        .tool-btn:hover {
-            transform: translateY(-1px);
-        }
-        .tool-btn.active {
-            background-color: #10b981 !important;
-            border-color: #10b981 !important;
-        }
-        .panel {
-            background: rgba(31, 41, 55, 0.95);
-            backdrop-filter: blur(8px);
-        }
-        .tab-btn.active {
-            background-color: #374151;
-            border-bottom: 2px solid #10b981;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 3px;
-        }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-        }
-        .modal-overlay.show {
-            display: flex;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fidelity Mechanical Solutions | Premium HVAC & Mechanical Services</title>
+  <meta name="description" content="Expert HVAC and mechanical services through transparent diagnostics, systematic engineering, and uncompromising integrity. Serving Greater Houston with technical excellence.">
+  <meta property="og:title" content="Fidelity Mechanical Solutions">
+  <meta property="og:description" content="Where mechanical precision meets thoughtful service. Houston's premier diagnostic-forward HVAC company.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-dark: #0d1014;
+      --secondary-dark: #1a1d23;
+      --accent-blue: #4a90e2;
+      --accent-teal: #2d6a7e;
+      --text-primary: #e8eaed;
+      --text-secondary: #b8c5d1;
+      --text-muted: #7a8a99;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --hover-bg: rgba(74, 144, 226, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--primary-dark);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .nav-container {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(13, 16, 20, 0.95);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-container.scrolled {
+      background: rgba(13, 16, 20, 0.98);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-accent {
+      color: var(--accent-blue);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-blue);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .nav-toggle .bar {
+      width: 25px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: 0.3s;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at top, rgba(74, 144, 226, 0.15), transparent 50%),
+                  radial-gradient(ellipse at bottom, rgba(45, 106, 126, 0.1), transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #e8eaed 0%, #b8c5d1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.8;
+    }
+
+    .cta-container {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-primary, .cta-secondary {
+      padding: 1rem 2.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .cta-primary {
+      background: var(--accent-blue);
+      color: white;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, 0.3);
+    }
+
+    .cta-primary:hover {
+      background: #3a7bc8;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(74, 144, 226, 0.4);
+    }
+
+    .cta-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+    }
+
+    .cta-secondary:hover {
+      background: var(--hover-bg);
+      border-color: var(--accent-blue);
+    }
+
+    /* Section Styles */
+    section {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    section h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    section p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      max-width: 800px;
+    }
+
+    /* Philosophy Section */
+    .philosophy {
+      background: var(--secondary-dark);
+      border-radius: 16px;
+      padding: 4rem;
+      margin: 4rem 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .philosophy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+      margin-top: 3rem;
+    }
+
+    .philosophy-card {
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .philosophy-card:hover {
+      transform: translateY(-5px);
+      background: rgba(74, 144, 226, 0.05);
+      border-color: var(--accent-blue);
+    }
+
+    .philosophy-card h3 {
+      color: var(--accent-blue);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .philosophy-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Diagnostics Section */
+    .diagnostics {
+      background: linear-gradient(135deg, rgba(45, 106, 126, 0.1) 0%, transparent 100%);
+      padding: 6rem 2rem;
+    }
+
+    .diagnostic-tabs {
+      display: flex;
+      gap: 1rem;
+      margin: 3rem 0 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      padding: 0.8rem 1.8rem;
+      background: var(--secondary-dark);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--accent-blue);
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: white;
+      border-color: var(--accent-blue);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 3rem;
+      background: var(--secondary-dark);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      animation: fadeIn 0.5s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .diagnostic-step {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .diagnostic-step:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 50px;
+      height: 50px;
+      background: var(--accent-blue);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .step-content h4 {
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .step-content p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .service-card {
+      padding: 2.5rem;
+      background: var(--secondary-dark);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent-blue);
+    }
+
+    .service-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .service-card h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+
+    .service-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .service-features {
+      list-style: none;
+      margin-top: 1.5rem;
+    }
+
+    .service-features li {
+      color: var(--text-secondary);
+      padding: 0.5rem 0;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .service-features li::before {
+      content: '✓';
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Contact Section */
+    .contact {
+      background: var(--secondary-dark);
+      border-radius: 16px;
+      padding: 4rem;
+      margin: 4rem 2rem;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .contact-methods {
+      display: flex;
+      gap: 3rem;
+      justify-content: center;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .contact-icon {
+      font-size: 2.5rem;
+    }
+
+    .contact-item a {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .contact-item a:hover {
+      color: var(--text-primary);
+    }
+
+    .contact-note {
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    /* Floating Contact Button */
+    .floating-contact {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 999;
+    }
+
+    .floating-btn {
+      width: 60px;
+      height: 60px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .floating-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--secondary-dark);
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+      border-top: 1px solid var(--border-color);
+    }
+
+    footer p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 800px;
+      margin: 0 auto 1rem;
+    }
+
+    .footer-tagline {
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: 1rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: rgba(13, 16, 20, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 3rem 2rem;
+        transition: right 0.3s ease;
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-toggle {
+        display: flex;
+      }
+
+      .hero {
+        padding: 6rem 1.5rem 3rem;
+      }
+
+      .philosophy, .contact {
+        padding: 2.5rem 1.5rem;
+        margin: 2rem 1rem;
+      }
+
+      .philosophy-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-methods {
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .diagnostic-step {
+        flex-direction: column;
+      }
+
+      .floating-contact {
+        bottom: 1rem;
+        right: 1rem;
+      }
+
+      .floating-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
 </head>
-<body class="min-h-screen text-white">
-    <div id="app" class="flex flex-col h-screen">
-        <!-- Header -->
-        <header class="bg-gray-800 border-b border-gray-700 px-4 py-2">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-lg font-bold text-white">HVAC Ductwork Designer Pro</h1>
-                    <p class="text-xs text-gray-400">Scale: 1/4" = 1' | Grid: 1 ft squares</p>
-                </div>
-                <div class="flex gap-2">
-                    <button id="btnUndo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Z">↶ Undo</button>
-                    <button id="btnRedo" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs" title="Ctrl+Y">↷ Redo</button>
-                    <button id="btnSave" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">💾 Save</button>
-                    <button id="btnLoad" class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs">📂 Load</button>
-                    <button id="btnExport" class="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-xs">📄 Export PNG</button>
-                    <button id="btnClear" class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs">🗑️ Clear</button>
-                </div>
-            </div>
-        </header>
+<body>
+  <!-- Navigation -->
+  <nav class="nav-container" id="navbar">
+    <div class="nav">
+      <div class="logo">
+        FIDELITY <span class="logo-accent">MECHANICAL</span>
+      </div>
+      <div class="nav-toggle" onclick="toggleMenu()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <div class="nav-links" id="navLinks">
+        <a href="#home" onclick="closeMenu()">Home</a>
+        <a href="#philosophy" onclick="closeMenu()">Philosophy</a>
+        <a href="#diagnostics" onclick="closeMenu()">Diagnostics</a>
+        <a href="#services" onclick="closeMenu()">Services</a>
+        <a href="#contact" onclick="closeMenu()">Contact</a>
+      </div>
+    </div>
+  </nav>
 
-        <div class="flex flex-1 overflow-hidden">
-            <!-- Left Toolbar -->
-            <div class="w-52 bg-gray-800 border-r border-gray-700 p-2 flex flex-col gap-1 overflow-y-auto text-xs">
-                <!-- Structure -->
-                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Structure</div>
-                <button class="tool-btn active flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="WALL">
-                    <span class="w-3 h-3 bg-gray-500 rounded-sm"></span>Wall
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ROOM">
-                    <span class="w-3 h-3 border border-yellow-400 rounded-sm"></span>Room Label
-                </button>
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <h1>Fidelity Mechanical Solutions</h1>
+      <p class="hero-subtitle">
+        More than service — this is how we think, how we move, and how we work in your space with respect and clarity.
+      </p>
+      <div class="cta-container">
+        <a href="#contact" class="cta-primary">Get Free Estimate</a>
+        <a href="#services" class="cta-secondary">View Services</a>
+      </div>
+    </div>
+  </section>
 
-                <!-- Ductwork -->
-                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Ductwork</div>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TRUNK">
-                    <span class="w-3 h-3 bg-blue-700 rounded-sm"></span>Trunk Line
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="SUPPLY">
-                    <span class="w-3 h-3 bg-blue-500 rounded-sm"></span>Supply Branch
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="RETURN">
-                    <span class="w-3 h-3 bg-orange-500 rounded-sm"></span>Return Duct
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="FLEX">
-                    <span class="w-3 h-3 bg-green-500 rounded-sm"></span>Flex Duct
-                </button>
+  <!-- Philosophy Section -->
+  <section id="philosophy" class="philosophy">
+    <h2>Our Philosophy</h2>
+    <p>
+      We are a mechanical service company organized around one premise: that technical work, client understanding, 
+      and professional development are not separate functions—they are the work itself.
+    </p>
+    <div class="philosophy-grid">
+      <div class="philosophy-card">
+        <h3>Diagnostic-First Approach</h3>
+        <p>
+          Every service call begins with comprehensive system analysis. We don't chase symptoms—we identify root causes 
+          through systematic investigation and data-driven methodology.
+        </p>
+      </div>
+      <div class="philosophy-card">
+        <h3>Transparent Communication</h3>
+        <p>
+          Clear explanations, documented findings, and honest recommendations. You'll understand exactly what's happening 
+          with your system and why our solutions make sense.
+        </p>
+      </div>
+      <div class="philosophy-card">
+        <h3>Technical Excellence</h3>
+        <p>
+          Our technicians are evolving craftspeople—trained in systematic diagnosis, continuous learning, and 
+          professional integrity. Quality work is our standard, not our selling point.
+        </p>
+      </div>
+    </div>
+  </section>
 
-                <!-- Fittings -->
-                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Fittings</div>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ELBOW90">
-                    <span class="w-3 h-3 text-blue-400 font-bold">∟</span>90° Elbow
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="ELBOW45">
-                    <span class="w-3 h-3 text-blue-400 font-bold">∠</span>45° Elbow
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TEE">
-                    <span class="w-3 h-3 text-blue-400 font-bold">⊥</span>Tee
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="TAKEOFF">
-                    <span class="w-3 h-3 text-blue-400 font-bold">⊢</span>Takeoff
-                </button>
+  <!-- Diagnostics Section -->
+  <section id="diagnostics" class="diagnostics">
+    <h2>Data-Driven Diagnostics</h2>
+    <p>
+      Modern HVAC service requires more than intuition. Our diagnostic methodology combines field experience 
+      with systematic data collection to deliver accurate, lasting solutions.
+    </p>
 
-                <!-- Terminals -->
-                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Terminals</div>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="REGISTER">
-                    <span class="w-3 h-3 border-2 border-cyan-400 rounded-sm"></span>Supply Register
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="RETURN_GRILLE">
-                    <span class="w-3 h-3 border-2 border-orange-400 rounded-sm"></span>Return Grille
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="DIFFUSER">
-                    <span class="w-3 h-3 border-2 border-purple-400 rounded-full"></span>Ceiling Diffuser
-                </button>
-
-                <!-- Equipment -->
-                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Equipment</div>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="AHU">
-                    <span class="w-3 h-3 bg-purple-500 rounded-sm"></span>Air Handler
-                </button>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="FURNACE">
-                    <span class="w-3 h-3 bg-red-500 rounded-sm"></span>Furnace
-                </button>
-
-                <!-- Tools -->
-                <div class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1 mt-2">Tools</div>
-                <button class="tool-btn flex items-center gap-2 px-2 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-left" data-mode="SELECT">
-                    <span class="w-3 h-3">↖</span>Select/Delete
-                </button>
-
-                <!-- Settings -->
-                <div class="mt-3 pt-2 border-t border-gray-700 space-y-1">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="snapGrid" checked class="rounded w-3 h-3">
-                        <span>Snap to Grid</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="showGrid" checked class="rounded w-3 h-3">
-                        <span>Show Grid</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="showMeasure" checked class="rounded w-3 h-3">
-                        <span>Show Measurements</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="orthoLock" class="rounded w-3 h-3">
-                        <span>Ortho Lock (H/V)</span>
-                    </label>
-                </div>
-
-                <!-- Duct Size -->
-                <div class="mt-2 pt-2 border-t border-gray-700">
-                    <label class="text-[10px] font-semibold text-gray-400 uppercase">Duct Size</label>
-                    <select id="ductSize" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-1 py-1 text-xs">
-                        <option value="4">4"</option>
-                        <option value="5">5"</option>
-                        <option value="6">6"</option>
-                        <option value="7">7"</option>
-                        <option value="8" selected>8"</option>
-                        <option value="10">10"</option>
-                        <option value="12">12"</option>
-                        <option value="14">14"</option>
-                        <option value="10x8">10"×8"</option>
-                        <option value="12x8">12"×8"</option>
-                        <option value="14x8">14"×8"</option>
-                        <option value="16x8">16"×8"</option>
-                        <option value="20x8">20"×8"</option>
-                    </select>
-                </div>
-
-                <!-- CFM Input -->
-                <div class="mt-2">
-                    <label class="text-[10px] font-semibold text-gray-400 uppercase">Terminal CFM</label>
-                    <input type="number" id="registerCFM" value="100" min="25" max="1000" step="25" 
-                           class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-1 py-1 text-xs">
-                </div>
-
-                <!-- Fitting Rotation -->
-                <div class="mt-2">
-                    <label class="text-[10px] font-semibold text-gray-400 uppercase">Fitting Rotation</label>
-                    <select id="fittingRotation" class="mt-1 w-full bg-gray-700 border border-gray-600 rounded px-1 py-1 text-xs">
-                        <option value="0">0°</option>
-                        <option value="90">90°</option>
-                        <option value="180">180°</option>
-                        <option value="270">270°</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Canvas Area -->
-            <div class="flex-1 relative overflow-hidden bg-gray-900">
-                <canvas id="designCanvas" class="absolute inset-0"></canvas>
-                
-                <!-- Mode indicator -->
-                <div id="modeIndicator" class="absolute top-2 left-2 panel px-2 py-1 rounded text-xs font-medium">
-                    Mode: <span id="currentMode" class="text-green-400">WALL</span>
-                </div>
-
-                <!-- Measurement display -->
-                <div id="measureDisplay" class="absolute bottom-2 left-2 panel px-2 py-1 rounded text-xs hidden">
-                    <span id="liveLength">0</span> ft
-                </div>
-            </div>
-
-            <!-- Right Panel -->
-            <div class="w-72 bg-gray-800 border-l border-gray-700 flex flex-col overflow-hidden">
-                <!-- Tabs -->
-                <div class="flex border-b border-gray-700">
-                    <button class="tab-btn active flex-1 px-2 py-2 text-xs hover:bg-gray-700" data-tab="summary">Summary</button>
-                    <button class="tab-btn flex-1 px-2 py-2 text-xs hover:bg-gray-700" data-tab="pressure">Pressure</button>
-                    <button class="tab-btn flex-1 px-2 py-2 text-xs hover:bg-gray-700" data-tab="materials">Materials</button>
-                </div>
-
-                <!-- Tab Content -->
-                <div class="flex-1 overflow-y-auto p-2 text-xs">
-                    <!-- Summary Tab -->
-                    <div id="tab-summary" class="tab-content">
-                        <div class="space-y-2">
-                            <!-- Airflow Balance -->
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Airflow Balance</div>
-                                <div class="flex justify-between">
-                                    <span class="text-blue-400">Supply:</span>
-                                    <span id="totalSupplyCFM">0 CFM</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-orange-400">Return:</span>
-                                    <span id="totalReturnCFM">0 CFM</span>
-                                </div>
-                                <div class="flex justify-between mt-1 pt-1 border-t border-gray-600">
-                                    <span>Balance:</span>
-                                    <span id="cfmBalance" class="font-bold">0 CFM</span>
-                                </div>
-                            </div>
-
-                            <!-- Duct Lengths -->
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Duct Lengths</div>
-                                <div class="flex justify-between">
-                                    <span class="text-blue-700">Trunk:</span>
-                                    <span id="trunkTotal">0 ft</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-blue-400">Supply:</span>
-                                    <span id="supplyTotal">0 ft</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-orange-400">Return:</span>
-                                    <span id="returnTotal">0 ft</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-green-400">Flex:</span>
-                                    <span id="flexTotal">0 ft</span>
-                                </div>
-                            </div>
-
-                            <!-- Components -->
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Components</div>
-                                <div class="grid grid-cols-2 gap-1 text-[10px]">
-                                    <span>Registers:</span><span id="registerCount" class="text-right">0</span>
-                                    <span>Return Grilles:</span><span id="returnGrilleCount" class="text-right">0</span>
-                                    <span>Diffusers:</span><span id="diffuserCount" class="text-right">0</span>
-                                    <span>90° Elbows:</span><span id="elbow90Count" class="text-right">0</span>
-                                    <span>45° Elbows:</span><span id="elbow45Count" class="text-right">0</span>
-                                    <span>Tees:</span><span id="teeCount" class="text-right">0</span>
-                                    <span>Takeoffs:</span><span id="takeoffCount" class="text-right">0</span>
-                                </div>
-                            </div>
-
-                            <!-- Rooms -->
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Rooms</div>
-                                <div id="roomList" class="space-y-1 text-[10px]">
-                                    <div class="text-gray-500 italic">No rooms defined</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Pressure Tab -->
-                    <div id="tab-pressure" class="tab-content hidden">
-                        <div class="space-y-2">
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">System Settings</div>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between items-center">
-                                        <span>System CFM:</span>
-                                        <input type="number" id="systemCFM" value="1200" class="w-16 bg-gray-600 rounded px-1 text-right">
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span>Filter Drop:</span>
-                                        <input type="number" id="filterDrop" value="0.10" step="0.01" class="w-16 bg-gray-600 rounded px-1 text-right">
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span>Coil Drop:</span>
-                                        <input type="number" id="coilDrop" value="0.20" step="0.01" class="w-16 bg-gray-600 rounded px-1 text-right">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Calculated Losses (in. w.c.)</div>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between">
-                                        <span>Supply Duct:</span>
-                                        <span id="supplyLoss">0.00</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Supply Fittings:</span>
-                                        <span id="supplyFittingLoss">0.00</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Return Duct:</span>
-                                        <span id="returnLoss">0.00</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Terminals:</span>
-                                        <span id="terminalLoss">0.00</span>
-                                    </div>
-                                    <div class="flex justify-between mt-1 pt-1 border-t border-gray-600 font-bold">
-                                        <span>Total ESP:</span>
-                                        <span id="totalESP">0.30</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <button id="calcPressure" class="w-full bg-blue-600 hover:bg-blue-700 rounded py-1.5 text-xs font-medium">
-                                Calculate Pressure
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Materials Tab -->
-                    <div id="tab-materials" class="tab-content hidden">
-                        <div class="space-y-2">
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Duct by Size</div>
-                                <div id="ductBySize" class="space-y-1 text-[10px]">
-                                    <div class="text-gray-500 italic">No ducts placed</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Fittings List</div>
-                                <div id="fittingsList" class="space-y-1 text-[10px]">
-                                    <div class="text-gray-500 italic">No fittings placed</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-700 rounded p-2">
-                                <div class="font-semibold mb-1">Estimated Materials</div>
-                                <div class="space-y-1">
-                                    <div class="flex justify-between">
-                                        <span>Sheet Metal:</span>
-                                        <span id="sheetMetalLbs">0 lbs</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Flex Duct:</span>
-                                        <span id="flexDuctFt">0 ft</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span>Hangers:</span>
-                                        <span id="hangerCount">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="diagnostic-tabs">
+      <button class="tab-btn active" onclick="switchTab(0)">Electrical Systems</button>
+      <button class="tab-btn" onclick="switchTab(1)">Refrigerant Analysis</button>
+      <button class="tab-btn" onclick="switchTab(2)">Airflow & Ductwork</button>
+      <button class="tab-btn" onclick="switchTab(3)">System Optimization</button>
     </div>
 
-    <!-- Room Label Modal -->
-    <div id="roomModal" class="modal-overlay">
-        <div class="bg-gray-800 rounded-lg p-4 w-80">
-            <h3 class="font-bold mb-3">Room Details</h3>
-            <div class="space-y-2">
-                <div>
-                    <label class="text-xs text-gray-400">Room Name</label>
-                    <input type="text" id="roomName" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm" placeholder="e.g., Master Bedroom">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">Square Footage</label>
-                    <input type="number" id="roomSqft" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm" placeholder="150">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">Required CFM</label>
-                    <input type="number" id="roomCFM" class="w-full bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm" placeholder="100">
-                </div>
-            </div>
-            <div class="flex gap-2 mt-4">
-                <button id="roomCancel" class="flex-1 bg-gray-600 hover:bg-gray-500 rounded py-1.5 text-sm">Cancel</button>
-                <button id="roomSave" class="flex-1 bg-green-600 hover:bg-green-700 rounded py-1.5 text-sm">Save</button>
-            </div>
+    <div class="tab-content active" id="tab-0">
+      <div class="diagnostic-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Voltage & Amperage Mapping</h4>
+          <p>Complete electrical profile of your system under load conditions. We measure what's actually happening, not what should be happening.</p>
         </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Component Testing</h4>
+          <p>Capacitors, contactors, and control boards tested for degradation. Early detection prevents catastrophic failures.</p>
+        </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Circuit Analysis</h4>
+          <p>Breaker integrity, wire sizing verification, and ground fault protection assessment. Safety first, always.</p>
+        </div>
+      </div>
     </div>
 
-    <!-- Hidden file input -->
-    <input type="file" id="fileInput" accept=".json" class="hidden">
-
-    <script>
-        (function() {
-            'use strict';
-            
-            const canvas = document.getElementById('designCanvas');
-            const ctx = canvas.getContext('2d');
-
-            // State
-            let elements = [];
-            let undoStack = [];
-            let redoStack = [];
-            let currentMode = 'WALL';
-            let isDrawing = false;
-            let startX = 0;
-            let startY = 0;
-            let currentElement = null;
-            let selectedElement = null;
-            let pendingRoomCoords = null;
-
-            // Constants
-            const GRID_SIZE = 20; // pixels per foot
-            const COLORS = {
-                WALL: '#6b7280',
-                TRUNK: '#1d4ed8',
-                SUPPLY: '#3b82f6',
-                RETURN: '#f97316',
-                FLEX: '#22c55e',
-                REGISTER: '#06b6d4',
-                RETURN_GRILLE: '#fb923c',
-                DIFFUSER: '#a855f7',
-                AHU: '#9333ea',
-                FURNACE: '#dc2626',
-                ELBOW90: '#60a5fa',
-                ELBOW45: '#60a5fa',
-                TEE: '#60a5fa',
-                TAKEOFF: '#60a5fa',
-                ROOM: '#fbbf24',
-                GRID: '#374151',
-                SELECTED: '#fbbf24'
-            };
-
-            // Equivalent lengths for pressure calc
-            const EQUIV_LENGTHS = {
-                ELBOW90: 15,
-                ELBOW45: 7,
-                TEE: 30,
-                TAKEOFF: 35
-            };
-
-            // Resize canvas
-            function resizeCanvas() {
-                const container = canvas.parentElement;
-                canvas.width = container.clientWidth;
-                canvas.height = container.clientHeight;
-                draw();
-            }
-
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-
-            // Snap to grid
-            function snap(val) {
-                if (!document.getElementById('snapGrid').checked) return val;
-                return Math.round(val / GRID_SIZE) * GRID_SIZE;
-            }
-
-            // Get mouse/touch coordinates relative to canvas
-            function getCanvasCoords(e) {
-                const rect = canvas.getBoundingClientRect();
-                let clientX, clientY;
-                
-                if (e.touches && e.touches.length > 0) {
-                    clientX = e.touches[0].clientX;
-                    clientY = e.touches[0].clientY;
-                } else {
-                    clientX = e.clientX;
-                    clientY = e.clientY;
-                }
-                
-                return {
-                    x: clientX - rect.left,
-                    y: clientY - rect.top
-                };
-            }
-
-            // Calculate length in feet
-            function calcLength(el) {
-                if (!el.endX) return 0;
-                const dx = el.endX - el.startX;
-                const dy = el.endY - el.startY;
-                return Math.sqrt(dx * dx + dy * dy) / GRID_SIZE;
-            }
-
-            // Draw grid
-            function drawGrid() {
-                if (!document.getElementById('showGrid').checked) return;
-                
-                ctx.strokeStyle = COLORS.GRID;
-                ctx.lineWidth = 0.5;
-
-                for (let x = 0; x <= canvas.width; x += GRID_SIZE) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, canvas.height);
-                    ctx.stroke();
-                }
-
-                for (let y = 0; y <= canvas.height; y += GRID_SIZE) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(canvas.width, y);
-                    ctx.stroke();
-                }
-            }
-
-            // Draw a single element
-            function drawElement(el, isPreview) {
-                const alpha = isPreview ? 0.5 : 1;
-                const isSelected = el === selectedElement;
-
-                ctx.save();
-                ctx.globalAlpha = alpha;
-
-                // Line-based elements (walls, ducts)
-                if (['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(el.type)) {
-                    let color = COLORS[el.type];
-                    let width = 8;
-                    
-                    if (el.type === 'TRUNK') width = 14;
-                    else if (el.type === 'SUPPLY') width = 10;
-                    else if (el.type === 'RETURN') width = 10;
-                    else if (el.type === 'FLEX') width = 6;
-
-                    ctx.strokeStyle = isSelected ? COLORS.SELECTED : color;
-                    ctx.lineWidth = width;
-                    ctx.lineCap = 'round';
-                    ctx.beginPath();
-                    ctx.moveTo(el.startX, el.startY);
-                    ctx.lineTo(el.endX, el.endY);
-                    ctx.stroke();
-
-                    // Center line for ducts
-                    if (el.type !== 'WALL' && el.type !== 'FLEX') {
-                        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                        ctx.lineWidth = 1;
-                        ctx.setLineDash([4, 4]);
-                        ctx.beginPath();
-                        ctx.moveTo(el.startX, el.startY);
-                        ctx.lineTo(el.endX, el.endY);
-                        ctx.stroke();
-                        ctx.setLineDash([]);
-                    }
-
-                    // Measurement label
-                    if (document.getElementById('showMeasure').checked && !isPreview) {
-                        const len = calcLength(el).toFixed(1);
-                        const midX = (el.startX + el.endX) / 2;
-                        const midY = (el.startY + el.endY) / 2;
-                        
-                        ctx.fillStyle = 'white';
-                        ctx.font = '10px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.globalAlpha = 1;
-                        ctx.fillText(len + "'", midX, midY - 10);
-                        
-                        if (el.size && el.type !== 'WALL') {
-                            ctx.font = '8px sans-serif';
-                            ctx.fillText(el.size + '"', midX, midY + 12);
-                        }
-                    }
-                }
-                // Fittings
-                else if (['ELBOW90', 'ELBOW45', 'TEE', 'TAKEOFF'].includes(el.type)) {
-                    const size = 12;
-                    const rotation = (el.rotation || 0) * Math.PI / 180;
-                    
-                    ctx.translate(el.startX, el.startY);
-                    ctx.rotate(rotation);
-                    
-                    ctx.strokeStyle = isSelected ? COLORS.SELECTED : COLORS[el.type];
-                    ctx.lineWidth = 4;
-                    ctx.lineCap = 'round';
-
-                    if (el.type === 'ELBOW90') {
-                        ctx.beginPath();
-                        ctx.moveTo(-size, 0);
-                        ctx.lineTo(0, 0);
-                        ctx.lineTo(0, -size);
-                        ctx.stroke();
-                    } else if (el.type === 'ELBOW45') {
-                        ctx.beginPath();
-                        ctx.moveTo(-size, 0);
-                        ctx.lineTo(0, 0);
-                        ctx.lineTo(size * 0.7, -size * 0.7);
-                        ctx.stroke();
-                    } else if (el.type === 'TEE') {
-                        ctx.beginPath();
-                        ctx.moveTo(-size, 0);
-                        ctx.lineTo(size, 0);
-                        ctx.moveTo(0, 0);
-                        ctx.lineTo(0, -size);
-                        ctx.stroke();
-                    } else if (el.type === 'TAKEOFF') {
-                        ctx.beginPath();
-                        ctx.moveTo(-size, 0);
-                        ctx.lineTo(size, 0);
-                        ctx.moveTo(0, 0);
-                        ctx.lineTo(0, -size);
-                        ctx.stroke();
-                        // Add circle at takeoff point
-                        ctx.beginPath();
-                        ctx.arc(0, -size, 3, 0, Math.PI * 2);
-                        ctx.fillStyle = ctx.strokeStyle;
-                        ctx.fill();
-                    }
-                }
-                // Terminals (registers, grilles, diffusers)
-                else if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(el.type)) {
-                    const color = COLORS[el.type];
-                    const size = 14;
-                    
-                    ctx.fillStyle = isSelected ? COLORS.SELECTED : color;
-                    
-                    if (el.type === 'DIFFUSER') {
-                        ctx.beginPath();
-                        ctx.arc(el.startX, el.startY, size / 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    } else {
-                        ctx.fillRect(el.startX - size/2, el.startY - size/2, size, size);
-                    }
-                    
-                    // CFM label
-                    if (el.cfm) {
-                        ctx.fillStyle = 'white';
-                        ctx.font = 'bold 8px sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(el.cfm, el.startX, el.startY);
-                    }
-                }
-                // Equipment
-                else if (el.type === 'AHU' || el.type === 'FURNACE') {
-                    const width = 50;
-                    const height = 35;
-                    
-                    ctx.fillStyle = isSelected ? COLORS.SELECTED : COLORS[el.type];
-                    ctx.fillRect(el.startX - width/2, el.startY - height/2, width, height);
-                    
-                    ctx.strokeStyle = 'white';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(el.startX - width/2, el.startY - height/2, width, height);
-                    
-                    ctx.fillStyle = 'white';
-                    ctx.font = 'bold 9px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(el.type === 'AHU' ? 'AHU' : 'FURN', el.startX, el.startY);
-                }
-                // Room labels
-                else if (el.type === 'ROOM') {
-                    ctx.fillStyle = COLORS.ROOM;
-                    ctx.font = 'bold 11px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(el.name || 'Room', el.startX, el.startY);
-                    
-                    if (el.sqft || el.cfm) {
-                        ctx.font = '9px sans-serif';
-                        let label = [];
-                        if (el.sqft) label.push(el.sqft + ' sf');
-                        if (el.cfm) label.push(el.cfm + ' CFM');
-                        ctx.fillText(label.join(' | '), el.startX, el.startY + 12);
-                    }
-                }
-
-                ctx.restore();
-            }
-
-            // Main draw function
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                drawGrid();
-
-                // Draw all saved elements
-                for (let i = 0; i < elements.length; i++) {
-                    drawElement(elements[i], false);
-                }
-
-                // Draw current element being created
-                if (isDrawing && currentElement) {
-                    drawElement(currentElement, true);
-                }
-
-                updateSummary();
-            }
-
-            // Update summary panels
-            function updateSummary() {
-                let trunkLen = 0, supplyLen = 0, returnLen = 0, flexLen = 0;
-                let registerCount = 0, returnGrilleCount = 0, diffuserCount = 0;
-                let supplyCFM = 0, returnCFM = 0;
-                let elbow90Count = 0, elbow45Count = 0, teeCount = 0, takeoffCount = 0;
-                
-                const ductBySizeMap = {};
-                const fittingsMap = {};
-                const rooms = [];
-
-                elements.forEach(el => {
-                    const len = calcLength(el);
-                    
-                    if (el.type === 'TRUNK') {
-                        trunkLen += len;
-                        const key = 'Trunk ' + (el.size || '14') + '"';
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-                    if (el.type === 'SUPPLY') {
-                        supplyLen += len;
-                        const key = 'Supply ' + (el.size || '8') + '"';
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-                    if (el.type === 'RETURN') {
-                        returnLen += len;
-                        const key = 'Return ' + (el.size || '8') + '"';
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-                    if (el.type === 'FLEX') {
-                        flexLen += len;
-                        const key = 'Flex ' + (el.size || '6') + '"';
-                        ductBySizeMap[key] = (ductBySizeMap[key] || 0) + len;
-                    }
-
-                    if (el.type === 'REGISTER') {
-                        registerCount++;
-                        supplyCFM += el.cfm || 0;
-                    }
-                    if (el.type === 'RETURN_GRILLE') {
-                        returnGrilleCount++;
-                        returnCFM += el.cfm || 0;
-                    }
-                    if (el.type === 'DIFFUSER') {
-                        diffuserCount++;
-                        supplyCFM += el.cfm || 0;
-                    }
-
-                    if (el.type === 'ELBOW90') {
-                        elbow90Count++;
-                        const key = '90° Elbow ' + (el.size || '8') + '"';
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-                    if (el.type === 'ELBOW45') {
-                        elbow45Count++;
-                        const key = '45° Elbow ' + (el.size || '8') + '"';
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-                    if (el.type === 'TEE') {
-                        teeCount++;
-                        const key = 'Tee ' + (el.size || '8') + '"';
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-                    if (el.type === 'TAKEOFF') {
-                        takeoffCount++;
-                        const key = 'Takeoff ' + (el.size || '6') + '"';
-                        fittingsMap[key] = (fittingsMap[key] || 0) + 1;
-                    }
-
-                    if (el.type === 'ROOM') {
-                        rooms.push(el);
-                    }
-                });
-
-                // Update summary tab
-                document.getElementById('totalSupplyCFM').textContent = supplyCFM + ' CFM';
-                document.getElementById('totalReturnCFM').textContent = returnCFM + ' CFM';
-                
-                const balance = supplyCFM - returnCFM;
-                const balanceEl = document.getElementById('cfmBalance');
-                balanceEl.textContent = (balance >= 0 ? '+' : '') + balance + ' CFM';
-                balanceEl.className = 'font-bold ' + (balance === 0 ? 'text-green-400' : 
-                                     Math.abs(balance) <= supplyCFM * 0.1 ? 'text-yellow-400' : 'text-red-400');
-
-                document.getElementById('trunkTotal').textContent = trunkLen.toFixed(1) + ' ft';
-                document.getElementById('supplyTotal').textContent = supplyLen.toFixed(1) + ' ft';
-                document.getElementById('returnTotal').textContent = returnLen.toFixed(1) + ' ft';
-                document.getElementById('flexTotal').textContent = flexLen.toFixed(1) + ' ft';
-
-                document.getElementById('registerCount').textContent = registerCount;
-                document.getElementById('returnGrilleCount').textContent = returnGrilleCount;
-                document.getElementById('diffuserCount').textContent = diffuserCount;
-                document.getElementById('elbow90Count').textContent = elbow90Count;
-                document.getElementById('elbow45Count').textContent = elbow45Count;
-                document.getElementById('teeCount').textContent = teeCount;
-                document.getElementById('takeoffCount').textContent = takeoffCount;
-
-                // Room list
-                const roomList = document.getElementById('roomList');
-                if (rooms.length === 0) {
-                    roomList.innerHTML = '<div class="text-gray-500 italic">No rooms defined</div>';
-                } else {
-                    roomList.innerHTML = rooms.map(r => 
-                        '<div class="flex justify-between"><span>' + (r.name || 'Room') + '</span><span>' + (r.cfm || 0) + ' CFM</span></div>'
-                    ).join('');
-                }
-
-                // Materials tab - duct by size
-                const ductBySize = document.getElementById('ductBySize');
-                const ductKeys = Object.keys(ductBySizeMap);
-                if (ductKeys.length === 0) {
-                    ductBySize.innerHTML = '<div class="text-gray-500 italic">No ducts placed</div>';
-                } else {
-                    ductBySize.innerHTML = ductKeys.map(k => 
-                        '<div class="flex justify-between"><span>' + k + '</span><span>' + ductBySizeMap[k].toFixed(1) + ' ft</span></div>'
-                    ).join('');
-                }
-
-                // Materials tab - fittings
-                const fittingsList = document.getElementById('fittingsList');
-                const fittingKeys = Object.keys(fittingsMap);
-                if (fittingKeys.length === 0) {
-                    fittingsList.innerHTML = '<div class="text-gray-500 italic">No fittings placed</div>';
-                } else {
-                    fittingsList.innerHTML = fittingKeys.map(k => 
-                        '<div class="flex justify-between"><span>' + k + '</span><span>×' + fittingsMap[k] + '</span></div>'
-                    ).join('');
-                }
-
-                // Estimated materials
-                const totalDuct = trunkLen + supplyLen + returnLen;
-                document.getElementById('sheetMetalLbs').textContent = Math.ceil(totalDuct * 2.5) + ' lbs';
-                document.getElementById('flexDuctFt').textContent = flexLen.toFixed(0) + ' ft';
-                document.getElementById('hangerCount').textContent = Math.ceil(totalDuct / 4);
-            }
-
-            // Calculate static pressure
-            function calculatePressure() {
-                const filterDrop = parseFloat(document.getElementById('filterDrop').value) || 0.1;
-                const coilDrop = parseFloat(document.getElementById('coilDrop').value) || 0.2;
-
-                let supplyDuctLoss = 0;
-                let returnDuctLoss = 0;
-                let supplyFittingLoss = 0;
-                let terminalLoss = 0;
-
-                elements.forEach(el => {
-                    const len = calcLength(el);
-                    
-                    // Duct friction (0.08" per 100 ft typical)
-                    if (el.type === 'TRUNK' || el.type === 'SUPPLY') {
-                        supplyDuctLoss += len * 0.08 / 100;
-                    }
-                    if (el.type === 'RETURN') {
-                        returnDuctLoss += len * 0.08 / 100;
-                    }
-                    if (el.type === 'FLEX') {
-                        supplyDuctLoss += len * 0.15 / 100; // Flex has higher friction
-                    }
-
-                    // Fitting equivalent lengths
-                    if (EQUIV_LENGTHS[el.type]) {
-                        supplyFittingLoss += EQUIV_LENGTHS[el.type] * 0.08 / 100;
-                    }
-
-                    // Terminal losses
-                    if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(el.type)) {
-                        terminalLoss += 0.03;
-                    }
-                });
-
-                const totalESP = filterDrop + coilDrop + supplyDuctLoss + supplyFittingLoss + 
-                                returnDuctLoss + terminalLoss;
-
-                document.getElementById('supplyLoss').textContent = supplyDuctLoss.toFixed(3);
-                document.getElementById('supplyFittingLoss').textContent = supplyFittingLoss.toFixed(3);
-                document.getElementById('returnLoss').textContent = returnDuctLoss.toFixed(3);
-                document.getElementById('terminalLoss').textContent = terminalLoss.toFixed(3);
-                document.getElementById('totalESP').textContent = totalESP.toFixed(3);
-            }
-
-            // Save state for undo
-            function saveState() {
-                undoStack.push(JSON.stringify(elements));
-                if (undoStack.length > 50) undoStack.shift();
-                redoStack = [];
-            }
-
-            // Check if element type is point-based (single click)
-            function isPointElement(mode) {
-                return ['REGISTER', 'RETURN_GRILLE', 'DIFFUSER', 'AHU', 'FURNACE', 
-                        'ELBOW90', 'ELBOW45', 'TEE', 'TAKEOFF'].includes(mode);
-            }
-
-            // Check if element type is line-based (click and drag)
-            function isLineElement(mode) {
-                return ['WALL', 'TRUNK', 'SUPPLY', 'RETURN', 'FLEX'].includes(mode);
-            }
-
-            // Point near line for selection
-            function pointNearLine(px, py, x1, y1, x2, y2, threshold) {
-                const A = px - x1;
-                const B = py - y1;
-                const C = x2 - x1;
-                const D = y2 - y1;
-
-                const dot = A * C + B * D;
-                const lenSq = C * C + D * D;
-                let param = lenSq !== 0 ? dot / lenSq : -1;
-
-                let xx, yy;
-                if (param < 0) { xx = x1; yy = y1; }
-                else if (param > 1) { xx = x2; yy = y2; }
-                else { xx = x1 + param * C; yy = y1 + param * D; }
-
-                const dx = px - xx;
-                const dy = py - yy;
-                return Math.sqrt(dx * dx + dy * dy) < threshold;
-            }
-
-            // Find element at coordinates
-            function findElementAt(x, y) {
-                for (let i = elements.length - 1; i >= 0; i--) {
-                    const el = elements[i];
-                    
-                    if (isLineElement(el.type)) {
-                        if (pointNearLine(x, y, el.startX, el.startY, el.endX, el.endY, 12)) {
-                            return el;
-                        }
-                    } else {
-                        // Point elements - check distance from center
-                        const dx = x - el.startX;
-                        const dy = y - el.startY;
-                        if (Math.sqrt(dx * dx + dy * dy) < 20) {
-                            return el;
-                        }
-                    }
-                }
-                return null;
-            }
-
-            // EVENT HANDLERS
-
-            // Mouse/touch down
-            function handlePointerDown(e) {
-                e.preventDefault();
-                
-                const coords = getCanvasCoords(e);
-                const x = snap(coords.x);
-                const y = snap(coords.y);
-
-                // Select mode
-                if (currentMode === 'SELECT') {
-                    selectedElement = findElementAt(coords.x, coords.y);
-                    draw();
-                    return;
-                }
-
-                // Room mode - show modal
-                if (currentMode === 'ROOM') {
-                    pendingRoomCoords = { x: x, y: y };
-                    document.getElementById('roomModal').classList.add('show');
-                    document.getElementById('roomName').focus();
-                    return;
-                }
-
-                // Point elements - place immediately
-                if (isPointElement(currentMode)) {
-                    saveState();
-                    
-                    const newElement = {
-                        type: currentMode,
-                        startX: x,
-                        startY: y,
-                        size: document.getElementById('ductSize').value,
-                        rotation: parseInt(document.getElementById('fittingRotation').value) || 0
-                    };
-                    
-                    // Add CFM for terminals
-                    if (['REGISTER', 'RETURN_GRILLE', 'DIFFUSER'].includes(currentMode)) {
-                        newElement.cfm = parseInt(document.getElementById('registerCFM').value) || 100;
-                    }
-                    
-                    elements.push(newElement);
-                    draw();
-                    return;
-                }
-
-                // Line elements - start drawing
-                if (isLineElement(currentMode)) {
-                    isDrawing = true;
-                    startX = x;
-                    startY = y;
-                    
-                    currentElement = {
-                        type: currentMode,
-                        startX: x,
-                        startY: y,
-                        endX: x,
-                        endY: y,
-                        size: document.getElementById('ductSize').value
-                    };
-                    
-                    draw();
-                }
-            }
-
-            // Mouse/touch move
-            function handlePointerMove(e) {
-                if (!isDrawing || !currentElement) return;
-                e.preventDefault();
-
-                const coords = getCanvasCoords(e);
-                let x = snap(coords.x);
-                let y = snap(coords.y);
-
-                // Ortho lock
-                if (document.getElementById('orthoLock').checked) {
-                    const dx = Math.abs(x - startX);
-                    const dy = Math.abs(y - startY);
-                    if (dx > dy) {
-                        y = startY;
-                    } else {
-                        x = startX;
-                    }
-                }
-
-                currentElement.endX = x;
-                currentElement.endY = y;
-
-                // Update live measurement
-                const len = calcLength(currentElement).toFixed(1);
-                document.getElementById('liveLength').textContent = len;
-                document.getElementById('measureDisplay').classList.remove('hidden');
-
-                draw();
-            }
-
-            // Mouse/touch up
-            function handlePointerUp(e) {
-                if (!isDrawing || !currentElement) return;
-                
-                isDrawing = false;
-                document.getElementById('measureDisplay').classList.add('hidden');
-
-                // Only save if element has meaningful length
-                const len = calcLength(currentElement);
-                if (len > 0.25) {
-                    saveState();
-                    elements.push(currentElement);
-                }
-
-                currentElement = null;
-                draw();
-            }
-
-            // Canvas event listeners
-            canvas.addEventListener('mousedown', handlePointerDown);
-            canvas.addEventListener('mousemove', handlePointerMove);
-            document.addEventListener('mouseup', handlePointerUp);
-
-            canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
-            canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
-            document.addEventListener('touchend', handlePointerUp);
-
-            // Tool selection
-            document.querySelectorAll('[data-mode]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    currentMode = this.dataset.mode;
-                    document.getElementById('currentMode').textContent = currentMode;
-                    
-                    // Update active button
-                    document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Update cursor
-                    canvas.style.cursor = currentMode === 'SELECT' ? 'default' : 'crosshair';
-                    
-                    selectedElement = null;
-                    draw();
-                });
-            });
-
-            // Tab switching
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-                    document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
-                });
-            });
-
-            // Room modal handlers
-            document.getElementById('roomSave').addEventListener('click', function() {
-                if (!pendingRoomCoords) return;
-                
-                saveState();
-                elements.push({
-                    type: 'ROOM',
-                    startX: pendingRoomCoords.x,
-                    startY: pendingRoomCoords.y,
-                    name: document.getElementById('roomName').value || 'Room',
-                    sqft: parseInt(document.getElementById('roomSqft').value) || null,
-                    cfm: parseInt(document.getElementById('roomCFM').value) || null
-                });
-                
-                document.getElementById('roomModal').classList.remove('show');
-                document.getElementById('roomName').value = '';
-                document.getElementById('roomSqft').value = '';
-                document.getElementById('roomCFM').value = '';
-                pendingRoomCoords = null;
-                draw();
-            });
-
-            document.getElementById('roomCancel').addEventListener('click', function() {
-                document.getElementById('roomModal').classList.remove('show');
-                pendingRoomCoords = null;
-            });
-
-            // Undo
-            document.getElementById('btnUndo').addEventListener('click', function() {
-                if (undoStack.length === 0) return;
-                redoStack.push(JSON.stringify(elements));
-                elements = JSON.parse(undoStack.pop());
-                selectedElement = null;
-                draw();
-            });
-
-            // Redo
-            document.getElementById('btnRedo').addEventListener('click', function() {
-                if (redoStack.length === 0) return;
-                undoStack.push(JSON.stringify(elements));
-                elements = JSON.parse(redoStack.pop());
-                draw();
-            });
-
-            // Clear
-            document.getElementById('btnClear').addEventListener('click', function() {
-                if (elements.length === 0) return;
-                if (confirm('Clear all elements?')) {
-                    saveState();
-                    elements = [];
-                    selectedElement = null;
-                    draw();
-                }
-            });
-
-            // Save
-            document.getElementById('btnSave').addEventListener('click', function() {
-                const data = JSON.stringify({ elements: elements, version: 1 });
-                const blob = new Blob([data], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'ductwork-design.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
-
-            // Load
-            document.getElementById('btnLoad').addEventListener('click', function() {
-                document.getElementById('fileInput').click();
-            });
-
-            document.getElementById('fileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = function(evt) {
-                    try {
-                        const data = JSON.parse(evt.target.result);
-                        if (data.elements) {
-                            saveState();
-                            elements = data.elements;
-                            draw();
-                        }
-                    } catch (err) {
-                        alert('Invalid file format');
-                    }
-                };
-                reader.readAsText(file);
-                e.target.value = '';
-            });
-
-            // Export PNG
-            document.getElementById('btnExport').addEventListener('click', function() {
-                const exportCanvas = document.createElement('canvas');
-                exportCanvas.width = canvas.width;
-                exportCanvas.height = canvas.height;
-                const exportCtx = exportCanvas.getContext('2d');
-                
-                // White background
-                exportCtx.fillStyle = 'white';
-                exportCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-                exportCtx.drawImage(canvas, 0, 0);
-                
-                const url = exportCanvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'ductwork-design.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            });
-
-            // Calculate pressure button
-            document.getElementById('calcPressure').addEventListener('click', calculatePressure);
-
-            // Keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                // Ignore if typing in input
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-                
-                if (e.ctrlKey && e.key === 'z') {
-                    e.preventDefault();
-                    document.getElementById('btnUndo').click();
-                }
-                if (e.ctrlKey && e.key === 'y') {
-                    e.preventDefault();
-                    document.getElementById('btnRedo').click();
-                }
-                if (e.key === 'Delete' || e.key === 'Backspace') {
-                    if (selectedElement && currentMode === 'SELECT') {
-                        e.preventDefault();
-                        saveState();
-                        elements = elements.filter(el => el !== selectedElement);
-                        selectedElement = null;
-                        draw();
-                    }
-                }
-                if (e.key === 'Escape') {
-                    selectedElement = null;
-                    isDrawing = false;
-                    currentElement = null;
-                    document.getElementById('roomModal').classList.remove('show');
-                    draw();
-                }
-            });
-
-            // Settings changes trigger redraw
-            ['snapGrid', 'showGrid', 'showMeasure', 'orthoLock'].forEach(function(id) {
-                document.getElementById(id).addEventListener('change', draw);
-            });
-
-            // Initial draw
-            draw();
-            
-            console.log('HVAC Ductwork Designer initialized');
-        })();
-    </script>
+    <div class="tab-content" id="tab-1">
+      <div class="diagnostic-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Pressure & Temperature Correlation</h4>
+          <p>Superheat and subcooling measurements reveal system efficiency and proper refrigerant charge levels.</p>
+        </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Recovery & Analysis</h4>
+          <p>When needed, refrigerant recovery with contamination testing. We don't guess about system chemistry.</p>
+        </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Leak Detection</h4>
+          <p>Electronic leak detection and pressure decay testing to locate even the smallest refrigerant leaks.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-2">
+      <div class="diagnostic-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Static Pressure Testing</h4>
+          <p>Measure total external static pressure to identify restrictive ductwork, filters, or coil blockages.</p>
+        </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Airflow Calculation</h4>
+          <p>Temperature split analysis and blower performance curves to verify proper CFM delivery.</p>
+        </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Distribution Analysis</h4>
+          <p>Room-by-room temperature and pressure balancing for optimal comfort and efficiency.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-3">
+      <div class="diagnostic-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Performance Baseline</h4>
+          <p>Establish current system performance metrics as foundation for improvement recommendations.</p>
+        </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Efficiency Opportunities</h4>
+          <p>Identify simple adjustments and upgrades that deliver measurable energy savings.</p>
+        </div>
+      </div>
+      <div class="diagnostic-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Preventive Scheduling</h4>
+          <p>Create maintenance timeline based on your system's actual condition, not arbitrary intervals.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services">
+    <h2>Services</h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🔧</div>
+        <h3>System Installation</h3>
+        <p>Complete HVAC installations with proper sizing, startup protocols, and comprehensive client education.</p>
+        <ul class="service-features">
+          <li>Load calculation & system sizing</li>
+          <li>Professional installation</li>
+          <li>Startup & optimization</li>
+          <li>Complete system walkthrough</li>
+        </ul>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">🔍</div>
+        <h3>Diagnostics & Repair</h3>
+        <p>Root-cause focused troubleshooting that solves problems permanently, not temporarily.</p>
+        <ul class="service-features">
+          <li>Comprehensive system analysis</li>
+          <li>Data-driven diagnosis</li>
+          <li>Quality parts & materials</li>
+          <li>Prevention education included</li>
+        </ul>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">📋</div>
+        <h3>Preventive Maintenance</h3>
+        <p>Systematic maintenance programs that extend equipment life and prevent costly failures.</p>
+        <ul class="service-features">
+          <li>Quarterly system checkups</li>
+          <li>Performance trend analysis</li>
+          <li>Priority scheduling</li>
+          <li>Detailed service reports</li>
+        </ul>
+      </div>
+
+      <div class="service-card">
+        <div class="service-icon">⚡</div>
+        <h3>System Optimization</h3>
+        <p>Performance tuning and efficiency improvements for existing systems.</p>
+        <ul class="service-features">
+          <li>Energy efficiency audit</li>
+          <li>Airflow balancing</li>
+          <li>Control system upgrade</li>
+          <li>ROI analysis provided</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <h2>Contact</h2>
+    <p>Text preferred for fastest response. Service requests are typically confirmed within 2 hours during operating hours.</p>
+    
+    <div class="contact-methods">
+      <div class="contact-item">
+        <div class="contact-icon">📱</div>
+        <a href="sms:7132012842">(713) 201-2842</a>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Text Preferred</span>
+      </div>
+      
+      <div class="contact-item">
+        <div class="contact-icon">📧</div>
+        <a href="mailto:nvvtruelife@outlook.com">support@FidelityMechanical.com</a>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Email</span>
+      </div>
+    </div>
+
+    <p class="contact-note">
+      Service area: Greater Houston and surrounding communities
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>
+      &copy; 2025 Fidelity Mechanical Solutions. All rights reserved.
+    </p>
+    <p class="footer-tagline">
+      Built with purpose. Run with clarity. Revenue is a result of competent service, not its goal.
+    </p>
+  </footer>
+
+  <!-- Floating Contact Button -->
+  <div class="floating-contact">
+    <a href="sms:7132012842" class="floating-btn" title="Text us now">💬</a>
+  </div>
+
+  <script>
+    // Navigation scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Mobile menu toggle
+    function toggleMenu() {
+      document.getElementById('navLinks').classList.toggle('active');
+    }
+
+    function closeMenu() {
+      document.getElementById('navLinks').classList.remove('active');
+    }
+
+    // Diagnostic tabs functionality
+    function switchTab(index) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const contents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach((tab, i) => {
+        if (i === index) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+      
+      contents.forEach((content, i) => {
+        if (i === index) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }U
+      });
+    }
+
+    // Smooth scroll with offset for fixed nav
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          const offset = 80;
+          const targetPosition = target.offsetTop - offset;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>
