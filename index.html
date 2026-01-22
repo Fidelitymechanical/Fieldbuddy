@@ -1,946 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fidelity Mechanical Solutions | Premium HVAC & Mechanical Services</title>
-  <meta name="description" content="Expert HVAC and mechanical services through transparent diagnostics, systematic engineering, and uncompromising integrity. Serving Greater Houston with technical excellence.">
-  <meta property="og:title" content="Fidelity Mechanical Solutions">
-  <meta property="og:description" content="Where mechanical precision meets thoughtful service. Houston's premier diagnostic-forward HVAC company.">
-  <meta property="og:type" content="website">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    :root {
-      --primary-dark: #0d1014;
-      --secondary-dark: #1a1d23;
-      --accent-blue: #4a90e2;
-      --accent-teal: #2d6a7e;
-      --text-primary: #e8eaed;
-      --text-secondary: #b8c5d1;
-      --text-muted: #7a8a99;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --hover-bg: rgba(74, 144, 226, 0.1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background-color: var(--primary-dark);
-      color: var(--text-primary);
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* Navigation */
-    .nav-container {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      background: rgba(13, 16, 20, 0.95);
-      backdrop-filter: blur(20px);
-      z-index: 1000;
-      border-bottom: 1px solid var(--border-color);
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .nav-container.scrolled {
-      background: rgba(13, 16, 20, 0.98);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .nav {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 1.2rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .logo-accent {
-      color: var(--accent-blue);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.5rem;
-      align-items: center;
-    }
-
-    .nav-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.95rem;
-      transition: color 0.3s ease;
-      position: relative;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--accent-blue);
-      transition: width 0.3s ease;
-    }
-
-    .nav-links a:hover {
-      color: var(--text-primary);
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    .nav-toggle {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-    }
-
-    .nav-toggle .bar {
-      width: 25px;
-      height: 2px;
-      background: var(--text-primary);
-      transition: 0.3s;
-    }
-
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 8rem 2rem 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(ellipse at top, rgba(74, 144, 226, 0.15), transparent 50%),
-                  radial-gradient(ellipse at bottom, rgba(45, 106, 126, 0.1), transparent 50%);
-      pointer-events: none;
-    }
-
-    .hero-content {
-      max-width: 900px;
-      position: relative;
-      z-index: 1;
-      animation: fadeInUp 1s ease-out;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
-      background: linear-gradient(135deg, #e8eaed 0%, #b8c5d1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: clamp(1.1rem, 2vw, 1.4rem);
-      color: var(--text-secondary);
-      margin-bottom: 3rem;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      line-height: 1.8;
-    }
-
-    .cta-container {
-      display: flex;
-      gap: 1.5rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .cta-primary, .cta-secondary {
-      padding: 1rem 2.5rem;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 1rem;
-      transition: all 0.3s ease;
-      display: inline-block;
-    }
-
-    .cta-primary {
-      background: var(--accent-blue);
-      color: white;
-      box-shadow: 0 4px 20px rgba(74, 144, 226, 0.3);
-    }
-
-    .cta-primary:hover {
-      background: #3a7bc8;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 30px rgba(74, 144, 226, 0.4);
-    }
-
-    .cta-secondary {
-      background: transparent;
-      color: var(--text-primary);
-      border: 2px solid var(--border-color);
-    }
-
-    .cta-secondary:hover {
-      background: var(--hover-bg);
-      border-color: var(--accent-blue);
-    }
-
-    /* Section Styles */
-    section {
-      padding: 6rem 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    section h2 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin-bottom: 1.5rem;
-      color: var(--text-primary);
-      font-weight: 700;
-    }
-
-    section p {
-      color: var(--text-secondary);
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-      max-width: 800px;
-    }
-
-    /* Philosophy Section */
-    .philosophy {
-      background: var(--secondary-dark);
-      border-radius: 16px;
-      padding: 4rem;
-      margin: 4rem 2rem;
-      border: 1px solid var(--border-color);
-    }
-
-    .philosophy-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2.5rem;
-      margin-top: 3rem;
-    }
-
-    .philosophy-card {
-      padding: 2rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-    }
-
-    .philosophy-card:hover {
-      transform: translateY(-5px);
-      background: rgba(74, 144, 226, 0.05);
-      border-color: var(--accent-blue);
-    }
-
-    .philosophy-card h3 {
-      color: var(--accent-blue);
-      margin-bottom: 1rem;
-      font-size: 1.3rem;
-    }
-
-    .philosophy-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    /* Diagnostics Section */
-    .diagnostics {
-      background: linear-gradient(135deg, rgba(45, 106, 126, 0.1) 0%, transparent 100%);
-      padding: 6rem 2rem;
-    }
-
-    .diagnostic-tabs {
-      display: flex;
-      gap: 1rem;
-      margin: 3rem 0 2rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .tab-btn {
-      padding: 0.8rem 1.8rem;
-      background: var(--secondary-dark);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .tab-btn:hover {
-      background: var(--hover-bg);
-      border-color: var(--accent-blue);
-      color: var(--text-primary);
-    }
-
-    .tab-btn.active {
-      background: var(--accent-blue);
-      color: white;
-      border-color: var(--accent-blue);
-    }
-
-    .tab-content {
-      display: none;
-      padding: 3rem;
-      background: var(--secondary-dark);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      animation: fadeIn 0.5s ease;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .diagnostic-step {
-      display: flex;
-      gap: 2rem;
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .diagnostic-step:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .step-number {
-      flex-shrink: 0;
-      width: 50px;
-      height: 50px;
-      background: var(--accent-blue);
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.2rem;
-    }
-
-    .step-content h4 {
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
-    }
-
-    .step-content p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    /* Services Grid */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    .service-card {
-      padding: 2.5rem;
-      background: var(--secondary-dark);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-    }
-
-    .service-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-      border-color: var(--accent-blue);
-    }
-
-    .service-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .service-card h3 {
-      color: var(--text-primary);
-      margin-bottom: 1rem;
-      font-size: 1.4rem;
-    }
-
-    .service-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
-    .service-features {
-      list-style: none;
-      margin-top: 1.5rem;
-    }
-
-    .service-features li {
-      color: var(--text-secondary);
-      padding: 0.5rem 0;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .service-features li::before {
-      content: '✓';
-      color: var(--accent-blue);
-      font-weight: 700;
-    }
-
-    /* Contact Section */
-    .contact {
-      background: var(--secondary-dark);
-      border-radius: 16px;
-      padding: 4rem;
-      margin: 4rem 2rem;
-      border: 1px solid var(--border-color);
-      text-align: center;
-    }
-
-    .contact-methods {
-      display: flex;
-      gap: 3rem;
-      justify-content: center;
-      margin-top: 3rem;
-      flex-wrap: wrap;
-    }
-
-    .contact-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .contact-icon {
-      font-size: 2.5rem;
-    }
-
-    .contact-item a {
-      color: var(--accent-blue);
-      text-decoration: none;
-      font-size: 1.2rem;
-      font-weight: 600;
-      transition: color 0.3s ease;
-    }
-
-    .contact-item a:hover {
-      color: var(--text-primary);
-    }
-
-    .contact-note {
-      margin-top: 2rem;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      font-style: italic;
-    }
-
-    /* Floating Contact Button */
-    .floating-contact {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      z-index: 999;
-    }
-
-    .floating-btn {
-      width: 60px;
-      height: 60px;
-      background: var(--accent-blue);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 1.5rem;
-      text-decoration: none;
-      box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
-      transition: all 0.3s ease;
-    }
-
-    .floating-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6);
-    }
-
-    /* Footer */
-    footer {
-      background: var(--secondary-dark);
-      padding: 3rem 2rem 2rem;
-      text-align: center;
-      border-top: 1px solid var(--border-color);
-    }
-
-    footer p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      max-width: 800px;
-      margin: 0 auto 1rem;
-    }
-
-    .footer-tagline {
-      color: var(--text-secondary);
-      font-style: italic;
-      margin-top: 1rem;
-    }
-
-    /* Animations */
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .nav-links {
-        position: fixed;
-        top: 70px;
-        right: -100%;
-        width: 100%;
-        height: calc(100vh - 70px);
-        background: rgba(13, 16, 20, 0.98);
-        backdrop-filter: blur(20px);
-        flex-direction: column;
-        justify-content: flex-start;
-        padding: 3rem 2rem;
-        transition: right 0.3s ease;
-      }
-
-      .nav-links.active {
-        right: 0;
-      }
-
-      .nav-toggle {
-        display: flex;
-      }
-
-      .hero {
-        padding: 6rem 1.5rem 3rem;
-      }
-
-      .philosophy, .contact {
-        padding: 2.5rem 1.5rem;
-        margin: 2rem 1rem;
-      }
-
-      .philosophy-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .services-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .contact-methods {
-        flex-direction: column;
-        gap: 2rem;
-      }
-
-      .diagnostic-step {
-        flex-direction: column;
-      }
-
-      .floating-contact {
-        bottom: 1rem;
-        right: 1rem;
-      }
-
-      .floating-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 1.2rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio-Quantum Neural Interface v3.0</title>
+    <style>
+        :root {
+            --neon-cyan: #64ffda;
+            --neon-green: #00ff88;
+            --neon-red: #ff6b6b;
+            --bg-dark: #0a192f;
+            --panel-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at center, #112240 0%, #0a192f 100%);
+            color: #e0e6ed;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 320px 1fr 350px;
+            grid-template-rows: 70px 1fr;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        /* Glassmorphism Panels */
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.2rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+        }
+
+        .logo-group { display: flex; align-items: center; gap: 15px; }
+        
+        .quantum-pulse {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green);
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+
+        /* Visualization Area */
+        #quantum-canvas {
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        /* Metrics Styling */
+        .metric-card {
+            background: rgba(255,255,255,0.03);
+            border-left: 4px solid var(--neon-cyan);
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .progress-container {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 8px;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--neon-cyan);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        /* Editor */
+        .editor-container { flex-grow: 1; display: flex; flex-direction: column; }
+        
+        #code-editor {
+            flex-grow: 1;
+            background: rgba(0,0,0,0.4);
+            color: #8892b0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            padding: 15px;
+            border: none;
+            resize: none;
+            outline: none;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Controls */
+        .control-group { margin-bottom: 20px; }
+        label { font-size: 0.75rem; color: #8892b0; text-transform: uppercase; letter-spacing: 1px; }
+        
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--neon-cyan);
+            margin: 8px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid var(--neon-cyan);
+            background: transparent;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(100, 255, 218, 0.3);
+        }
+
+        .log {
+            font-family: monospace;
+            font-size: 11px;
+            height: 120px;
+            overflow-y: auto;
+            color: #8892b0;
+            background: rgba(0,0,0,0.2);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .log-info { color: var(--neon-cyan); }
+        .log-warn { color: #feca57; }
+    </style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav class="nav-container" id="navbar">
-    <div class="nav">
-      <div class="logo">
-        FIDELITY <span class="logo-accent">MECHANICAL</span>
-      </div>
-      <div class="nav-toggle" onclick="toggleMenu()">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-      </div>
-      <div class="nav-links" id="navLinks">
-        <a href="#home" onclick="closeMenu()">Home</a>
-        <a href="#philosophy" onclick="closeMenu()">Philosophy</a>
-        <a href="#diagnostics" onclick="closeMenu()">Diagnostics</a>
-        <a href="#services" onclick="closeMenu()">Services</a>
-        <a href="#contact" onclick="closeMenu()">Contact</a>
-      </div>
-    </div>
-  </nav>
 
-  <!-- Hero Section -->
-  <section id="home" class="hero">
-    <div class="hero-content">
-      <h1>Fidelity Mechanical Solutions</h1>
-      <p class="hero-subtitle">
-        More than service — this is how we think, how we move, and how we work in your space with respect and clarity.
-      </p>
-      <div class="cta-container">
-        <a href="#contact" class="cta-primary">Get Free Estimate</a>
-        <a href="#services" class="cta-secondary">View Services</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Philosophy Section -->
-  <section id="philosophy" class="philosophy">
-    <h2>Our Philosophy</h2>
-    <p>
-      We are a mechanical service company organized around one premise: that technical work, client understanding, 
-      and professional development are not separate functions—they are the work itself.
-    </p>
-    <div class="philosophy-grid">
-      <div class="philosophy-card">
-        <h3>Diagnostic-First Approach</h3>
-        <p>
-          Every service call begins with comprehensive system analysis. We don't chase symptoms—we identify root causes 
-          through systematic investigation and data-driven methodology.
-        </p>
-      </div>
-      <div class="philosophy-card">
-        <h3>Transparent Communication</h3>
-        <p>
-          Clear explanations, documented findings, and honest recommendations. You'll understand exactly what's happening 
-          with your system and why our solutions make sense.
-        </p>
-      </div>
-      <div class="philosophy-card">
-        <h3>Technical Excellence</h3>
-        <p>
-          Our technicians are evolving craftspeople—trained in systematic diagnosis, continuous learning, and 
-          professional integrity. Quality work is our standard, not our selling point.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Diagnostics Section -->
-  <section id="diagnostics" class="diagnostics">
-    <h2>Data-Driven Diagnostics</h2>
-    <p>
-      Modern HVAC service requires more than intuition. Our diagnostic methodology combines field experience 
-      with systematic data collection to deliver accurate, lasting solutions.
-    </p>
-
-    <div class="diagnostic-tabs">
-      <button class="tab-btn active" onclick="switchTab(0)">Electrical Systems</button>
-      <button class="tab-btn" onclick="switchTab(1)">Refrigerant Analysis</button>
-      <button class="tab-btn" onclick="switchTab(2)">Airflow & Ductwork</button>
-      <button class="tab-btn" onclick="switchTab(3)">System Optimization</button>
-    </div>
-
-    <div class="tab-content active" id="tab-0">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Voltage & Amperage Mapping</h4>
-          <p>Complete electrical profile of your system under load conditions. We measure what's actually happening, not what should be happening.</p>
+<div class="container">
+    <header class="panel header">
+        <div class="logo-group">
+            <div class="quantum-pulse"></div>
+            <h2>BIO-QUANTUM v3.0</h2>
         </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Component Testing</h4>
-          <p>Capacitors, contactors, and control boards tested for degradation. Early detection prevents catastrophic failures.</p>
+        <div style="display: flex; gap: 30px; font-size: 12px;">
+            <div>SYNC: <span id="sync-val" style="color:var(--neon-green)">94.2%</span></div>
+            <div>COHERENCE: <span id="coh-val" style="color:var(--neon-cyan)">--</span></div>
+            <div>STATUS: <span style="color:var(--neon-green)">STABLE</span></div>
         </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Circuit Analysis</h4>
-          <p>Breaker integrity, wire sizing verification, and ground fault protection assessment. Safety first, always.</p>
-        </div>
-      </div>
-    </div>
+    </header>
 
-    <div class="tab-content" id="tab-1">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Pressure & Temperature Correlation</h4>
-          <p>Superheat and subcooling measurements reveal system efficiency and proper refrigerant charge levels.</p>
+    <aside class="panel">
+        <h4 style="color:var(--neon-cyan); margin-bottom: 15px;">NEURAL TOPOLOGY</h4>
+        <canvas id="quantum-canvas"></canvas>
+        
+        <div id="metrics-area">
+            <div class="metric-card">
+                <div style="display:flex; justify-content:space-between">
+                    <span>Neuroplasticity</span>
+                    <span id="v-plasticity">72%</span>
+                </div>
+                <div class="progress-container"><div id="b-plasticity" class="progress-bar"></div></div>
+            </div>
+            <div class="metric-card" style="border-left-color: var(--neon-green);">
+                <div style="display:flex; justify-content:space-between">
+                    <span>Mitochondrial Efficiency</span>
+                    <span id="v-mito">88%</span>
+                </div>
+                <div class="progress-container"><div id="b-mito" class="progress-bar" style="background:var(--neon-green)"></div></div>
+            </div>
         </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Recovery & Analysis</h4>
-          <p>When needed, refrigerant recovery with contamination testing. We don't guess about system chemistry.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Leak Detection</h4>
-          <p>Electronic leak detection and pressure decay testing to locate even the smallest refrigerant leaks.</p>
-        </div>
-      </div>
-    </div>
 
-    <div class="tab-content" id="tab-2">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Static Pressure Testing</h4>
-          <p>Measure total external static pressure to identify restrictive ductwork, filters, or coil blockages.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Airflow Calculation</h4>
-          <p>Temperature split analysis and blower performance curves to verify proper CFM delivery.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Distribution Analysis</h4>
-          <p>Room-by-room temperature and pressure balancing for optimal comfort and efficiency.</p>
-        </div>
-      </div>
-    </div>
+        <div class="log" id="sys-log"></div>
+    </aside>
 
-    <div class="tab-content" id="tab-3">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Performance Baseline</h4>
-              <p>Establish current system performance metrics as foundation for improvement recommendations.</p>
+    <main class="panel editor-container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size: 12px; color: var(--neon-cyan);">SRC: OPTIMIZATION_KERNEL.PY</span>
+            <button class="btn" style="width: auto; padding: 5px 15px;" onclick="runKernel()">Execute Kernel</button>
         </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Efficiency Opportunities</h4>
-          <p>Identify simple adjustments and upgrades that deliver measurable energy savings.</p>
+        <textarea id="code-editor"></textarea>
+    </main>
+
+    <aside class="panel">
+        <h4 style="color:var(--neon-cyan); margin-bottom: 15px;">FIELD CONTROLS</h4>
+        
+        <div class="control-group">
+            <label>Waveform Frequency (Hz)</label>
+            <input type="range" id="freq-slider" min="1" max="60" value="24">
+            <div id="freq-display" style="text-align:right; font-size:12px">24 Hz</div>
         </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Preventive Scheduling</h4>
-          <p>Create maintenance timeline based on your system's actual condition, not arbitrary intervals.</p>
+
+        <div class="control-group">
+            <label>Entanglement Intensity</label>
+            <input type="range" id="entangle-slider" min="0" max="100" value="65">
         </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- Services Section -->
-  <section id="services">
-    <h2>Services</h2>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-icon">🔧</div>
-        <h3>System Installation</h3>
-        <p>Complete HVAC installations with proper sizing, startup protocols, and comprehensive client education.</p>
-        <ul class="service-features">
-          <li>Load calculation & system sizing</li>
-          <li>Professional installation</li>
-          <li>Startup & optimization</li>
-          <li>Complete system walkthrough</li>
-        </ul>
-      </div>
+        <div class="control-group">
+            <label>Field Resonance</label>
+            <input type="range" id="res-slider" min="0" max="100" value="40">
+        </div>
 
-      <div class="service-card">
-        <div class="service-icon">🔍</div>
-        <h3>Diagnostics & Repair</h3>
-        <p>Root-cause focused troubleshooting that solves problems permanently, not temporarily.</p>
-        <ul class="service-features">
-          <li>Comprehensive system analysis</li>
-          <li>Data-driven diagnosis</li>
-          <li>Quality parts & materials</li>
-          <li>Prevention education included</li>
-        </ul>
-      </div>
+        <button class="btn" onclick="triggerScan()">Full Bio-Scan</button>
+        <button class="btn" onclick="saveState()">Save Configuration</button>
+        <button class="btn" style="border-color: var(--neon-red); color: var(--neon-red);" onclick="resetSystem()">Emergency Reset</button>
+        
+        <div style="margin-top: 20px; font-size: 10px; color: #495670;">
+            <p>QUANTUM MODEL: ORCH-OR</p>
+            <p>$\hat{H} \psi = (i \hbar) \frac{\partial \psi}{\partial t}$</p>
+        </div>
+    </aside>
+</div>
 
-      <div class="service-card">
-        <div class="service-icon">📋</div>
-        <h3>Preventive Maintenance</h3>
-        <p>Systematic maintenance programs that extend equipment life and prevent costly failures.</p>
-        <ul class="service-features">
-          <li>Quarterly system checkups</li>
-          <li>Performance trend analysis</li>
-          <li>Priority scheduling</li>
-          <li>Detailed service reports</li>
-        </ul>
-      </div>
-
-      <div class="service-card">
-        <div class="service-icon">⚡</div>
-        <h3>System Optimization</h3>
-        <p>Performance tuning and efficiency improvements for existing systems.</p>
-        <ul class="service-features">
-          <li>Energy efficiency audit</li>
-          <li>Airflow balancing</li>
-          <li>Control system upgrade</li>
-          <li>ROI analysis provided</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section id="contact" class="contact">
-    <h2>Contact</h2>
-    <p>Text preferred for fastest response. Service requests are typically confirmed within 2 hours during operating hours.</p>
+<script>
+    // --- Initial Configuration & State ---
+    const defaultCode = `# Bio-Quantum Kernel v3.0
+def quantum_sync():
+    field = QuantumField(frequency=24.0)
+    field.engage_observer_protection()
     
-    <div class="contact-methods">
-      <div class="contact-item">
-        <div class="contact-icon">📱</div>
-        <a href="sms:7132012842">(713) 201-2842</a>
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Text Preferred</span>
-      </div>
-      
-      <div class="contact-item">
-        <div class="contact-icon">📧</div>
-        <a href="mailto:nvvtruelife@outlook.com">support@FidelityMechanical.com</a>
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Email</span>
-      </div>
-    </div>
+    while True:
+        coherence = field.measure_microtubules()
+        if coherence < 0.8:
+            field.inject_stabilizer(0.15)
+        update_neural_plasticity()`;
 
-    <p class="contact-note">
-      Service area: Greater Houston and surrounding communities
-    </p>
-  </section>
+    let state = JSON.parse(localStorage.getItem('bq_state')) || {
+        freq: 24,
+        entangle: 65,
+        res: 40,
+        code: defaultCode
+    };
 
-  <!-- Footer -->
-  <footer>
-    <p>
-      &copy; 2025 Fidelity Mechanical Solutions. All rights reserved.
-    </p>
-    <p class="footer-tagline">
-      Built with purpose. Run with clarity. Revenue is a result of competent service, not its goal.
-    </p>
-  </footer>
+    // --- DOM Elements ---
+    const canvas = document.getElementById('quantum-canvas');
+    const ctx = canvas.getContext('2d');
+    const logEl = document.getElementById('sys-log');
+    const editor = document.getElementById('code-editor');
 
-  <!-- Floating Contact Button -->
-  <div class="floating-contact">
-    <a href="sms:7132012842" class="floating-btn" title="Text us now">💬</a>
-  </div>
+    // --- Initialize ---
+    window.onload = () => {
+        editor.value = state.code;
+        document.getElementById('freq-slider').value = state.freq;
+        document.getElementById('entangle-slider').value = state.entangle;
+        document.getElementById('res-slider').value = state.res;
+        
+        addLog("System initialized. Welcome, Observer.");
+        requestAnimationFrame(drawWave);
+        updateLoop();
+    };
 
-  <script>
-    // Navigation scroll effect
-    window.addEventListener('scroll', () => {
-      const navbar = document.getElementById('navbar');
-      if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-    });
-
-    // Mobile menu toggle
-    function toggleMenu() {
-      document.getElementById('navLinks').classList.toggle('active');
+    // --- Persistent Storage ---
+    function saveState() {
+        state.code = editor.value;
+        localStorage.setItem('bq_state', JSON.stringify(state));
+        addLog("Configuration saved to local core.", "info");
     }
 
-    function closeMenu() {
-      document.getElementById('navLinks').classList.remove('active');
+    function addLog(msg, type="default") {
+        const time = new Date().toLocaleTimeString().split(' ')[0];
+        const color = type === "info" ? 'var(--neon-cyan)' : 'inherit';
+        logEl.innerHTML += `<div>[${time}] <span style="color:${color}">${msg}</span></div>`;
+        logEl.scrollTop = logEl.scrollHeight;
     }
 
-    // Diagnostic tabs functionality
-    function switchTab(index) {
-      const tabs = document.querySelectorAll('.tab-btn');
-      const contents = document.querySelectorAll('.tab-content');
-      
-      tabs.forEach((tab, i) => {
-        if (i === index) {
-          tab.classList.add('active');
-        } else {
-          tab.classList.remove('active');
+    // --- Canvas Logic (Real-time Quantum Wave) ---
+    let offset = 0;
+    function drawWave() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const freq = document.getElementById('freq-slider').value;
+        const amplitude = document.getElementById('entangle-slider').value / 4;
+        
+        ctx.beginPath();
+        ctx.strokeStyle = '#64ffda';
+        ctx.lineWidth = 2;
+
+        for (let x = 0; x < canvas.width; x++) {
+            // Complex wave interference pattern
+            const y = canvas.height/2 + 
+                      Math.sin(x * 0.05 + offset) * amplitude + 
+                      Math.sin(x * 0.02 + offset * 0.5) * (amplitude/2);
+            
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
         }
-      });
-      
-      contents.forEach((content, i) => {
-        if (i === index) {
-          content.classList.add('active');
-        } else {
-          content.classList.remove('active');
-        }U
-      });
+        
+        ctx.stroke();
+        
+        // Secondary "Ghost" wave (Quantum superposition)
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(0, 255, 136, 0.3)';
+        for (let x = 0; x < canvas.width; x++) {
+            const y = canvas.height/2 + Math.cos(x * 0.03 + offset) * (amplitude * 0.8);
+            if (x === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        offset += (freq / 100);
+        requestAnimationFrame(drawWave);
     }
 
-    // Smooth scroll with offset for fixed nav
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          const offset = 80;
-          const targetPosition = target.offsetTop - offset;
-          window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-  </script>
+    // --- UI Update Loop ---
+    function updateLoop() {
+        const freq = document.getElementById('freq-slider').value;
+        const coh = (90 + Math.random() * 9).toFixed(1);
+        
+        document.getElementById('freq-display').innerText = `${freq} Hz`;
+        document.getElementById('coh-val').innerText = `${coh}%`;
+        
+        // Randomize metrics slightly for "live" feel
+        const plas = 70 + Math.random() * 10;
+        document.getElementById('v-plasticity').innerText = `${plas.toFixed(0)}%`;
+        document.getElementById('b-plasticity').style.width = `${plas}%`;
+        
+        setTimeout(updateLoop, 2000);
+    }
+
+    function triggerScan() {
+        addLog("Initiating bio-scan...", "info");
+        let i = 0;
+        const interval = setInterval(() => {
+            addLog(`Scanning Layer ${i+1}... Complete.`);
+            if (i++ > 3) {
+                clearInterval(interval);
+                addLog("Bio-scan finished. No decoherence detected.", "info");
+            }
+        }, 800);
+    }
+
+    function runKernel() {
+        addLog("Compiling kernel...", "info");
+        setTimeout(() => addLog("Kernel Active. Neural pathways optimized."), 1200);
+    }
+
+    function resetSystem() {
+        localStorage.clear();
+        location.reload();
+    }
+</script>
+
 </body>
 </html>
