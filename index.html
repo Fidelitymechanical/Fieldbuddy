@@ -3,26 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fidelity Mechanical Solutions | Premium HVAC & Mechanical Services</title>
-  <meta name="description" content="Expert HVAC and mechanical services through transparent diagnostics, systematic engineering, and uncompromising integrity. Serving Greater Houston with technical excellence.">
-  <meta property="og:title" content="Fidelity Mechanical Solutions">
-  <meta property="og:description" content="Where mechanical precision meets thoughtful service. Houston's premier diagnostic-forward HVAC company.">
+  <title>Fidelity Mechanical Solutions | AC & Heating Repair in Houston</title>
+  <meta name="description" content="AC & Heating Repair in Houston — Same-Day Service. Licensed & insured. Transparent pricing. We treat your home like it's ours.">
+  <meta property="og:title" content="Fidelity Mechanical Solutions | AC & Heating Repair Houston">
+  <meta property="og:description" content="Same-day AC & heating repair in Houston. Licensed & insured. Transparent pricing.">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --primary-dark: #0d1014;
-      --secondary-dark: #1a1d23;
-      --accent-blue: #4a90e2;
-      --accent-teal: #2d6a7e;
-      --text-primary: #e8eaed;
-      --text-secondary: #b8c5d1;
-      --text-muted: #7a8a99;
+      --primary-dark: #0a0e13;
+      --secondary-dark: #131920;
+      --card-dark: #161d26;
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
       --border-color: rgba(255, 255, 255, 0.08);
-      --hover-bg: rgba(74, 144, 226, 0.1);
+      --hover-bg: rgba(59, 130, 246, 0.1);
     }
 
     * {
@@ -48,7 +49,7 @@
       position: fixed;
       top: 0;
       width: 100%;
-      background: rgba(13, 16, 20, 0.95);
+      background: rgba(10, 14, 19, 0.92);
       backdrop-filter: blur(20px);
       z-index: 1000;
       border-bottom: 1px solid var(--border-color);
@@ -56,27 +57,28 @@
     }
 
     .nav-container.scrolled {
-      background: rgba(13, 16, 20, 0.98);
+      background: rgba(10, 14, 19, 0.98);
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
     }
 
     .nav {
-      max-width: 1400px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 1.2rem 2rem;
+      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
     .logo {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: var(--text-primary);
-      letter-spacing: 0.5px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
 
     .logo-accent {
@@ -85,7 +87,7 @@
 
     .nav-links {
       display: flex;
-      gap: 2.5rem;
+      gap: 2rem;
       align-items: center;
     }
 
@@ -93,7 +95,7 @@
       color: var(--text-secondary);
       text-decoration: none;
       font-weight: 500;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       transition: color 0.3s ease;
       position: relative;
     }
@@ -141,6 +143,7 @@
       padding: 8rem 2rem 4rem;
       position: relative;
       overflow: hidden;
+      background: var(--primary-dark);
     }
 
     .hero::before {
@@ -150,66 +153,85 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: radial-gradient(ellipse at top, rgba(74, 144, 226, 0.15), transparent 50%),
-                  radial-gradient(ellipse at bottom, rgba(45, 106, 126, 0.1), transparent 50%);
+      background:
+        url('https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=1200&q=80') center/cover no-repeat;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 30% 50%, rgba(59, 130, 246, 0.12), transparent 60%),
+        linear-gradient(to bottom, rgba(10, 14, 19, 0.3) 0%, rgba(10, 14, 19, 0.9) 100%);
       pointer-events: none;
     }
 
     .hero-content {
-      max-width: 900px;
+      max-width: 800px;
       position: relative;
       z-index: 1;
       animation: fadeInUp 1s ease-out;
     }
 
     .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 700;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 800;
       margin-bottom: 1.5rem;
-      line-height: 1.2;
-      background: linear-gradient(135deg, #e8eaed 0%, #b8c5d1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      line-height: 1.15;
+      color: var(--text-primary);
+    }
+
+    .hero h1 .highlight {
+      color: var(--accent-blue);
     }
 
     .hero-subtitle {
-      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
       color: var(--text-secondary);
-      margin-bottom: 3rem;
-      max-width: 700px;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
       margin-left: auto;
       margin-right: auto;
-      line-height: 1.8;
+      line-height: 1.7;
     }
 
     .cta-container {
       display: flex;
-      gap: 1.5rem;
+      gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: 3.5rem;
     }
 
     .cta-primary, .cta-secondary {
-      padding: 1rem 2.5rem;
+      padding: 0.9rem 2rem;
       border-radius: 8px;
       text-decoration: none;
       font-weight: 600;
       font-size: 1rem;
       transition: all 0.3s ease;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .cta-primary {
       background: var(--accent-blue);
       color: white;
-      box-shadow: 0 4px 20px rgba(74, 144, 226, 0.3);
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+      border: 2px solid var(--accent-blue);
     }
 
     .cta-primary:hover {
-      background: #3a7bc8;
+      background: var(--accent-blue-hover);
       transform: translateY(-2px);
-      box-shadow: 0 6px 30px rgba(74, 144, 226, 0.4);
+      box-shadow: 0 6px 30px rgba(59, 130, 246, 0.4);
     }
 
     .cta-secondary {
@@ -223,72 +245,144 @@
       border-color: var(--accent-blue);
     }
 
+    /* Trust Badges */
+    .trust-badges {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 0;
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .trust-badge .badge-icon {
+      color: var(--accent-blue);
+      font-size: 1rem;
+    }
+
+    .trust-badge .stars {
+      color: #fbbf24;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
     /* Section Styles */
     section {
-      padding: 6rem 2rem;
+      padding: 5rem 2rem;
       max-width: 1200px;
       margin: 0 auto;
     }
 
     section h2 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin-bottom: 1.5rem;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 1rem;
       color: var(--text-primary);
       font-weight: 700;
     }
 
     section p {
       color: var(--text-secondary);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       margin-bottom: 1.5rem;
       max-width: 800px;
     }
 
-    /* Philosophy Section */
-    .philosophy {
-      background: var(--secondary-dark);
-      border-radius: 16px;
-      padding: 4rem;
-      margin: 4rem 2rem;
-      border: 1px solid var(--border-color);
+    .section-header {
+      text-align: center;
+      margin-bottom: 3rem;
     }
 
-    .philosophy-grid {
+    .section-header p {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Services Grid */
+    .services-section {
+      background: var(--secondary-dark);
+      padding: 5rem 2rem;
+      max-width: 100%;
+    }
+
+    .services-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .services-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2.5rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
       margin-top: 3rem;
     }
 
-    .philosophy-card {
-      padding: 2rem;
-      background: rgba(255, 255, 255, 0.02);
+    .service-card {
+      padding: 2.5rem 2rem;
+      background: var(--card-dark);
       border-radius: 12px;
       border: 1px solid var(--border-color);
       transition: all 0.3s ease;
+      text-align: center;
     }
 
-    .philosophy-card:hover {
+    .service-card:hover {
       transform: translateY(-5px);
-      background: rgba(74, 144, 226, 0.05);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
       border-color: var(--accent-blue);
     }
 
-    .philosophy-card h3 {
-      color: var(--accent-blue);
-      margin-bottom: 1rem;
-      font-size: 1.3rem;y
+    .service-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      display: block;
     }
 
-    .philosophy-card p {
+    .service-card h3 {
+      color: var(--text-primary);
+      margin-bottom: 0.8rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .service-card p {
       color: var(--text-muted);
       font-size: 0.95rem;
+      line-height: 1.7;
+      max-width: none;
+    }
+
+    .service-link {
+      display: inline-block;
+      margin-top: 1.5rem;
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: color 0.3s ease;
+    }
+
+    .service-link:hover {
+      color: var(--text-primary);
     }
 
     /* Diagnostics Section */
     .diagnostics {
-      background: linear-gradient(135deg, rgba(45, 106, 126, 0.1) 0%, transparent 100%);
-      padding: 6rem 2rem;
+      background: linear-gradient(135deg, rgba(45, 106, 126, 0.08) 0%, transparent 100%);
+      padding: 5rem 2rem;
+      max-width: 100%;
+    }
+
+    .diagnostics-inner {
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     .diagnostic-tabs {
@@ -309,6 +403,7 @@
       font-size: 0.95rem;
       font-weight: 500;
       transition: all 0.3s ease;
+      font-family: inherit;
     }
 
     .tab-btn:hover {
@@ -375,71 +470,13 @@
       font-size: 0.95rem;
     }
 
-    /* Services Grid */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    .service-card {
-      padding: 2.5rem;
-      background: var(--secondary-dark);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-    }
-
-    .service-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-      border-color: var(--accent-blue);
-    }
-
-    .service-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .service-card h3 {
-      color: var(--text-primary);
-      margin-bottom: 1rem;
-      font-size: 1.4rem;
-    }
-
-    .service-card p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-    }
-
-    .service-features {
-      list-style: none;
-      margin-top: 1.5rem;
-    }
-
-    .service-features li {
-      color: var(--text-secondary);
-      padding: 0.5rem 0;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .service-features li::before {
-      content: '✓';
-      color: var(--accent-blue);
-      font-weight: 700;
-    }
-
     /* Contact Section */
     .contact {
       background: var(--secondary-dark);
       border-radius: 16px;
       padding: 4rem;
-      margin: 4rem 2rem;
+      margin: 4rem auto;
+      max-width: 1200px;
       border: 1px solid var(--border-color);
       text-align: center;
     }
@@ -501,13 +538,13 @@
       color: white;
       font-size: 1.5rem;
       text-decoration: none;
-      box-shadow: 0 4px 20px rgba(74, 144, 226, 0.4);
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
       transition: all 0.3s ease;
     }
 
     .floating-btn:hover {
       transform: scale(1.1);
-      box-shadow: 0 6px 30px rgba(74, 144, 226, 0.6);
+      box-shadow: 0 6px 30px rgba(59, 130, 246, 0.6);
     }
 
     /* Footer */
@@ -552,11 +589,11 @@
     @media (max-width: 768px) {
       .nav-links {
         position: fixed;
-        top: 70px;
+        top: 60px;
         right: -100%;
         width: 100%;
-        height: calc(100vh - 70px);
-        background: rgba(13, 16, 20, 0.98);
+        height: calc(100vh - 60px);
+        background: rgba(10, 14, 19, 0.98);
         backdrop-filter: blur(20px);
         flex-direction: column;
         justify-content: flex-start;
@@ -576,17 +613,21 @@
         padding: 6rem 1.5rem 3rem;
       }
 
-      .philosophy, .contact {
-        padding: 2.5rem 1.5rem;
-        margin: 2rem 1rem;
+      .trust-badges {
+        gap: 1rem;
       }
 
-      .philosophy-grid {
-        grid-template-columns: 1fr;
+      .trust-badge {
+        font-size: 0.75rem;
       }
 
       .services-grid {
         grid-template-columns: 1fr;
+      }
+
+      .contact {
+        padding: 2.5rem 1.5rem;
+        margin: 2rem 1rem;
       }
 
       .contact-methods {
@@ -625,10 +666,10 @@
       </div>
       <div class="nav-links" id="navLinks">
         <a href="#home" onclick="closeMenu()">Home</a>
-        <a href="#philosophy" onclick="closeMenu()">Philosophy</a>
+        <a href="#financing" onclick="closeMenu()">Financing</a>
         <a href="#diagnostics" onclick="closeMenu()">Diagnostics</a>
         <a href="#services" onclick="closeMenu()">Services</a>
-        <a href="#contact" onclick="closeMenu()">Contact</a>
+        <a href="#reviews" onclick="closeMenu()">Reviews</a>
       </div>
     </div>
   </nav>
@@ -636,228 +677,196 @@
   <!-- Hero Section -->
   <section id="home" class="hero">
     <div class="hero-content">
-      <h1>Fidelity Mechanical Solutions</h1>
+      <h1>AC & Heating Repair in Houston — <span class="highlight">Same-Day Service</span></h1>
       <p class="hero-subtitle">
-        More than service — this is how we think, how we move, and how we work in your space with respect and clarity.
+        Licensed & insured. Transparent pricing. We treat your home like it's ours.
       </p>
       <div class="cta-container">
-        <a href="#contact" class="cta-primary">Get Free Estimate</a>
-        <a href="#services" class="cta-secondary">View Services</a>
+        <a href="tel:7132831388" class="cta-primary">Call Now (713-283-1388)</a>
+        <a href="#contact" class="cta-secondary">Get Free Estimate</a>
       </div>
-    </div>
-  </section>
-
-  <!-- Philosophy Section -->
-  <section id="philosophy" class="philosophy">
-    <h2>Our Philosophy</h2>
-    <p>
-      We are a mechanical service company organized around one premise: that technical work, client understanding, 
-      and professional development are not separate functions—they are the work itself.
-    </p>
-    <div class="philosophy-grid">
-      <div class="philosophy-card">
-        <h3>Diagnostic-First Approach</h3>
-        <p>
-          Every service call begins with comprehensive system analysis. We don't chase symptoms—we identify root causes 
-          through systematic investigation and data-driven methodology.
-        </p>
-      </div>
-      <div class="philosophy-card">
-        <h3>Transparent Communication</h3>
-        <p>
-          Clear explanations, documented findings, and honest recommendations. You'll understand exactly what's happening 
-          with your system and why our solutions make sense.
-        </p>
-      </div>
-      <div class="philosophy-card">
-        <h3>Technical Excellence</h3>
-        <p>
-          Our technicians are evolving craftspeople—trained in systematic diagnosis, continuous learning, and 
-          professional integrity. Quality work is our standard, not our selling point.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Diagnostics Section -->
-  <section id="diagnostics" class="diagnostics">
-    <h2>Data-Driven Diagnostics</h2>
-    <p>
-      Modern HVAC service requires more than intuition. Our diagnostic methodology combines field experience 
-      with systematic data collection to deliver accurate, lasting solutions.
-    </p>
-
-    <div class="diagnostic-tabs">
-      <button class="tab-btn active" onclick="switchTab(0)">Electrical Systems</button>
-      <button class="tab-btn" onclick="switchTab(1)">Refrigerant Analysis</button>
-      <button class="tab-btn" onclick="switchTab(2)">Airflow & Ductwork</button>
-      <button class="tab-btn" onclick="switchTab(3)">System Optimization</button>
-    </div>
-
-    <div class="tab-content active" id="tab-0">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Voltage & Amperage Mapping</h4>
-          <p>Complete electrical profile of your system under load conditions. We measure what's actually happening, not what should be happening.</p>
+      <div class="trust-badges">
+        <div class="trust-badge">
+          <span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+          <span>4.9 Google Rating</span>
         </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Component Testing</h4>
-          <p>Capacitors, contactors, and control boards tested for degradation. Early detection prevents catastrophic failures.</p>
+        <div class="trust-badge">
+          <span class="badge-icon">&#9201;</span>
+          <span>Same-Day Service</span>
         </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Circuit Analysis</h4>
-          <p>Breaker integrity, wire sizing verification, and ground fault protection assessment. Safety first, always.</p>
+        <div class="trust-badge">
+          <span class="badge-icon">&#9989;</span>
+          <span>Licensed & Insured</span>
         </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-1">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Pressure & Temperature Correlation</h4>
-          <p>Superheat and subcooling measurements reveal system efficiency and proper refrigerant charge levels.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Recovery & Analysis</h4>
-          <p>When needed, refrigerant recovery with contamination testing. We don't guess about system chemistry.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Leak Detection</h4>
-          <p>Electronic leak detection and pressure decay testing to locate even the smallest refrigerant leaks.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-2">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Static Pressure Testing</h4>
-          <p>Measure total external static pressure to identify restrictive ductwork, filters, or coil blockages.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Airflow Calculation</h4>
-          <p>Temperature split analysis and blower performance curves to verify proper CFM delivery.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Distribution Analysis</h4>
-          <p>Room-by-room temperature and pressure balancing for optimal comfort and efficiency.</p>
-        </div>
-      </div>
-    </div><div class="tab-content" id="tab-3">
-      <div class="diagnostic-step">
-        <div class="step-number">1</div>
-        <div class="step-content">
-          <h4>Performance Baseline</h4>
-       <p>Establish current system performance metrics as foundation for improvement recommendations.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">2</div>
-        <div class="step-content">
-          <h4>Efficiency Opportunities</h4>
-          <p>Identify simple adjustments and upgrades that deliver measurable energy savings.</p>
-        </div>
-      </div>
-      <div class="diagnostic-step">
-        <div class="step-number">3</div>
-        <div class="step-content">
-          <h4>Preventive Scheduling</h4>
-          <p>Create maintenance timeline based on your system's actual condition, not arbitrary intervals.</p>
+        <div class="trust-badge">
+          <span class="badge-icon">&#128736;</span>
+          <span>Repairs · Installs · Maintenance</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Services Section -->
-  <section id="services">
-    <h2>Services</h2>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-icon">🔧</div>
-        <h3>System Installation</h3>
-        <p>Complete HVAC installations with proper sizing, startup protocols, and comprehensive client education.</p>
-        <ul class="service-features">
-          <li>Load calculation & system sizing</li>
-          <li>Professional installation</li>
-          <li>Startup & optimization</li>
-          <li>Complete system walkthrough</li>
-        </ul>
+  <div id="services" class="services-section">
+    <div class="services-inner">
+      <div class="section-header">
+        <h2>Our Services</h2>
+        <p>Professional HVAC solutions for every need — from emergency repairs to full system installations.</p>
       </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <span class="service-icon">&#10052;</span>
+          <h3>AC Repair</h3>
+          <p>Fast, reliable cooling solutions for Houston's brutal summers.</p>
+          <a href="#contact" class="service-link">Learn More &rarr;</a>
+        </div>
 
-      <div class="service-card">
-        <div class="service-icon">🔍</div>
-        <h3>Diagnostics & Repair</h3>
-        <p>Root-cause focused troubleshooting that solves problems permanently, not temporarily.</p>
-        <ul class="service-features">
-          <li>Comprehensive system analysis</li>
-          <li>Data-driven diagnosis</li>
-          <li>Quality parts & materials</li>
-          <li>Prevention education included</li>
-        </ul>
-      </div>
+        <div class="service-card">
+          <span class="service-icon">&#128293;</span>
+          <h3>Heating Repair</h3>
+          <p>Keep your home warm and your system running efficiently.</p>
+          <a href="#contact" class="service-link">Learn More &rarr;</a>
+        </div>
 
-      <div class="service-card">
-        <div class="service-icon">📋</div>
-        <h3>Preventive Maintenance</h3>
-        <p>Systematic maintenance programs that extend equipment life and prevent costly failures.</p>
-        <ul class="service-features">
-          <li>Quarterly system checkups</li>
-          <li>Performance trend analysis</li>
-          <li>Priority scheduling</li>
-          <li>Detailed service reports</li>
-        </ul>
-      </div>
-
-      <div class="service-card">
-        <div class="service-icon">⚡</div>
-        <h3>System Optimization</h3>
-        <p>Performance tuning and efficiency improvements for existing systems.</p>
-        <ul class="service-features">
-          <li>Energy efficiency audit</li>
-          <li>Airflow balancing</li>
-          <li>Control system upgrade</li>
-          <li>ROI analysis provided</li>
-        </ul>
+        <div class="service-card">
+          <span class="service-icon">&#128295;</span>
+          <h3>New System Install</h3>
+          <p>Expert installation with top-rated equipment brands.</p>
+          <a href="#contact" class="service-link">Learn More &rarr;</a>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
+
+  <!-- Diagnostics Section -->
+  <div id="diagnostics" class="diagnostics">
+    <div class="diagnostics-inner">
+      <h2>Data-Driven Diagnostics</h2>
+      <p>
+        Modern HVAC service requires more than intuition. Our diagnostic methodology combines field experience
+        with systematic data collection to deliver accurate, lasting solutions.
+      </p>
+
+      <div class="diagnostic-tabs">
+        <button class="tab-btn active" onclick="switchTab(0)">Electrical Systems</button>
+        <button class="tab-btn" onclick="switchTab(1)">Refrigerant Analysis</button>
+        <button class="tab-btn" onclick="switchTab(2)">Airflow & Ductwork</button>
+        <button class="tab-btn" onclick="switchTab(3)">System Optimization</button>
+      </div>
+
+      <div class="tab-content active" id="tab-0">
+        <div class="diagnostic-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Voltage & Amperage Mapping</h4>
+            <p>Complete electrical profile of your system under load conditions. We measure what's actually happening, not what should be happening.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Component Testing</h4>
+            <p>Capacitors, contactors, and control boards tested for degradation. Early detection prevents catastrophic failures.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Circuit Analysis</h4>
+            <p>Breaker integrity, wire sizing verification, and ground fault protection assessment. Safety first, always.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-1">
+        <div class="diagnostic-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Pressure & Temperature Correlation</h4>
+            <p>Superheat and subcooling measurements reveal system efficiency and proper refrigerant charge levels.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Recovery & Analysis</h4>
+            <p>When needed, refrigerant recovery with contamination testing. We don't guess about system chemistry.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Leak Detection</h4>
+            <p>Electronic leak detection and pressure decay testing to locate even the smallest refrigerant leaks.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-2">
+        <div class="diagnostic-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Static Pressure Testing</h4>
+            <p>Measure total external static pressure to identify restrictive ductwork, filters, or coil blockages.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Airflow Calculation</h4>
+            <p>Temperature split analysis and blower performance curves to verify proper CFM delivery.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Distribution Analysis</h4>
+            <p>Room-by-room temperature and pressure balancing for optimal comfort and efficiency.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-3">
+        <div class="diagnostic-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Performance Baseline</h4>
+            <p>Establish current system performance metrics as foundation for improvement recommendations.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Efficiency Opportunities</h4>
+            <p>Identify simple adjustments and upgrades that deliver measurable energy savings.</p>
+          </div>
+        </div>
+        <div class="diagnostic-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Preventive Scheduling</h4>
+            <p>Create maintenance timeline based on your system's actual condition, not arbitrary intervals.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Contact Section -->
   <section id="contact" class="contact">
     <h2>Contact</h2>
     <p>Text preferred for fastest response. Service requests are typically confirmed within 2 hours during operating hours.</p>
-    
+
     <div class="contact-methods">
       <div class="contact-item">
-        <div class="contact-icon">📱</div>
-        <a href="sms:7132012842">(713) 201-2842</a>
-        <span style="color: var(--text-muted); font-size: 0.9rem;">Text Preferred</span>
+        <div class="contact-icon">&#128241;</div>
+        <a href="tel:7132831388">(713) 283-1388</a>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Call or Text</span>
       </div>
-      
+
       <div class="contact-item">
-        <div class="contact-icon">📧</div>
-        <a href="mailto:nvvtruelife@outlook.com">support@FidelityMechanical.com</a>
+        <div class="contact-icon">&#128231;</div>
+        <a href="mailto:support@fidelitymechanical.com">support@FidelityMechanical.com</a>
         <span style="color: var(--text-muted); font-size: 0.9rem;">Email</span>
       </div>
     </div>
@@ -879,7 +888,7 @@
 
   <!-- Floating Contact Button -->
   <div class="floating-contact">
-    <a href="sms:7132012842" class="floating-btn" title="Text us now">💬</a>
+    <a href="tel:7132831388" class="floating-btn" title="Call us now">&#128222;</a>
   </div>
 
   <script>
@@ -906,7 +915,7 @@
     function switchTab(index) {
       const tabs = document.querySelectorAll('.tab-btn');
       const contents = document.querySelectorAll('.tab-content');
-      
+
       tabs.forEach((tab, i) => {
         if (i === index) {
           tab.classList.add('active');
@@ -914,13 +923,13 @@
           tab.classList.remove('active');
         }
       });
-      
+
       contents.forEach((content, i) => {
         if (i === index) {
           content.classList.add('active');
         } else {
           content.classList.remove('active');
-        }U
+        }
       });
     }
 
@@ -930,7 +939,7 @@
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
-          const offset = 80;
+          const offset = 70;
           const targetPosition = target.offsetTop - offset;
           window.scrollTo({
             top: targetPosition,
@@ -942,6 +951,3 @@
   </script>
 </body>
 </html>
-
-
-    
