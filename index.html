@@ -1,976 +1,1270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fidelity Mechanical Solutions | Precision HVAC Service</title>
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-navy: #1a2332;
-            --accent-orange: #ff8c42;
-            --accent-gold: #ffa726;
-            --ice-blue: #4fc3f7;
-            --flame-red: #ff5722;
-            --silver: #b0bec5;
-            --dark-charcoal: #0d1117;
-            --white: #ffffff;
-            --off-white: #f5f5f5;
-            --text-light: rgba(255, 255, 255, 0.85);
-        }
-
-        body {
-            font-family: 'Archivo', -apple-system, sans-serif;
-            background: var(--dark-charcoal);
-            color: var(--text-light);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* Animated Gradient Background */
-        .gradient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(ellipse at 20% 30%, rgba(79, 195, 247, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(255, 140, 66, 0.06) 0%, transparent 50%),
-                linear-gradient(135deg, var(--dark-charcoal) 0%, #0a0e14 100%);
-            animation: gradientShift 20s ease infinite;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.95; }
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 1.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            background: rgba(13, 17, 23, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            animation: slideDown 0.8s ease-out;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--white);
-            letter-spacing: -0.5px;
-        }
-
-        .logo span {
-            color: var(--accent-orange);
-            font-weight: 600;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 3rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold));
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-orange);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        /* Hero Section */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding: 8rem 5% 0 5%;
-            overflow: hidden;
-        }
-
-        .hero-content {
-            max-width: 1400px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 6rem;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-text h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 6vw, 5.5rem);
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 2rem;
-            background: linear-gradient(135deg, var(--white) 0%, var(--silver) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 1s ease-out 0.2s both;
-        }
-
-        .hero-text .subtitle {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1rem;
-            color: var(--accent-orange);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            animation: fadeInUp 1s ease-out both;
-        }
-
-        .hero-text p {
-            font-size: 1.25rem;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 3rem;
-            line-height: 1.8;
-            max-width: 600px;
-            animation: fadeInUp 1s ease-out 0.4s both;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 1.5rem;
-            animation: fadeInUp 1s ease-out 0.6s both;
-        }
-
-        .btn {
-            padding: 1rem 2.5rem;
-            border: none;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
-            color: var(--white);
-            box-shadow: 0 10px 30px rgba(255, 140, 66, 0.3);
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(255, 140, 66, 0.4);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--white);
-            border: 2px solid var(--silver);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--accent-orange);
-            transform: translateY(-2px);
-        }
-
-        /* Hero Visual Element */
-        .hero-visual {
-            position: relative;
-            animation: fadeInScale 1s ease-out 0.4s both;
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .icon-container {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .dual-icon {
-            width: 400px;
-            height: 400px;
-            position: relative;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-        }
-
-        .icon-circle {
-            position: absolute;
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .icon-cold {
-            top: 50px;
-            left: 0;
-            background: linear-gradient(135deg, #1976d2, #4fc3f7);
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        .icon-hot {
-            bottom: 50px;
-            right: 0;
-            background: linear-gradient(135deg, #ff5722, #ffa726);
-            animation: pulse 3s ease-in-out infinite 1.5s;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .connecting-line {
-            position: absolute;
-            width: 3px;
-            height: 250px;
-            background: linear-gradient(180deg, var(--ice-blue), var(--accent-orange));
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(45deg);
-            opacity: 0.3;
-        }
-
-        /* Services Section */
-        .services {
-            padding: 8rem 5%;
-            position: relative;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 5rem;
-        }
-
-        .section-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            color: var(--accent-orange);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-        }
-
-        .section-header h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 4vw, 4rem);
-            font-weight: 700;
-            color: var(--white);
-            margin-bottom: 1.5rem;
-        }
-
-        .section-header p {
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.6);
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .service-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 3rem 2.5rem;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--ice-blue), var(--accent-orange));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s ease;
-        }
-
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .service-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 140, 66, 0.3);
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .service-icon {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            display: block;
-        }
-
-        .service-card h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--white);
-            margin-bottom: 1rem;
-        }
-
-        .service-card p {
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.7;
-        }
-
-        /* Values Section */
-        .values {
-            padding: 8rem 5%;
-            background: rgba(255, 255, 255, 0.02);
-            position: relative;
-        }
-
-        .values-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5rem;
-            align-items: center;
-        }
-
-        .values-text h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 4vw, 4rem);
-            font-weight: 700;
-            color: var(--white);
-            margin-bottom: 2rem;
-        }
-
-        .values-list {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .value-item {
-            padding-left: 2rem;
-            border-left: 3px solid var(--accent-orange);
-            transition: all 0.3s ease;
-        }
-
-        .value-item:hover {
-            border-left-color: var(--accent-gold);
-            padding-left: 2.5rem;
-        }
-
-        .value-item h3 {
-            font-size: 1.3rem;
-            color: var(--white);
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
-
-        .value-item p {
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.7;
-        }
-
-        /* Process Section */
-        .process {
-            padding: 8rem 5%;
-        }
-
-        .process-timeline {
-            max-width: 1000px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .process-timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(180deg, var(--ice-blue), var(--accent-orange));
-            transform: translateX(-50%);
-        }
-
-        .process-step {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            margin-bottom: 4rem;
-            position: relative;
-        }
-
-        .process-step:nth-child(even) .step-content {
-            order: 2;
-        }
-
-        .process-step:nth-child(even) .step-number {
-            order: 1;
-        }
-
-        .step-content {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 2.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            position: relative;
-        }
-
-        .step-content h3 {
-            font-size: 1.5rem;
-            color: var(--white);
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-
-        .step-content p {
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.7;
-        }
-
-        .step-number {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .number-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--white);
-            box-shadow: 0 10px 30px rgba(255, 140, 66, 0.3);
-        }
-
-        /* Contact Section */
-        .contact {
-            padding: 8rem 5%;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .contact-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5rem;
-        }
-
-        .contact-info h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 4vw, 4rem);
-            font-weight: 700;
-            color: var(--white);
-            margin-bottom: 2rem;
-        }
-
-        .contact-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .contact-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .contact-item-text h3 {
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 0.3rem;
-            font-weight: 500;
-        }
-
-        .contact-item-text p {
-            font-size: 1.3rem;
-            color: var(--white);
-            font-weight: 600;
-        }
-
-        .contact-item-text a {
-            color: var(--white);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .contact-item-text a:hover {
-            color: var(--accent-orange);
-        }
-
-        /* Footer */
-        footer {
-            padding: 3rem 5%;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            text-align: center;
-        }
-
-        footer p {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.95rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                gap: 4rem;
-                text-align: center;
-            }
-
-            .hero-text p {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .cta-buttons {
-                justify-content: center;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .values-content {
-                grid-template-columns: 1fr;
-            }
-
-            .contact-content {
-                grid-template-columns: 1fr;
-            }
-
-            .process-timeline::before {
-                left: 30px;
-            }
-
-            .process-step {
-                grid-template-columns: 1fr;
-                padding-left: 80px;
-            }
-
-            .process-step:nth-child(even) .step-content {
-                order: 1;
-            }
-
-            .step-number {
-                position: absolute;
-                left: 0;
-                justify-content: flex-start;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero-text h1 {
-                font-size: 2.5rem;
-            }
-
-            .dual-icon {
-                width: 300px;
-                height: 300px;
-            }
-
-            .icon-circle {
-                width: 120px;
-                height: 120px;
-                font-size: 3rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fidelity Mechanical Solutions | Precision HVAC & Mechanical Services</title>
+  <meta name="description" content="Expert HVAC and mechanical services through transparent diagnostics, systematic engineering, and uncompromising integrity. Serving Greater Houston with technical excellence.">
+  <meta property="og:title" content="Fidelity Mechanical Solutions">
+  <meta property="og:description" content="Where mechanical precision meets thoughtful service. Houston's premier diagnostic-forward HVAC company.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-dark: #0d1014;
+      --secondary-dark: #1a1d23;
+      --accent-blue: #4a90e2;
+      --accent-orange: #ff8c42;
+      --accent-teal: #2d6a7e;
+      --text-primary: #e8eaed;
+      --text-secondary: #b8c5d1;
+      --text-muted: #7a8a99;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --hover-bg: rgba(74, 144, 226, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: var(--primary-dark);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Navigation */
+    .nav-container {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(13, 16, 20, 0.95);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      border-bottom: 1px solid var(--border-color);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-container.scrolled {
+      background: rgba(13, 16, 20, 0.98);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-accent {
+      color: var(--accent-orange);
+      font-weight: 600;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-orange);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .nav-toggle .bar {
+      width: 25px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: 0.3s;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(ellipse at top, rgba(74, 144, 226, 0.15), transparent 50%),
+                  radial-gradient(ellipse at bottom, rgba(255, 140, 66, 0.1), transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-label {
+      font-size: 0.95rem;
+      color: var(--accent-orange);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #e8eaed 0%, #b8c5d1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.8;
+    }
+
+    .cta-container {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-primary, .cta-secondary {
+      padding: 1rem 2.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .cta-primary {
+      background: linear-gradient(135deg, var(--accent-orange), #ffa726);
+      color: white;
+      box-shadow: 0 4px 20px rgba(255, 140, 66, 0.3);
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(255, 140, 66, 0.4);
+    }
+
+    .cta-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+    }
+
+    .cta-secondary:hover {
+      background: var(--hover-bg);
+      border-color: var(--accent-blue);
+    }
+
+    /* Section Styles */
+    section {
+      padding: 6rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 0.9rem;
+      color: var(--accent-orange);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    section p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      max-width: 800px;
+    }
+
+    /* Philosophy Section */
+    .philosophy {
+      background: var(--secondary-dark);
+      border-radius: 16px;
+      padding: 4rem;
+      margin: 4rem 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .philosophy-intro {
+      max-width: 700px;
+      margin-bottom: 3rem;
+    }
+
+    .philosophy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+      margin-top: 3rem;
+    }
+
+    .philosophy-card {
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+    }
+
+    .philosophy-card:hover {
+      transform: translateY(-5px);
+      background: rgba(74, 144, 226, 0.05);
+      border-color: var(--accent-blue);
+      border-left-color: var(--accent-orange);
+    }
+
+    .philosophy-card h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .philosophy-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* Values Section */
+    .values {
+      background: rgba(255, 140, 66, 0.03);
+      padding: 6rem 2rem;
+      margin: 4rem 0;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .value-card {
+      background: var(--secondary-dark);
+      padding: 2.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-orange);
+      transition: all 0.3s ease;
+    }
+
+    .value-card:hover {
+      transform: translateX(5px);
+      border-left-color: var(--accent-blue);
+      background: rgba(74, 144, 226, 0.05);
+    }
+
+    .value-card h3 {
+      color: var(--text-primary);
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .value-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* FMS Method Section */
+    .fms-method {
+      background: var(--secondary-dark);
+      border-radius: 16px;
+      padding: 4rem;
+      margin: 4rem 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .method-steps {
+      display: grid;
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .method-step {
+      display: flex;
+      gap: 2rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .method-step:hover {
+      background: rgba(74, 144, 226, 0.05);
+      border-color: var(--accent-blue);
+    }
+
+    .step-number {
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--accent-orange), #ffa726);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
+    }
+
+    .step-content h4 {
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+    }
+
+    .step-content p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* Diagnostics Section */
+    .diagnostics {
+      background: linear-gradient(135deg, rgba(45, 106, 126, 0.1) 0%, transparent 100%);
+      padding: 6rem 2rem;
+    }
+
+    .diagnostic-tabs {
+      display: flex;
+      gap: 1rem;
+      margin: 3rem 0 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      padding: 0.8rem 1.8rem;
+      background: var(--secondary-dark);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      background: var(--hover-bg);
+      border-color: var(--accent-blue);
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--accent-orange), #ffa726);
+      color: white;
+      border-color: var(--accent-orange);
+    }
+
+    .tab-content {
+      display: none;
+      padding: 3rem;
+      background: var(--secondary-dark);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      animation: fadeIn 0.5s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .diagnostic-step {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .diagnostic-step:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .diagnostic-step .step-number {
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+    }
+
+    .diagnostic-step h4 {
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+
+    .diagnostic-step p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .service-card {
+      padding: 2.5rem;
+      background: var(--secondary-dark);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+
+    .service-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent-blue);
+    }
+
+    .service-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .service-card h3 {
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+
+    .service-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .service-features {
+      list-style: none;
+      margin-top: 1.5rem;
+    }
+
+    .service-features li {
+      color: var(--text-secondary);
+      padding: 0.5rem 0;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .service-features li::before {
+      content: '✓';
+      color: var(--accent-orange);
+      font-weight: 700;
+    }
+
+    /* Team Section */
+    .team {
+      background: var(--secondary-dark);
+      border-radius: 16px;
+      padding: 4rem;
+      margin: 4rem 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .team-member {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 3rem;
+      align-items: center;
+      margin-top: 3rem;
+    }
+
+    .member-photo {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .member-info h3 {
+      color: var(--text-primary);
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .member-title {
+      color: var(--accent-orange);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .member-info p {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    /* Contact Section */
+    .contact {
+      background: var(--secondary-dark);
+      border-radius: 16px;
+      padding: 4rem;
+      margin: 4rem 2rem;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .contact-methods {
+      display: flex;
+      gap: 3rem;
+      justify-content: center;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .contact-icon {
+      font-size: 2.5rem;
+    }
+
+    .contact-item a {
+      color: var(--accent-orange);
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    .contact-item a:hover {
+      color: var(--text-primary);
+    }
+
+    .contact-note {
+      margin-top: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    /* Floating Contact Button */
+    .floating-contact {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 999;
+    }
+
+    .floating-btn {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--accent-orange), #ffa726);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      text-decoration: none;
+      box-shadow: 0 4px 20px rgba(255, 140, 66, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .floating-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 30px rgba(255, 140, 66, 0.6);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--secondary-dark);
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+      border-top: 1px solid var(--border-color);
+    }
+
+    footer p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-width: 800px;
+      margin: 0 auto 1rem;
+    }
+
+    .footer-tagline {
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-top: 1rem;
+      font-size: 1.05rem;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .nav-links {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        width: 100%;
+        height: calc(100vh - 70px);
+        background: rgba(13, 16, 20, 0.98);
+        backdrop-filter: blur(20px);
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 3rem 2rem;
+        transition: right 0.3s ease;
+      }
+
+      .nav-links.active {
+        right: 0;
+      }
+
+      .nav-toggle {
+        display: flex;
+      }
+
+      .hero {
+        padding: 6rem 1.5rem 3rem;
+      }
+
+      .philosophy, .contact, .fms-method, .team {
+        padding: 2.5rem 1.5rem;
+        margin: 2rem 1rem;
+      }
+
+      .philosophy-grid, .values-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-methods {
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .diagnostic-step, .method-step {
+        flex-direction: column;
+      }
+
+      .team-member {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .member-photo {
+        margin: 0 auto;
+      }
+
+      .floating-contact {
+        bottom: 1rem;
+        right: 1rem;
+      }
+
+      .floating-btn {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="gradient-bg"></div>
+  <!-- Navigation -->
+  <nav class="nav-container" id="navbar">
+    <div class="nav">
+      <div class="logo">
+        FIDELITY <span class="logo-accent">MS</span>
+      </div>
+      <div class="nav-toggle" onclick="toggleMenu()">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <div class="nav-links" id="navLinks">
+        <a href="#home" onclick="closeMenu()">Home</a>
+        <a href="#philosophy" onclick="closeMenu()">Philosophy</a>
+        <a href="#values" onclick="closeMenu()">Values</a>
+        <a href="#method" onclick="closeMenu()">FMS Method</a>
+        <a href="#services" onclick="closeMenu()">Services</a>
+        <a href="#contact" onclick="closeMenu()">Contact</a>
+      </div>
+    </div>
+  </nav>
 
-    <nav>
-        <div class="logo">FIDELITY <span>MS</span></div>
-        <ul class="nav-links">
-            <li><a href="#services">Services</a></li>
-            <li><a href="#values">Values</a></li>
-            <li><a href="#process">Process</a></li>
-            <li><a href="#contact">Contact</a></li>
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-content">
+      <div class="hero-label">Mechanical Solutions</div>
+      <h1>Precision, Trust & Technical Discipline</h1>
+      <p class="hero-subtitle">
+        We deliver HVAC service through verified logic, not guesswork. Every diagnostic decision follows a methodical sequence designed to reduce downtime and extend system lifespan.
+      </p>
+      <div class="cta-container">
+        <a href="#contact" class="cta-primary">Schedule Service</a>
+        <a href="#method" class="cta-secondary">Our Method</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Philosophy Section -->
+  <section id="philosophy" class="philosophy">
+    <div class="section-label">How We Operate</div>
+    <h2>Our Philosophy</h2>
+    <div class="philosophy-intro">
+      <p>
+        We are a mechanical service company organized around one premise: that technical work, client understanding, 
+        and professional development are not separate functions—they are the work itself.
+      </p>
+      <p style="margin-top: 1rem;">
+        Fidelity exists to raise the standard in mechanical service—not through volume or sales tactics, but through 
+        precision, trust, and technical discipline.
+      </p>
+    </div>
+    <div class="philosophy-grid">
+      <div class="philosophy-card">
+        <h3>The Separation Problem</h3>
+        <p>
+          Technical skill and clear communication aren't separate—they're integrated. We explain what we find in 
+          language you understand, backed by verified evidence.
+        </p>
+      </div>
+      <div class="philosophy-card">
+        <h3>Relationship Over Transaction</h3>
+        <p>
+          Service creates accountability, not just revenue. Every visit either reinforces or erodes client trust. 
+          We earn it through consistent patterns, not promises.
+        </p>
+      </div>
+      <div class="philosophy-card">
+        <h3>Logic Over Guesswork</h3>
+        <p>
+          We replace assumptions with verified logic. Power, airflow, electrical, refrigerant, controls, environment—
+          all measured, all verified, every time.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Values Section -->
+  <section id="values" class="values">
+    <div style="text-align: center; max-width: 800px; margin: 0 auto 3rem;">
+      <div class="section-label">What Drives Us</div>
+      <h2>Core Values</h2>
+      <p>These principles define every service interaction and guide how we develop technicians into leaders.</p>
+    </div>
+    <div class="values-grid">
+      <div class="value-card">
+        <h3>Clarity Over Chaos</h3>
+        <p>
+          Every communication—technical, verbal, written, or visual—should reduce confusion. This applies to client 
+          explanations, internal reporting, and field documentation.
+        </p>
+      </div>
+      <div class="value-card">
+        <h3>Honor in the Field</h3>
+        <p>
+          We respect the trade. Our appearance, discipline, and follow-through reflect our standards daily. 
+          Professional conduct isn't a preference—it's a principle.
+        </p>
+      </div>
+      <div class="value-card">
+        <h3>Client Respect</h3>
+        <p>
+          Our work happens in your space, on your clock, often during your stress. Time-conscious, pressure-free 
+          service isn't optional—it's foundational.
+        </p>
+      </div>
+      <div class="value-card">
+        <h3>Growth Through Precision</h3>
+        <p>
+          Every diagnostic decision follows a logic sequence. No shortcuts. Superheat, subcool, pressure, airflow, 
+          load—all measured, all verified.
+        </p>
+      </div>
+      <div class="value-card">
+        <h3>Earned Trust</h3>
+        <p>
+          Trust isn't given—it's built through consistent performance, honest communication, and technical excellence. 
+          Every visit counts.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FMS Diagnostic Method -->
+  <section id="method" class="fms-method">
+    <div class="section-label">The FMS D.O.O.</div>
+    <h2>The Fidelity Diagnostic Method</h2>
+    <p>
+      A repeatable logic sequence that prevents callbacks and ensures nothing is missed. Every technician uses it. 
+      Every review references it. Every callback gets traced against it.
+    </p>
+    <p style="margin-top: 1rem; color: var(--text-muted); font-style: italic;">
+      Power → Airflow → Electrical → Refrigerant → Controls → Environment
+    </p>
+    
+    <div class="method-steps">
+      <div class="method-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>Power Verification</h4>
+          <p>
+            Confirm voltage at source and load. Verify disconnects, fuses, breaker behavior. Don't test a system 
+            that isn't powered—confirm, don't assume.
+          </p>
+        </div>
+      </div>
+
+      <div class="method-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>Airflow Assessment</h4>
+          <p>
+            Filter condition, blower response, damper position. Static pressure if needed; return vs supply balance. 
+            Never skip airflow and jump to refrigerant—it voids the logic.
+          </p>
+        </div>
+      </div>
+
+      <div class="method-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>Electrical Systems</h4>
+          <p>
+            Capacitance, contactor integrity, wiring condition. Visually inspect terminals and connections. 
+            Test coils, relays, amp draw under load.
+          </p>
+        </div>
+      </div>
+
+      <div class="method-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>Refrigerant Analysis</h4>
+          <p>
+            Only after airflow is confirmed. Measure superheat and subcool—don't just look at pressure. 
+            Note TXV behavior, possible underfeed or overfeed indicators.
+          </p>
+        </div>
+      </div>
+
+      <div class="method-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <h4>Controls Verification</h4>
+          <p>
+            Verify thermostat logic, communication voltage. Check sensor data, staging, and interlocks. 
+            Observe expected vs actual system response.
+          </p>
+        </div>
+      </div>
+
+      <div class="method-step">
+        <div class="step-number">6</div>
+        <div class="step-content">
+          <h4>Environmental Factors</h4>
+          <p>
+            Assess rooftop loading, grease accumulation, ambient interference. Validate drainage slope, humidity 
+            factors, airflow path obstructions. Site-specific factors change system behavior.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section id="services">
+    <div class="section-label">What We Offer</div>
+    <h2>Complete Mechanical Solutions</h2>
+    <p>Professional heating, cooling, and maintenance services designed to reduce downtime and extend system lifespan.</p>
+    
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">❄️</div>
+        <h3>Commercial Cooling</h3>
+        <p>
+          Precision diagnostics and repair for commercial refrigeration and air conditioning systems. We verify airflow, 
+          refrigerant charge, and electrical integrity on every service call.
+        </p>
+        <ul class="service-features">
+          <li>Rooftop unit service & repair</li>
+          <li>Walk-in cooler diagnostics</li>
+          <li>Split system maintenance</li>
+          <li>Performance optimization</li>
         </ul>
-    </nav>
+      </div>
 
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <div class="subtitle">Mechanical Solutions</div>
-                <h1>Precision, Trust & Technical Discipline</h1>
-                <p>We deliver HVAC service through verified logic, not guesswork. Every diagnostic decision follows a methodical sequence. No shortcuts. No assumptions. Just engineering excellence.</p>
-                <div class="cta-buttons">
-                    <a href="#contact" class="btn btn-primary">Schedule Service</a>
-                    <a href="#values" class="btn btn-secondary">Our Approach</a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="icon-container">
-                    <div class="dual-icon">
-                        <div class="connecting-line"></div>
-                        <div class="icon-circle icon-cold">❄️</div>
-                        <div class="icon-circle icon-hot">🔥</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+      <div class="service-card">
+        <div class="service-icon">🔥</div>
+        <h3>Heating Systems</h3>
+        <p>
+          Complete heating system service from rooftop units to furnaces. Power verification, control logic testing, 
+          and environmental assessment on every visit.
+        </p>
+        <ul class="service-features">
+          <li>Gas furnace service</li>
+          <li>Heat pump diagnostics</li>
+          <li>Ignition system repair</li>
+          <li>Safety inspection</li>
+        </ul>
+      </div>
 
-    <section id="services" class="services">
-        <div class="section-header">
-            <div class="section-label">What We Do</div>
-            <h2>Complete Mechanical Solutions</h2>
-            <p>Professional heating, cooling, and maintenance services designed to reduce downtime and extend system lifespan.</p>
-        </div>
-        <div class="services-grid">
-            <div class="service-card">
-                <span class="service-icon">❄️</span>
-                <h3>Commercial Cooling</h3>
-                <p>Precision diagnostics and repair for commercial refrigeration and air conditioning systems. We verify airflow, refrigerant charge, and electrical integrity on every service call.</p>
-            </div>
-            <div class="service-card">
-                <span class="service-icon">🔥</span>
-                <h3>Heating Systems</h3>
-                <p>Complete heating system service from rooftop units to furnaces. Power verification, control logic testing, and environmental assessment on every visit.</p>
-            </div>
-            <div class="service-card">
-                <span class="service-icon">⚙️</span>
-                <h3>Preventive Maintenance</h3>
-                <p>Structured maintenance protocols that prevent callbacks. Regular inspections following our FMS Diagnostic Method ensure systems operate at peak efficiency.</p>
-            </div>
-            <div class="service-card">
-                <span class="service-icon">🔧</span>
-                <h3>Emergency Service</h3>
-                <p>Rapid response with full diagnostic capability. We arrive prepared with the tools and knowledge to resolve issues on the first visit.</p>
-            </div>
-            <div class="service-card">
-                <span class="service-icon">📊</span>
-                <h3>System Analysis</h3>
-                <p>Comprehensive system evaluations with documented findings. Clear reporting that helps you make informed decisions about repairs and replacements.</p>
-            </div>
-            <div class="service-card">
-                <span class="service-icon">🎓</span>
-                <h3>Client Education</h3>
-                <p>We teach, not sell. Every service interaction includes clear explanations of what we found, why it matters, and what your options are.</p>
-            </div>
-        </div>
-    </section>
+      <div class="service-card">
+        <div class="service-icon">⚙️</div>
+        <h3>Preventive Maintenance</h3>
+        <p>
+          Structured maintenance protocols that prevent callbacks. Regular inspections following our FMS Diagnostic 
+          Method ensure systems operate at peak efficiency.
+        </p>
+        <ul class="service-features">
+          <li>Quarterly system checkups</li>
+          <li>Performance trend analysis</li>
+          <li>Filter & coil cleaning</li>
+          <li>Detailed service reports</li>
+        </ul>
+      </div>
 
-    <section id="values" class="values">
-        <div class="values-content">
-            <div class="values-text">
-                <div class="section-label">Our Foundation</div>
-                <h2>Built on Principles, Not Promises</h2>
-            </div>
-            <div class="values-list">
-                <div class="value-item">
-                    <h3>Clarity Over Chaos</h3>
-                    <p>Every communication—technical, verbal, or written—reduces confusion. We explain what we find in plain language backed by verified evidence.</p>
-                </div>
-                <div class="value-item">
-                    <h3>Honor in the Field</h3>
-                    <p>Professional appearance, disciplined process, and respectful conduct. We represent our trade with pride on every service call.</p>
-                </div>
-                <div class="value-item">
-                    <h3>Client Respect</h3>
-                    <p>Your time matters. Your space matters. We work efficiently, communicate clearly, and never use pressure sales tactics.</p>
-                </div>
-                <div class="value-item">
-                    <h3>Growth Through Precision</h3>
-                    <p>Every diagnostic follows a logic sequence: Power → Airflow → Electrical → Refrigerant → Controls → Environment. No shortcuts.</p>
-                </div>
-                <div class="value-item">
-                    <h3>Earned Trust</h3>
-                    <p>Trust isn't given—it's built through consistent performance, honest communication, and technical excellence.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+      <div class="service-card">
+        <div class="service-icon">🔧</div>
+        <h3>Emergency Service</h3>
+        <p>
+          Rapid response with full diagnostic capability. We arrive prepared with the tools and knowledge to resolve 
+          issues on the first visit.
+        </p>
+        <ul class="service-features">
+          <li>24/7 emergency availability</li>
+          <li>Complete diagnostic equipment</li>
+          <li>Priority scheduling</li>
+          <li>Same-day service available</li>
+        </ul>
+      </div>
 
-    <section id="process" class="process">
-        <div class="section-header">
-            <div class="section-label">The FMS Method</div>
-            <h2>Our Diagnostic Process</h2>
-            <p>A systematic approach that ensures nothing is missed and everything is verified.</p>
-        </div>
-        <div class="process-timeline">
-            <div class="process-step">
-                <div class="step-number">
-                    <div class="number-circle">1</div>
-                </div>
-                <div class="step-content">
-                    <h3>Power Verification</h3>
-                    <p>We confirm voltage at source and load, verify disconnects and breaker behavior. Never test a system that isn't properly powered.</p>
-                </div>
-            </div>
-            <div class="process-step">
-                <div class="step-number">
-                    <div class="number-circle">2</div>
-                </div>
-                <div class="step-content">
-                    <h3>Airflow Assessment</h3>
-                    <p>Filter condition, blower response, static pressure measurement. Proper airflow is essential before moving to refrigerant diagnostics.</p>
-                </div>
-            </div>
-            <div class="process-step">
-                <div class="step-number">
-                    <div class="number-circle">3</div>
-                </div>
-                <div class="step-content">
-                    <h3>Electrical Testing</h3>
-                    <p>Capacitance verification, contactor integrity, amp draw under load. Visual inspection of terminals and all electrical connections.</p>
-                </div>
-            </div>
-            <div class="process-step">
-                <div class="step-number">
-                    <div class="number-circle">4</div>
-                </div>
-                <div class="step-content">
-                    <h3>Refrigerant Analysis</h3>
-                    <p>Superheat and subcool measurements—not just pressure readings. We verify system charge and identify TXV behavior patterns.</p>
-                </div>
-            </div>
-            <div class="process-step">
-                <div class="step-number">
-                    <div class="number-circle">5</div>
-                </div>
-                <div class="step-content">
-                    <h3>Controls & Environment</h3>
-                    <p>Thermostat logic verification, sensor validation, and environmental assessment. Site-specific factors that affect system performance.</p>
-                </div>
-            </div>
-            <div class="process-step">
-                <div class="step-number">
-                    <div class="number-circle">6</div>
-                </div>
-                <div class="step-content">
-                    <h3>Final Verification</h3>
-                    <p>System operational under load, all readings documented, client educated on findings. Every service includes a complete verification sweep.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+      <div class="service-card">
+        <div class="service-icon">📊</div>
+        <h3>System Analysis</h3>
+        <p>
+          Comprehensive system evaluations with documented findings. Clear reporting that helps you make informed 
+          decisions about repairs and replacements.
+        </p>
+        <ul class="service-features">
+          <li>Energy efficiency audit</li>
+          <li>Airflow balancing</li>
+          <li>Load calculation</li>
+          <li>ROI analysis provided</li>
+        </ul>
+      </div>
 
-    <section id="contact" class="contact">
-        <div class="contact-content">
-            <div class="contact-info">
-                <div class="section-label">Get In Touch</div>
-                <h2>Ready for Professional Service?</h2>
-                <p style="color: rgba(255, 255, 255, 0.6); margin-top: 1rem; line-height: 1.7;">Contact Martin Pérez and the Fidelity team for precision HVAC service. We're here to provide clear answers and professional solutions.</p>
-                <div class="contact-details">
-                    <div class="contact-item">
-                        <div class="contact-icon">📞</div>
-                        <div class="contact-item-text">
-                            <h3>Phone</h3>
-                            <p><a href="tel:713-201-2842">713-201-2842</a></p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">✉️</div>
-                        <div class="contact-item-text">
-                            <h3>Email</h3>
-                            <p><a href="mailto:nvvtruelife@outlook.com">nvvtruelife@outlook.com</a></p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">🌐</div>
-                        <div class="contact-item-text">
-                            <h3>Website</h3>
-                            <p><a href="http://fidelitymechanicalsolutions.com" target="_blank">fidelitymechanicalsolutions.com</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="contact-form-area" style="background: rgba(255, 255, 255, 0.03); padding: 3rem; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center;">
-                <div style="text-align: center;">
-                    <div style="font-size: 4rem; margin-bottom: 1.5rem;">🔧</div>
-                    <h3 style="font-size: 1.5rem; color: var(--white); margin-bottom: 1rem;">Field Operations</h3>
-                    <p style="color: rgba(255, 255, 255, 0.6); line-height: 1.7;">Serving the Houston area with professional heating, cooling, and maintenance solutions.</p>
-                    <div style="margin-top: 2rem;">
-                        <a href="tel:713-201-2842" class="btn btn-primary">Call Now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+      <div class="service-card">
+        <div class="service-icon">🎓</div>
+        <h3>Client Education</h3>
+        <p>
+          We teach, not sell. Every service interaction includes clear explanations of what we found, why it matters, 
+          and what your options are—without pressure.
+        </p>
+        <ul class="service-features">
+          <li>System walkthrough</li>
+          <li>Maintenance training</li>
+          <li>Visual documentation</li>
+          <li>Clear written reports</li>
+        </ul>
+      </div>
+    </div>
+  </section>
 
-    <footer>
-        <p>&copy; 2026 Fidelity Mechanical Solutions. All rights reserved. | Precision • Trust • Technical Discipline</p>
-    </footer>
+  <!-- Team Section -->
+  <section class="team">
+    <div class="section-label">Leadership</div>
+    <h2>Field Operations</h2>
+    <div class="team-member">
+      <div class="member-photo">👤</div>
+      <div class="member-info">
+        <h3>Martin Pérez</h3>
+        <div class="member-title">Field Operations Lead</div>
+        <p>
+          Martin leads Fidelity's field operations with a commitment to technical precision and professional integrity. 
+          Every service call reflects our core values: clarity over chaos, honor in the field, and earned trust through 
+          consistent performance.
+        </p>
+        <p>
+          With systematic training in the FMS Diagnostic Method and a focus on client education, Martin ensures that 
+          every technician represents the Fidelity standard of excellence.
+        </p>
+      </div>
+    </div>
+  </section>
 
-    <script>
-        // Smooth scroll for navigation
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
+  <!-- Contact Section -->
+  <section id="contact" class="contact">
+    <div class="section-label">Get In Touch</div>
+    <h2>Ready for Professional Service?</h2>
+    <p>
+      Contact Martin Pérez and the Fidelity team for precision HVAC service. Text preferred for fastest response—
+      service requests typically confirmed within 2 hours during operating hours.
+    </p>
+    
+    <div class="contact-methods">
+      <div class="contact-item">
+        <div class="contact-icon">📱</div>
+        <a href="sms:7132012842">713-201-2842</a>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Text Preferred</span>
+      </div>
+      
+      <div class="contact-item">
+        <div class="contact-icon">📧</div>
+        <a href="mailto:nvvtruelife@outlook.com">nvvtruelife@outlook.com</a>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Email</span>
+      </div>
 
-        // Scroll-triggered animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
+      <div class="contact-item">
+        <div class="contact-icon">🌐</div>
+        <a href="http://fidelitymechanicalsolutions.com" target="_blank">fidelitymechanicalsolutions.com</a>
+        <span style="color: var(--text-muted); font-size: 0.9rem;">Website</span>
+      </div>
+    </div>
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
+    <p class="contact-note">
+      Service area: Greater Houston and surrounding communities
+    </p>
+  </section>
 
-        // Observe service cards
-        document.querySelectorAll('.service-card').forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-            observer.observe(card);
-        });
+  <!-- Footer -->
+  <footer>
+    <p>
+      &copy; 2026 Fidelity Mechanical Solutions. All rights reserved.
+    </p>
+    <p class="footer-tagline">
+      Precision • Trust • Technical Discipline — Where mechanical excellence meets thoughtful service.
+    </p>
+  </footer>
 
-        // Observe value items
-        document.querySelectorAll('.value-item').forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateX(-30px)';
-            item.style.transition = `all 0.6s ease ${index * 0.1}s`;
-            observer.observe(item);
-        });
+  <!-- Floating Contact Button -->
+  <div class="floating-contact">
+    <a href="sms:7132012842" class="floating-btn" title="Text us now">💬</a>
+  </div>
 
-        // Observe process steps
-        document.querySelectorAll('.process-step').forEach((step, index) => {
-            step.style.opacity = '0';
-            step.style.transform = 'translateY(30px)';
-            step.style.transition = `all 0.6s ease ${index * 0.15}s`;
-            observer.observe(step);
-        });
-    </script>
+  <script>
+    // Navigation scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+
+    // Mobile menu toggle
+    function toggleMenu() {
+      document.getElementById('navLinks').classList.toggle('active');
+    }
+
+    function closeMenu() {
+      document.getElementById('navLinks').classList.remove('active');
+    }
+
+    // Diagnostic tabs functionality (if you add them back)
+    function switchTab(index) {
+      const tabs = document.querySelectorAll('.tab-btn');
+      const contents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach((tab, i) => {
+        if (i === index) {
+          tab.classList.add('active');
+        } else {
+          tab.classList.remove('active');
+        }
+      });
+      
+      contents.forEach((content, i) => {
+        if (i === index) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
+    }
+
+    // Smooth scroll with offset for fixed nav
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          const offset = 80;
+          const targetPosition = target.offsetTop - offset;
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Scroll-triggered animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observe cards for animation
+    document.querySelectorAll('.philosophy-card, .value-card, .service-card, .method-step').forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(30px)';
+      card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+      observer.observe(card);
+    });
+  </script>
 </body>
 </html>
