@@ -1,2410 +1,976 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-  <meta name="description" content="Professional HVAC field documentation and materials system">
-  <title>Field Buddy Pro - Service & Materials</title>
-  <style>
-    /* ==================== BASE STYLES ==================== */
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-    }
-    
-    html {
-      scroll-padding-top: 20px;
-    }
-    
-    body { 
-      font: 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 8px;
-      padding-bottom: 90px;
-      color: #1a1a1a;
-    }
-    
-    /* ==================== INPUTS ==================== */
-    input, select, textarea, button {
-      font-size: 16px;
-      padding: 14px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      width: 100%;
-      margin: 8px 0;
-      font-family: inherit;
-      -webkit-appearance: none;
-      background: white;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #007AFF;
-      box-shadow: 0 0 0 2px rgba(0,122,255,0.2);
-    }
-    
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-      line-height: 1.5;
-    }
-    
-    input[readonly] {
-      background: #f8f8f8;
-      color: #666;
-      cursor: not-allowed;
-    }
-    
-    input[type="checkbox"] {
-      width: 24px;
-      height: 24px;
-      margin-right: 12px;
-      cursor: pointer;
-      accent-color: #007AFF;
-      flex-shrink: 0;
-    }
-    
-    label {
-      display: block;
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 4px;
-      font-weight: 500;
-    }
-    
-    label.check {
-      display: flex;
-      align-items: center;
-      font-size: 15px;
-      color: #1a1a1a;
-      margin: 10px 0;
-      padding: 12px;
-      background: white;
-      border-radius: 8px;
-      cursor: pointer;
-      border: 2px solid #e0e0e0;
-      transition: all 0.2s;
-    }
-    
-    label.check:hover {
-      background: #f8f8f8;
-      border-color: #007AFF;
-    }
-    
-    label.check input:checked {
-      accent-color: #34C759;
-    }
-    
-    label.check.checked {
-      background: #e6f7ec;
-      border-color: #34C759;
-    }
-    
-    /* ==================== BUTTONS ==================== */
-    button {
-      background: #007AFF;
-      color: white;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      min-height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    
-    button:active {
-      opacity: 0.7;
-      transform: scale(0.98);
-    }
-    
-    button.secondary { background: #8E8E93; }
-    button.success { background: #34C759; }
-    button.danger { background: #FF3B30; }
-    button.warning { background: #FF9500; }
-    button.small { 
-      padding: 10px 14px;
-      font-size: 14px;
-      min-height: 40px;
-    }
-    
-    /* ==================== CARDS ==================== */
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 12px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    
-    .card-header {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #f0f0f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    
-    .card-subheader {
-      font-size: 15px;
-      font-weight: 600;
-      color: #007AFF;
-      margin: 16px 0 8px 0;
-      padding-top: 12px;
-      border-top: 1px solid #e0e0e0;
-    }
-    
-    /* ==================== GRID LAYOUTS ==================== */
-    .grid-2 { 
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    
-    .grid-3 { 
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-    }
-    
-    .grid-4 { 
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-    
-    @media (max-width: 640px) {
-      .grid-2, .grid-3, .grid-4 {
-        grid-template-columns: 1fr;
-      }
-    }
-    
-    /* ==================== MODE TOGGLE ==================== */
-    .mode-toggle {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin: 12px 0;
-    }
-    
-    .mode-toggle button {
-      background: white;
-      color: #666;
-      border: 2px solid #ddd;
-      font-size: 15px;
-      padding: 12px;
-      min-height: 44px;
-    }
-    
-    .mode-toggle button.active {
-      background: #007AFF;
-      color: white;
-      border-color: #007AFF;
-    }
-    
-    /* ==================== STATUS INDICATORS ==================== */
-    .status {
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      line-height: 1.4;
-    }
-    
-    .status.good { 
-      background: #D1F4E0; 
-      color: #0F5132; 
-      border-left: 4px solid #34C759;
-    }
-    
-    .status.warn { 
-      background: #FFF3CD; 
-      color: #664D03; 
-      border-left: 4px solid #FF9500;
-    }
-    
-    .status.bad { 
-      background: #F8D7DA; 
-      color: #842029; 
-      border-left: 4px solid #FF3B30;
-    }
-    
-    .status.info {
-      background: #D1ECF1;
-      color: #0C5460;
-      border-left: 4px solid #007AFF;
-    }
-    
-    /* ==================== VOICE INPUT ==================== */
-    .voice-wrapper {
-      position: relative;
-    }
-    
-    .voice-btn {
-      position: absolute;
-      right: 4px;
-      top: 12px;
-      transform: translateY(0);
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      background: #007AFF;
-      border-radius: 50%;
-      font-size: 20px;
-      z-index: 2;
-      min-height: unset;
-      margin: 0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fidelity Mechanical Solutions | Precision HVAC Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    textarea + .voice-btn {
-      top: 12px;
-    }
-    
-    .voice-btn.listening { 
-      background: #FF3B30;
-      animation: pulse 1s infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    
-    .voice-wrapper input,
-    .voice-wrapper textarea {
-      padding-right: 50px;
-    }
+        :root {
+            --primary-navy: #1a2332;
+            --accent-orange: #ff8c42;
+            --accent-gold: #ffa726;
+            --ice-blue: #4fc3f7;
+            --flame-red: #ff5722;
+            --silver: #b0bec5;
+            --dark-charcoal: #0d1117;
+            --white: #ffffff;
+            --off-white: #f5f5f5;
+            --text-light: rgba(255, 255, 255, 0.85);
+        }
 
-    /* ==================== DYNAMIC FIELDS ==================== */
-    .dynamic-item {
-      background: #f8f9fa;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 8px 0;
-      border: 1px solid #e0e0e0;
-      position: relative;
-    }
-    
-    .dynamic-item .remove-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #FF3B30;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: unset;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .add-btn {
-      background: #34C759;
-      margin-top: 8px;
-    }
-    
-    /* ==================== COLLAPSIBLE SECTIONS ==================== */
-    .section {
-      margin: 16px 0;
-    }
-    
-    .section-toggle {
-      background: white;
-      border: 2px solid #ddd;
-      color: #1a1a1a;
-      font-weight: 600;
-      padding: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      border-radius: 8px;
-      margin: 8px 0;
-      transition: all 0.2s;
-      width: 100%;
-      text-align: left;
-      min-height: 48px;
-    }
-    
-    .section-toggle:hover {
-      background: #f8f8f8;
-      border-color: #007AFF;
-    }
-    
-    .section-toggle .arrow {
-      font-size: 18px;
-      transition: transform 0.2s;
-      transform-origin: center;
-    }
-    
-    .section.open .arrow {
-      transform: rotate(180deg);
-    }
-    
-    .section-content {
-      display: none;
-      background: white;
-      padding: 16px;
-      border-radius: 0 0 8px 8px;
-      border: 2px solid #ddd;
-      border-top: none;
-      margin-top: -8px;
-    }
-    
-    .section.open .section-content {
-      display: block;
-    }
-    
-    /* ==================== MODE-SPECIFIC VISIBILITY ==================== */
-    .service-only,
-    .materials-only,
-    .cooling-only,
-    .heating-only { 
-      display: none; 
-    }
-    
-    body.mode-service .service-only { display: block; }
-    body.mode-materials .materials-only { display: block; }
-    
-    body.mode-service.mode-cooling .cooling-only { display: block; }
-    body.mode-service.mode-heating .heating-only { display: block; }
+        body {
+            font-family: 'Archivo', -apple-system, sans-serif;
+            background: var(--dark-charcoal);
+            color: var(--text-light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-    /* Grid override for mode-specific items */
-    .grid-2 .cooling-only,
-    .grid-2 .heating-only,
-    .grid-3 .cooling-only,
-    .grid-3 .heating-only {
-      display: none;
-    }
-    
-    body.mode-service.mode-cooling .grid-2 .cooling-only,
-    body.mode-service.mode-cooling .grid-3 .cooling-only {
-      display: block;
-    }
-    
-    body.mode-service.mode-heating .grid-2 .heating-only,
-    body.mode-service.mode-heating .grid-3 .heating-only {
-      display: block;
-    }
-    
-    /* ==================== PHOTOS ==================== */
-    .photo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 8px;
-      margin-top: 12px;
-    }
-    
-    .photo-item {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #f0f0f0;
-    }
-    
-    .photo-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .photo-label {
-      position: absolute;
-      bottom: 4px;
-      left: 4px;
-      right: 4px;
-      background: rgba(0,0,0,0.75);
-      color: white;
-      padding: 4px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
-      text-align: center;
-      text-transform: uppercase;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .photo-delete {
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      background: #FF3B30;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.9;
-      min-height: unset;
-      padding: 0;
-      margin: 0;
-    }
-    
-    /* ==================== MATERIALS LIST SPECIFIC ==================== */
-    .material-catalog {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    
-    .material-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px;
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      margin: 6px 0;
-      background: white;
-      transition: all 0.2s;
-    }
-    
-    .material-item:hover {
-      background: #f8f8f8;
-      border-color: #007AFF;
-    }
-    
-    .material-item-info {
-      flex: 1;
-    }
-    
-    .material-item-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: #1a1a1a;
-    }
-    
-    .material-item-spec {
-      font-size: 12px;
-      color: #666;
-      margin-top: 2px;
-    }
-    
-    .material-add-btn {
-      padding: 6px 12px;
-      font-size: 14px;
-      min-height: 32px;
-      margin: 0;
-      border-radius: 6px;
-    }
-    
-    .selected-material {
-      background: #f8f9fa;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 8px 0;
-      border: 2px solid #e0e0e0;
-    }
-    
-    .selected-material-header {
-      display: flex;
-      align-items: start;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    
-    .selected-material-title {
-      font-weight: 600;
-      font-size: 15px;
-      color: #1a1a1a;
-    }
-    
-    .selected-material-category {
-      font-size: 11px;
-      color: #666;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-    
-    .selected-material-controls {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    
-    .qty-input {
-      width: 60px;
-      padding: 6px;
-      text-align: center;
-      margin: 0;
-      font-weight: 600;
-    }
-    
-    .suggestion-item {
-      background: white;
-      padding: 10px;
-      border-radius: 6px;
-      margin: 6px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border: 1px solid #e0e0e0;
-    }
-    
-    .suggestion-info {
-      flex: 1;
-    }
-    
-    .suggestion-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: #1a1a1a;
-    }
-    
-    .suggestion-reason {
-      font-size: 12px;
-      color: #666;
-      margin-top: 2px;
-    }
-    
-    /* ==================== REPORT PREVIEW ==================== */
-    .report-preview {
-      background: #f8f8f8;
-      padding: 16px;
-      border-radius: 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      overflow-x: auto;
-      margin: 12px 0;
-      border: 1px solid #ddd;
-    }
-    
-    /* ==================== STICKY ACTION BAR ==================== */
-    .actions {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 10px;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      display: flex;
-      gap: 8px;
-      z-index: 100;
-    }
-    
-    .actions button {
-      flex: 1;
-      font-size: 14px;
-      padding: 12px 8px;
-    }
-    
-    /* ==================== MODAL & TOAST ==================== */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.2s, visibility 0.2s;
-    }
-    
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transform: scale(0.95);
-      transition: transform 0.2s;
-    }
-    
-    .modal-overlay.visible {
-      opacity: 1;
-      visibility: visible;
-    }
-    
-    .modal-overlay.visible .modal-content {
-      transform: scale(1);
-    }
-    
-    .modal-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-    
-    .modal-body {
-      font-size: 15px;
-      color: #333;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    
-    .modal-actions {
-      display: flex;
-      gap: 8px;
-    }
-    
-    .modal-actions button {
-      flex: 1;
-    }
-    
-    .toast-notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      z-index: 2000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s, top 0.3s;
-    }
-    
-    .toast-notification.visible {
-      opacity: 1;
-      visibility: visible;
-      top: 30px;
-    }
-    
-    .toast-notification.success { background: #34C759; }
-    .toast-notification.danger { background: #FF3B30; }
-    
-    /* ==================== HIDDEN / UTILITY ==================== */
-    .hidden { display: none !important; }
-    .mt-8 { margin-top: 8px; }
-    .mt-16 { margin-top: 16px; }
-    .mb-8 { margin-bottom: 8px; }
-    .text-muted { color: #666; font-size: 13px; }
-  </style>
+        /* Animated Gradient Background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(79, 195, 247, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(255, 140, 66, 0.06) 0%, transparent 50%),
+                linear-gradient(135deg, var(--dark-charcoal) 0%, #0a0e14 100%);
+            animation: gradientShift 20s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(13, 17, 23, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--accent-orange);
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-orange);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 5%;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 6rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 6vw, 5.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--white) 0%, var(--silver) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .hero-text .subtitle {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: var(--accent-orange);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out both;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 3rem;
+            line-height: 1.8;
+            max-width: 600px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+            color: var(--white);
+            box-shadow: 0 10px 30px rgba(255, 140, 66, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(255, 140, 66, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 2px solid var(--silver);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-orange);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Visual Element */
+        .hero-visual {
+            position: relative;
+            animation: fadeInScale 1s ease-out 0.4s both;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .icon-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dual-icon {
+            width: 400px;
+            height: 400px;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .icon-circle {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon-cold {
+            top: 50px;
+            left: 0;
+            background: linear-gradient(135deg, #1976d2, #4fc3f7);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .icon-hot {
+            bottom: 50px;
+            right: 0;
+            background: linear-gradient(135deg, #ff5722, #ffa726);
+            animation: pulse 3s ease-in-out infinite 1.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .connecting-line {
+            position: absolute;
+            width: 3px;
+            height: 250px;
+            background: linear-gradient(180deg, var(--ice-blue), var(--accent-orange));
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(45deg);
+            opacity: 0.3;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 8rem 5%;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-orange);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 3rem 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ice-blue), var(--accent-orange));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 140, 66, 0.3);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+        }
+
+        /* Values Section */
+        .values {
+            padding: 8rem 5%;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+        }
+
+        .values-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center;
+        }
+
+        .values-text h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+
+        .values-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .value-item {
+            padding-left: 2rem;
+            border-left: 3px solid var(--accent-orange);
+            transition: all 0.3s ease;
+        }
+
+        .value-item:hover {
+            border-left-color: var(--accent-gold);
+            padding-left: 2.5rem;
+        }
+
+        .value-item h3 {
+            font-size: 1.3rem;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .value-item p {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+        }
+
+        /* Process Section */
+        .process {
+            padding: 8rem 5%;
+        }
+
+        .process-timeline {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .process-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--ice-blue), var(--accent-orange));
+            transform: translateX(-50%);
+        }
+
+        .process-step {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .process-step:nth-child(even) .step-content {
+            order: 2;
+        }
+
+        .process-step:nth-child(even) .step-number {
+            order: 1;
+        }
+
+        .step-content {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+        }
+
+        .step-content h3 {
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .step-content p {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--white);
+            box-shadow: 0 10px 30px rgba(255, 140, 66, 0.3);
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 8rem 5%;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .contact-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+        }
+
+        .contact-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 4vw, 4rem);
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .contact-item-text h3 {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+
+        .contact-item-text p {
+            font-size: 1.3rem;
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .contact-item-text a {
+            color: var(--white);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-item-text a:hover {
+            color: var(--accent-orange);
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 5%;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        footer p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 4rem;
+                text-align: center;
+            }
+
+            .hero-text p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .values-content {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-content {
+                grid-template-columns: 1fr;
+            }
+
+            .process-timeline::before {
+                left: 30px;
+            }
+
+            .process-step {
+                grid-template-columns: 1fr;
+                padding-left: 80px;
+            }
+
+            .process-step:nth-child(even) .step-content {
+                order: 1;
+            }
+
+            .step-number {
+                position: absolute;
+                left: 0;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .dual-icon {
+                width: 300px;
+                height: 300px;
+            }
+
+            .icon-circle {
+                width: 120px;
+                height: 120px;
+                font-size: 3rem;
+            }
+        }
+    </style>
 </head>
-<body class="mode-service mode-cooling">
+<body>
+    <div class="gradient-bg"></div>
 
-  <!-- Header -->
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div style="font-size: 20px;">⚡ Field Buddy Pro</div>
-        <div style="font-size: 12px; color: #666; font-weight: 400; margin-top: 4px;">Service & Materials System</div>
-      </div>
-    </div>
-    
-    <div class="mode-toggle">
-      <button onclick="setMode('service')" id="btn-service" class="active">🔧 Service</button>
-      <button onclick="setMode('materials')" id="btn-materials">📦 Materials</button>
-    </div>
-  </div>
+    <nav>
+        <div class="logo">FIDELITY <span>MS</span></div>
+        <ul class="nav-links">
+            <li><a href="#services">Services</a></li>
+            <li><a href="#values">Values</a></li>
+            <li><a href="#process">Process</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
 
-  <!-- ==================== SERVICE MODE ==================== -->
-  <div class="service-only">
-    
-    <!-- Job Info -->
-    <div class="card">
-      <div class="card-header">
-        <span>📋 Job Information</span>
-      </div>
-      
-      <label for="customer">Customer Name</label>
-      <input type="text" id="customer" placeholder="Full name">
-      
-      <label for="address">Address</label>
-      <input type="text" id="address" placeholder="Street, City, State">
-      
-      <div class="grid-2">
-        <div>
-          <label for="sales-tech">Technician</label>
-          <input type="text" id="sales-tech" placeholder="Your name">
-        </div>
-        <div>
-          <label for="date">Date</label>
-          <input type="date" id="date">
-        </div>
-      </div>
-      
-      <label>Job Type</label>
-      <select id="job-type">
-        <option value="">Select job type...</option>
-        <option value="maintenance">Maintenance</option>
-        <option value="repair">Repair</option>
-        <option value="diagnostic">Diagnostic</option>
-        <option value="emergency">Emergency</option>
-      </select>
-      
-      <label>Customer Complaint</label>
-      <div class="voice-wrapper">
-        <textarea id="complaint" placeholder="What's the issue? (in customer's words)" rows="3"></textarea>
-        <button class="voice-btn" data-voice="complaint">🎤</button>
-      </div>
-    </div>
-    
-    <!-- On-Site Time Tracking -->
-    <div class="card">
-      <div class="card-header">
-        <span>⏱️ Time Tracking</span>
-      </div>
-      
-      <div class="grid-2">
-        <div>
-          <label>Arrival Time</label>
-          <input type="time" id="arrival-time">
-        </div>
-        <div>
-          <label>Completion Time</label>
-          <input type="time" id="completion-time" onchange="calculateLaborHours()">
-        </div>
-      </div>
-      
-      <div class="grid-2">
-        <div>
-          <label>Travel Time (minutes)</label>
-          <input type="number" id="travel-time" min="0" step="5">
-        </div>
-        <div>
-          <label>Total Labor Hours (auto)</label>
-          <input type="text" id="total-hours" readonly>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Equipment Section -->
-    <div class="card">
-      <div class="card-header">
-        <span>⚙️ Equipment</span>
-      </div>
-
-      <!-- Heat/Cool Toggle -->
-      <div class="mode-toggle" style="grid-template-columns: 1fr 1fr; margin-bottom: 12px;">
-        <button onclick="setHeatCoolMode('cooling')" id="btn-hc-cooling" class="active secondary">❄️ Cooling</button>
-        <button onclick="setHeatCoolMode('heating')" id="btn-hc-heating" class="secondary">🔥 Heating</button>
-      </div>
-      
-      <label>Unit Type</label>
-      <select id="unit-type" onchange="toggleUnitData()">
-          <option value="">Select unit type...</option>
-          <option value="split">Split System</option>
-          <option value="package">Package Unit</option>
-          <option value="minisplit">Mini-Split</option>
-          <option value="heatpump">Heat Pump</option>
-      </select>
-      
-      <label for="brand">Brand</label>
-      <select id="brand">
-        <option value="">Select brand...</option>
-        <option value="Carrier">Carrier</option>
-        <option value="Trane">Trane</option>
-        <option value="Lennox">Lennox</option>
-        <option value="Rheem">Rheem</option>
-        <option value="Goodman">Goodman</option>
-        <option value="York">York</option>
-        <option value="American Standard">American Standard</option>
-        <option value="Bryant">Bryant</option>
-        <option value="Daikin">Daikin</option>
-        <option value="Mitsubishi">Mitsubishi</option>
-        <option value="Other">Other</option>
-      </select>
-      
-      <div id="indoor-unit-fields" class="mt-8">
-          <label>Indoor Unit Data (Nameplate)</label>
-          <div class="voice-wrapper mb-8">
-              <input type="text" id="indoor-data" placeholder="Model/Serial/Tonnage">
-              <button class="voice-btn" data-voice="indoor-data">🎤</button>
-          </div>
-      </div>
-
-      <div id="outdoor-unit-fields">
-          <label>Outdoor Unit Data (Nameplate)</label>
-          <div class="voice-wrapper mb-8">
-              <input type="text" id="outdoor-data" placeholder="Model/Serial/SEER-BTU">
-              <button class="voice-btn" data-voice="outdoor-data">🎤</button>
-          </div>
-      </div>
-      
-      <div class="grid-2">
-        <div>
-          <label for="tonnage">System Tonnage</label>
-          <select id="tonnage">
-            <option value="">Select...</option>
-            <option value="1.5">1.5 Ton</option>
-            <option value="2">2 Ton</option>
-            <option value="2.5">2.5 Ton</option>
-            <option value="3">3 Ton</option>
-            <option value="3.5">3.5 Ton</option>
-            <option value="4">4 Ton</option>
-            <option value="5">5 Ton</option>
-          </select>
-        </div>
-        <div>
-          <label for="refrigerant">Refrigerant Type</label>
-          <select id="refrigerant" onchange="clearRefrigerantCalculations()">
-            <option value="">Select...</option>
-            <option value="R-410A">R-410A</option>
-            <option value="R-22">R-22 (Legacy)</option>
-            <option value="R-32">R-32</option>
-            <option value="R-454B">R-454B (A2L)</option>
-          </select>
-        </div>
-      </div>
-      
-      <label for="mfg-date">Manufacture Date</label>
-      <input type="date" id="mfg-date" onchange="calculateAge()">
-      <div id="equipment-age" class="text-muted"></div>
-    </div>
-    
-    <!-- Materials & Parts Used -->
-    <div class="section" id="section-materials-service">
-      <button class="section-toggle" onclick="toggleSection('section-materials-service')">
-        <span>🔧 Parts & Materials Used</span>
-        <span class="arrow">▼</span>
-      </button>
-      <div class="section-content">
-        <label>Refrigerant</label>
-        <div class="grid-2">
-          <select id="refrigerant-added-type">
-            <option value="">Type...</option>
-            <option value="R-410A">R-410A</option>
-            <option value="R-22">R-22</option>
-            <option value="R-32">R-32</option>
-            <option value="R-454B">R-454B</option>
-          </select>
-          <input type="text" id="refrigerant-amount" placeholder="Amount (lbs/oz)">
-        </div>
-        <input type="text" id="refrigerant-recovered" placeholder="Amount Recovered (if any)">
-        
-        <label>Filter Replaced</label>
-        <div class="grid-2">
-          <select id="filter-size">
-            <option value="">Size...</option>
-            <option value="16x25x1">16x25x1</option>
-            <option value="20x25x1">20x25x1</option>
-            <option value="20x25x4">20x25x4 (Media)</option>
-            <option value="other">Other Size</option>
-          </select>
-          <select id="filter-merv">
-            <option value="">MERV...</option>
-            <option value="8">MERV 8</option>
-            <option value="11">MERV 11</option>
-            <option value="13">MERV 13</option>
-          </select>
-        </div>
-        
-        <label>Capacitor Replaced</label>
-        <div class="grid-2">
-          <select id="capacitor-type">
-            <option value="">Type...</option>
-            <option value="dual-35/5">Dual 35/5µF</option>
-            <option value="dual-40/5">Dual 40/5µF</option>
-            <option value="dual-45/5">Dual 45/5µF</option>
-            <option value="other">Other Rating</option>
-          </select>
-          <input type="number" id="capacitor-qty" placeholder="Qty" min="0" value="0">
-        </div>
-        
-        <label>Contactor Replaced</label>
-        <div class="grid-2">
-          <select id="contactor-rating">
-            <option value="">Rating...</option>
-            <option value="30A-2P">30A Double Pole</option>
-            <option value="40A-2P">40A Double Pole</option>
-            <option value="other">Other Rating</option>
-          </select>
-          <input type="number" id="contactor-qty" placeholder="Qty" min="0" value="0">
-        </div>
-        
-        <label>Other Parts Used</label>
-        <textarea id="other-parts" rows="3" placeholder="List any other materials: fuses, relays, transformers, etc."></textarea>
-      </div>
-    </div>
-    
-    <!-- Full Diagnostic Measurements -->
-    <div class="section" id="section-service-diagnostics">
-      <button class="section-toggle" onclick="toggleSection('section-service-diagnostics')">
-        <span>📊 Full Diagnostic Measurements</span>
-        <span class="arrow">▼</span>
-      </button>
-      <div class="section-content">
-        <div class="status info">
-          <span>ℹ️</span>
-          <span>Diagnostic Method: Power → Airflow → Electrical → Refrigerant → Controls</span>
-        </div>
-        
-        <div class="card-subheader">General Readings</div>
-        <div class="grid-2">
-          <div><label>Outdoor Temp (°F)</label><input type="number" id="outdoor-temp" step="0.1"></div>
-          <div><label>Outdoor Humidity (%)</label><input type="number" id="outdoor-humidity" min="0" max="100"></div>
-        </div>
-        <div class="grid-2">
-          <div><label>Return Air (°F)</label><input type="number" id="return-temp" step="0.1" oninput="calcDelta()"></div>
-          <div><label>Supply Air (°F)</label><input type="number" id="supply-temp" step="0.1" oninput="calcDelta()"></div>
-        </div>
-        <div class="grid-2">
-          <div><label>Return Static (in w.c.)</label><input type="number" id="return-static" step="0.01" oninput="calcStatic()"></div>
-          <div><label>Supply Static (in w.c.)</label><input type="number" id="supply-static" step="0.01" oninput="calcStatic()"></div>
-        </div>
-        <div class="grid-2 mb-8">
-          <div><label>Delta T (auto)</label><input type="text" id="delta-t" readonly></div>
-          <div><label>Total Static (auto)</label><input type="text" id="total-static" readonly></div>
-        </div>
-        <div id="delta-status"></div>
-        <div id="static-status"></div>
-        
-        <div class="card-subheader mt-16">Electrical Measurements</div>
-        <div class="grid-2">
-          <div><label>Voltage L1-L2</label><input type="number" id="voltage-line" step="0.1" oninput="validateVoltage()"></div>
-          <div><label>Control Voltage (24V)</label><input type="number" id="control-voltage" step="0.1"></div>
-        </div>
-        <div id="voltage-status"></div>
-        
-        <div class="grid-2 mt-8">
-          <div><label>Blower Amps</label><input type="text" id="blower-amps" placeholder="Actual/Rated"></div>
-          <div class="cooling-only"><label>Compressor Amps</label><input type="text" id="comp-amps" placeholder="Actual/Rated"></div>
-          <div class="heating-only"><label>Inducer Amps</label><input type="number" id="inducer-amps" step="0.1"></div>
-        </div>
-        
-        <div class="cooling-only">
-          <div class="card-subheader mt-16">Refrigerant Circuit</div>
-          <div class="grid-2">
-            <div><label>Suction P (psig)</label><input type="number" id="suction-pressure" step="0.1" oninput="calcRefrigerant()"></div>
-            <div><label>Liquid P (psig)</label><input type="number" id="liquid-pressure" step="0.1" oninput="calcRefrigerant()"></div>
-          </div>
-          <div class="grid-2">
-            <div><label>Suction T (°F)</label><input type="number" id="suction-temp" step="0.1" oninput="calcRefrigerant()"></div>
-            <div><label>Liquid T (°F)</label><input type="number" id="liquid-temp" step="0.1" oninput="calcRefrigerant()"></div>
-          </div>
-          <div class="grid-2 mt-8">
-              <div><label>Superheat (auto)</label><input type="text" id="superheat" readonly></div>
-              <div><label>Subcool (auto)</label><input type="text" id="subcool" readonly></div>
-          </div>
-          <div id="superheat-status"></div>
-          <div id="subcool-status"></div>
-        </div>
-        
-        <div class="heating-only">
-          <div class="card-subheader mt-16">Heating Circuit</div>
-          <div class="grid-2">
-            <div><label>Heat Exchanger</label>
-              <select id="heat-exchanger">
-                <option value="">Inspect...</option>
-                <option value="clean">Clean - OK</option>
-                <option value="sooted">Sooted</option>
-                <option value="cracked">Cracked - DANGER</option>
-              </select>
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="subtitle">Mechanical Solutions</div>
+                <h1>Precision, Trust & Technical Discipline</h1>
+                <p>We deliver HVAC service through verified logic, not guesswork. Every diagnostic decision follows a methodical sequence. No shortcuts. No assumptions. Just engineering excellence.</p>
+                <div class="cta-buttons">
+                    <a href="#contact" class="btn btn-primary">Schedule Service</a>
+                    <a href="#values" class="btn btn-secondary">Our Approach</a>
+                </div>
             </div>
-            <div><label>Flame Appearance</label>
-              <select id="flame-appearance">
-                <option value="">Inspect...</option>
-                <option value="blue">Blue - Normal</option>
-                <option value="yellow">Yellow - Incomplete Combustion</option>
-                <option value="lazy">Lazy/Rolling</option>
-              </select>
+            <div class="hero-visual">
+                <div class="icon-container">
+                    <div class="dual-icon">
+                        <div class="connecting-line"></div>
+                        <div class="icon-circle icon-cold">❄️</div>
+                        <div class="icon-circle icon-hot">🔥</div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
-    
-    <!-- Component Inspection & Safety -->
-    <div class="section" id="section-service-component">
-      <button class="section-toggle" onclick="toggleSection('section-service-component')">
-        <span>🔍 Component Inspection & Safety</span>
-        <span class="arrow">▼</span>
-      </button>
-      <div class="section-content">
-        <div class="card-subheader">Safety Checklist</div>
-        <div class="grid-2">
-          <label class="check"><input type="checkbox" id="safety-disconnect"> Disconnect present & functional</label>
-          <label class="check"><input type="checkbox" id="safety-clearances"> Clearances adequate</label>
-          <label class="check"><input type="checkbox" id="safety-drain"> Drain trapped & flowing</label>
-          <label class="check"><input type="checkbox" id="safety-floats"> Float switches tested</label>
+    </section>
+
+    <section id="services" class="services">
+        <div class="section-header">
+            <div class="section-label">What We Do</div>
+            <h2>Complete Mechanical Solutions</h2>
+            <p>Professional heating, cooling, and maintenance services designed to reduce downtime and extend system lifespan.</p>
         </div>
-        <div class="heating-only grid-2">
-          <label class="check"><input type="checkbox" id="safety-gas"> Gas piping OK</label>
-          <label class="check"><input type="checkbox" id="safety-vent"> Vent termination secure</label>
-          <label class="check"><input type="checkbox" id="safety-co"> No CO detected</label>
-          <label class="check"><input type="checkbox" id="safety-flame-sensor"> Flame sensor clean</label>
-        </div>
-        
-        <div class="card-subheader mt-16">Component Health</div>
-        <label>Filter Condition</label>
-        <div class="voice-wrapper">
-          <input type="text" id="filter" placeholder="Size and condition (e.g., 16x25x1 - Light Dust)">
-          <button class="voice-btn" data-voice="filter">🎤</button>
-        </div>
-        
-        <div class="grid-2">
-          <div>
-            <label>Evaporator Coil</label>
-            <select id="evap-coil">
-              <option value="">Evap coil condition...</option>
-              <option value="clean">Clean</option>
-              <option value="light-dust">Light dust</option>
-              <option value="restricted">Restricted - needs cleaning</option>
-              <option value="frozen">Frozen</option>
-              <option value="corroded">Corroded</option>
-              <option value="leaking">Leaking</option>
-            </select>
-          </div>
-          <div>
-            <label>Condenser Coil</label>
-            <select id="cond-coil">
-              <option value="">Cond coil condition...</option>
-              <option value="clean">Clean</option>
-              <option value="light-debris">Light debris</option>
-              <option value="restricted">Restricted - needs cleaning</option>
-              <option value="bent-fins">Bent fins</option>
-              <option value="corroded">Corroded</option>
-            </select>
-          </div>
-        </div>
-        
-        <div class="grid-2">
-          <div>
-            <label>Capacitor (µF)</label>
-            <div class="voice-wrapper">
-              <input type="text" id="capacitor-reading" placeholder="Actual/Rated µF">
-              <button class="voice-btn" data-voice="capacitor-reading">🎤</button>
+        <div class="services-grid">
+            <div class="service-card">
+                <span class="service-icon">❄️</span>
+                <h3>Commercial Cooling</h3>
+                <p>Precision diagnostics and repair for commercial refrigeration and air conditioning systems. We verify airflow, refrigerant charge, and electrical integrity on every service call.</p>
             </div>
-          </div>
-          <div>
-            <label>Contactor</label>
-            <select id="contactor-condition">
-              <option value="">Contactor condition...</option>
-              <option value="excellent">Good - clean contacts</option>
-              <option value="light-pitting">Light pitting</option>
-              <option value="heavy-pitting">Heavy pitting - recommend replacement</option>
-              <option value="burned">Burned/welded</option>
-            </select>
-          </div>
-        </div>
-        
-        <label>Blower Motor Condition</label>
-        <select id="blower-condition">
-          <option value="">Blower condition...</option>
-          <option value="clean-quiet">Clean, runs quietly</option>
-          <option value="dusty">Dusty but functional</option>
-          <option value="noisy">Noisy - bearings worn</option>
-          <option value="struggling">Struggling to start</option>
-          <option value="failed">Failed/not running</option>
-        </select>
-      </div>
-    </div>
-    
-    <!-- Final Review -->
-    <div class="card">
-      <div class="card-header">
-        <span>📝 Final Review & Findings</span>
-      </div>
-      
-      <label>Primary Findings Summary</label>
-      <div class="voice-wrapper">
-          <textarea id="findings" placeholder="What's wrong and why - be specific" rows="3"></textarea>
-          <button class="voice-btn" data-voice="findings">🎤</button>
-      </div>
-      
-      <label>Repair Recommendations</label>
-      <div class="voice-wrapper">
-          <textarea id="recommendations" placeholder="Repair options and next steps" rows="3"></textarea>
-          <button class="voice-btn" data-voice="recommendations">🎤</button>
-      </div>
-
-      <label>Work Performed Today</label>
-      <div class="voice-wrapper">
-          <textarea id="work-performed" placeholder="What was done during this service call" rows="2"></textarea>
-          <button class="voice-btn" data-voice="work-performed">🎤</button>
-      </div>
-    </div>
-    
-  </div>
-
-  <!-- ==================== MATERIALS MODE ==================== -->
-  <div class="materials-only">
-    
-    <!-- Materials Job Info -->
-    <div class="card">
-      <div class="card-header">
-        <span>📋 Materials Job Info</span>
-      </div>
-      
-      <label for="mat-customer">Customer/Job Name</label>
-      <input type="text" id="mat-customer" placeholder="Enter customer or job identifier">
-      
-      <label for="mat-address">Job Address</label>
-      <input type="text" id="mat-address" placeholder="Installation address">
-      
-      <div class="grid-2">
-        <div>
-          <label for="mat-tech">Technician</label>
-          <input type="text" id="mat-tech" placeholder="Your name">
-        </div>
-        <div>
-          <label for="mat-date">Date</label>
-          <input type="date" id="mat-date">
-        </div>
-      </div>
-      
-      <label for="mat-notes">Job Notes</label>
-      <textarea id="mat-notes" rows="2" placeholder="Special requirements, access notes, etc."></textarea>
-    </div>
-    
-    <!-- Smart Suggestions -->
-    <div id="suggestions-container" class="hidden">
-      <div class="card">
-        <div class="card-header">
-          <span>💡 Smart Suggestions</span>
-        </div>
-        <div class="status info">
-          <span>ℹ️</span>
-          <span>Based on your selections, you may need these items</span>
-        </div>
-        <div id="suggestions-list"></div>
-      </div>
-    </div>
-    
-    <!-- Materials Selection -->
-    <div class="card">
-      <div class="card-header">
-        <span>🛠️ Add Materials</span>
-      </div>
-      
-      <label>Select Category</label>
-      <select id="material-category" onchange="updateMaterialsList()">
-        <option value="">Choose a category...</option>
-        <option value="equipment">Equipment</option>
-        <option value="ductwork">Ductwork & Fittings</option>
-        <option value="refrigerant">Refrigerant & Line Sets</option>
-        <option value="electrical">Electrical</option>
-        <option value="iaq">IAQ & Filtration</option>
-        <option value="venting">Venting (Gas/Oil)</option>
-        <option value="drainage">Drainage</option>
-        <option value="consumables">Consumables & Supplies</option>
-      </select>
-      
-      <div id="materials-catalog-container" class="material-catalog mt-8"></div>
-    </div>
-    
-    <!-- Selected Materials List -->
-    <div class="card">
-      <div class="card-header">
-        <span>📝 Materials List</span>
-        <span id="total-items-badge" class="text-muted">0 items</span>
-      </div>
-      
-      <div id="selected-materials-list">
-        <div class="text-muted" style="text-align: center; padding: 20px;">
-          No materials selected yet. Add items from the catalog above.
-        </div>
-      </div>
-    </div>
-    
-  </div>
-
-  <!-- GLOBAL: Photo Documentation -->
-  <div class="card">
-    <div class="card-header">
-      <span>📸 Photo Documentation</span>
-    </div>
-    
-    <div class="status info">
-      <span>📷</span>
-      <span>Take photos: Nameplate, before/after, problem areas, materials needed</span>
-    </div>
-
-    <div class="grid-4">
-      <button onclick="takePhoto('Nameplate')" class="secondary small">📷 Nameplate</button>
-      <button onclick="takePhoto('Problem')" class="secondary small">📷 Problem</button>
-      <button onclick="takePhoto('Before')" class="secondary small">📷 Before</button>
-      <button onclick="takePhoto('After')" class="secondary small">📷 After</button>
-      <button onclick="takePhoto('Electrical')" class="secondary small">📷 Electrical</button>
-      <button onclick="takePhoto('Coils')" class="secondary small">📷 Coils</button>
-      <button onclick="takePhoto('Materials')" class="secondary small">📷 Materials</button>
-      <button onclick="takePhoto('Other')" class="secondary small">📷 Other</button>
-    </div>
-    <div class="photo-grid" id="photo-preview"></div>
-  </div>
-
-  <!-- GLOBAL: Signature -->
-  <div class="card">
-    <div class="card-header">
-      <span>✍️ Signature</span>
-    </div>
-    
-    <div class="grid-2">
-      <div>
-        <label for="tech-name">Technician Name</label>
-        <input type="text" id="tech-name" placeholder="Your name">
-      </div>
-      <div>
-        <label for="customer-signature">Customer Signature</label>
-        <input type="text" id="customer-signature" placeholder="Customer name">
-      </div>
-    </div>
-  </div>
-
-  <!-- GLOBAL: Sticky Action Bar -->
-  <div class="actions">
-    <button class="success" onclick="generate()" id="generate-btn">
-      <span>✓</span> Generate
-    </button>
-    <button class="warning" onclick="exportReport()">
-      <span>📤</span> Export
-    </button>
-    <button class="danger" onclick="clearForm()">
-      <span>✕</span> Clear
-    </button>
-  </div>
-  
-  <!-- GLOBAL: Modal & Toast -->
-  <div class="modal-overlay" id="modal-container">
-    <div class="modal-content">
-      <div class="modal-title" id="modal-title">Confirmation</div>
-      <div class="modal-body" id="modal-body">Are you sure?</div>
-      <div class="modal-actions">
-        <button class="secondary" id="modal-cancel">Cancel</button>
-        <button class="danger" id="modal-confirm">Confirm</button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="toast-notification" id="toast-notification">
-    Message here
-  </div>
-
-  <script>
-    // ==================== GLOBAL STATE ====================
-    const $ = (id) => document.getElementById(id);
-    const num = val => { const n = parseFloat(val); return isNaN(n) ? null : n; };
-    
-    let currentMode = 'service';
-    let heatCoolMode = 'cooling';
-    let photos = [];
-    let selectedMaterials = [];
-    
-    // Materials Catalog (NO PRICING)
-    const materialsCatalog = {
-      equipment: {
-        name: 'Equipment',
-        items: [
-          { id: 'furnace-gas', name: 'Gas Furnace', sizes: ['60K BTU', '80K BTU', '100K BTU', '120K BTU'], category: 'furnace' },
-          { id: 'furnace-electric', name: 'Electric Furnace', sizes: ['10kW', '15kW', '20kW', '25kW'], category: 'furnace' },
-          { id: 'ac-unit', name: 'Air Conditioner', sizes: ['1.5 Ton', '2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton', '5 Ton'], category: 'cooling', tonnage: true },
-          { id: 'heat-pump', name: 'Heat Pump', sizes: ['2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton', '5 Ton'], category: 'cooling', tonnage: true },
-          { id: 'evap-coil', name: 'Evaporator Coil', sizes: ['2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton', '5 Ton'], category: 'cooling', tonnage: true },
-          { id: 'air-handler', name: 'Air Handler', sizes: ['2 Ton', '2.5 Ton', '3 Ton', '3.5 Ton', '4 Ton'], category: 'cooling' },
-          { id: 'package-unit', name: 'Package Unit', sizes: ['2 Ton', '3 Ton', '4 Ton', '5 Ton'], category: 'cooling', tonnage: true }
-        ]
-      },
-      ductwork: {
-        name: 'Ductwork & Fittings',
-        items: [
-          { id: 'trunk-duct', name: 'Trunk Duct (Rectangular)', sizes: ['12x8', '14x8', '16x8', '18x10', '20x10', '24x12'], unit: 'ft' },
-          { id: 'flex-duct', name: 'Flexible Duct', sizes: ['4"', '5"', '6"', '7"', '8"', '10"', '12"'], unit: 'ft' },
-          { id: 'plenum-supply', name: 'Supply Plenum', sizes: ['16x20', '18x24', '20x24', '24x24'] },
-          { id: 'plenum-return', name: 'Return Plenum', sizes: ['16x20', '18x24', '20x24', '24x24'] },
-          { id: 'collar', name: 'Starting Collar', sizes: ['4"', '5"', '6"', '7"', '8"', '10"', '12"'] },
-          { id: 'register', name: 'Supply Register', sizes: ['4x10', '4x12', '6x10', '6x12', '8x10', '10x10'] },
-          { id: 'grille', name: 'Return Grille', sizes: ['10x10', '12x12', '14x14', '16x16', '20x20', '24x24'] },
-          { id: 'damper', name: 'Balancing Damper', sizes: ['4"', '6"', '8"', '10"', '12"'] },
-          { id: 'transition', name: 'Transition', sizes: ['Various'] },
-          { id: 'elbow-90', name: '90° Elbow', sizes: ['6"', '8"', '10"', '12"'] }
-        ]
-      },
-      refrigerant: {
-        name: 'Refrigerant & Line Sets',
-        items: [
-          { id: 'lineset-small', name: 'Line Set (1.5-2.5 Ton)', sizes: ['15 ft', '25 ft', '35 ft', '50 ft'], spec: '1/4" x 3/8"', tonnageRange: [1.5, 2.5] },
-          { id: 'lineset-medium', name: 'Line Set (3-3.5 Ton)', sizes: ['15 ft', '25 ft', '35 ft', '50 ft'], spec: '3/8" x 3/4"', tonnageRange: [3, 3.5] },
-          { id: 'lineset-large', name: 'Line Set (4-5 Ton)', sizes: ['15 ft', '25 ft', '35 ft', '50 ft'], spec: '3/8" x 7/8"', tonnageRange: [4, 5] },
-          { id: 'r410a', name: 'R-410A Refrigerant', sizes: ['25 lb', '50 lb'], unit: 'cylinder' },
-          { id: 'r32', name: 'R-32 Refrigerant', sizes: ['20 lb'], unit: 'cylinder' },
-          { id: 'nitrogen', name: 'Nitrogen (Pressure Test)', sizes: ['Small', 'Large'], unit: 'tank' },
-          { id: 'linecover', name: 'Line Set Cover/Insulation', sizes: ['15 ft', '25 ft', '50 ft'] }
-        ]
-      },
-      electrical: {
-        name: 'Electrical',
-        items: [
-          { id: 'disconnect-30', name: 'Disconnect Box (30A)', sizes: ['30A'], amperage: 30 },
-          { id: 'disconnect-60', name: 'Disconnect Box (60A)', sizes: ['60A'], amperage: 60 },
-          { id: 'whip', name: 'Electrical Whip', sizes: ['3 ft', '6 ft', '10 ft'] },
-          { id: 'breaker', name: 'Circuit Breaker', sizes: ['15A', '20A', '30A', '40A', '50A', '60A'] },
-          { id: 'wire-lv', name: 'Low Voltage Wire (18ga)', sizes: ['18/5', '18/8'], unit: 'ft' },
-          { id: 'wire-hv', name: 'High Voltage Wire', sizes: ['10/2', '10/3', '8/2', '8/3', '6/2', '6/3'], unit: 'ft' },
-          { id: 'condensate-switch', name: 'Condensate Safety Switch', sizes: ['Standard'] },
-          { id: 'relay', name: 'Relay', sizes: ['24V', '120V', '240V'] },
-          { id: 'capacitor', name: 'Capacitor', sizes: ['5µF', '7.5µF', '10µF', '15µF', '20µF', '25µF', '30µF', '35µF', '40µF', '45µF', '50µF'] },
-          { id: 'contactor', name: 'Contactor', sizes: ['1-Pole', '2-Pole', '3-Pole'] }
-        ]
-      },
-      iaq: {
-        name: 'IAQ & Filtration',
-        items: [
-          { id: 'media-cleaner', name: 'Media Air Cleaner', sizes: ['16x25', '20x25', '20x20'] },
-          { id: 'electronic-cleaner', name: 'Electronic Air Cleaner', sizes: ['16x25', '20x25'] },
-          { id: 'hepa-filter', name: 'HEPA Filter Box', sizes: ['Standard'] },
-          { id: 'humidifier', name: 'Whole-Home Humidifier', sizes: ['Bypass', 'Fan-Powered', 'Steam'] },
-          { id: 'dehumidifier', name: 'Whole-Home Dehumidifier', sizes: ['90 Pint', '120 Pint', '150 Pint'] },
-          { id: 'uv-light', name: 'UV Light System', sizes: ['Single Lamp', 'Dual Lamp'] },
-          { id: 'erv', name: 'ERV System', sizes: ['100 CFM', '150 CFM', '200 CFM'] },
-          { id: 'hrv', name: 'HRV System', sizes: ['100 CFM', '150 CFM', '200 CFM'] },
-          { id: 'reme-halo', name: 'REME HALO Air Purifier', sizes: ['24V'] }
-        ]
-      },
-      venting: {
-        name: 'Venting (Gas/Oil)',
-        items: [
-          { id: 'bvent', name: 'B-Vent Pipe', sizes: ['3"', '4"', '5"', '6"', '7"'], unit: 'ft' },
-          { id: 'pvc-vent', name: 'PVC Vent Pipe', sizes: ['2"', '3"', '4"'], unit: 'ft' },
-          { id: 'vent-cap', name: 'Vent Cap/Termination', sizes: ['2"', '3"', '4"', '5"', '6"'] },
-          { id: 'vent-connector', name: 'Vent Connector', sizes: ['3"', '4"', '5"', '6"'] },
-          { id: 'vent-elbow', name: 'Vent Elbow (45°/90°)', sizes: ['2"', '3"', '4"', '5"'] },
-          { id: 'inducer', name: 'Inducer Motor', sizes: ['Standard', 'High Efficiency'] }
-        ]
-      },
-      drainage: {
-        name: 'Drainage',
-        items: [
-          { id: 'condensate-pump', name: 'Condensate Pump', sizes: ['Standard', 'Heavy Duty'] },
-          { id: 'drain-pvc', name: 'PVC Drain Pipe (3/4")', sizes: ['10 ft', '20 ft'], unit: 'length' },
-          { id: 'drain-pan', name: 'Drain Pan', sizes: ['Primary', 'Secondary', 'Auxiliary'] },
-          { id: 'ptrap', name: 'P-Trap', sizes: ['3/4"', '1"'] },
-          { id: 'float-switch', name: 'Float Switch', sizes: ['Standard'] },
-          { id: 'drain-fitting', name: 'Drain Fittings Kit', sizes: ['Standard'] }
-        ]
-      },
-      consumables: {
-        name: 'Consumables & Supplies',
-        items: [
-          { id: 'mastic', name: 'Duct Mastic', sizes: ['1 Gallon', '5 Gallon'] },
-          { id: 'foil-tape', name: 'Foil Tape', sizes: ['2"', '3"'], unit: 'roll' },
-          { id: 'duct-tape', name: 'Duct Tape', sizes: ['Standard'], unit: 'roll' },
-          { id: 'screws-tap', name: 'Self-Tapping Screws', sizes: ['#8 x 1/2"', '#10 x 3/4"', '#12 x 1"'], unit: 'box' },
-          { id: 'screws-sheet', name: 'Sheet Metal Screws', sizes: ['#8', '#10'], unit: 'box' },
-          { id: 'hangers', name: 'Duct Hangers/Strapping', sizes: ['Standard'], unit: 'roll' },
-          { id: 'insulation-duct', name: 'Duct Insulation', sizes: ['R-6', 'R-8'], unit: 'roll' },
-          { id: 'insulation-pipe', name: 'Pipe Insulation', sizes: ['1/4"', '3/8"', '1/2"', '3/4"'], unit: 'ft' },
-          { id: 'refrig-oil', name: 'Refrigerant Oil', sizes: ['8 oz', '16 oz'] },
-          { id: 'leak-seal', name: 'Leak Sealant', sizes: ['Standard'] },
-          { id: 'cleaning', name: 'Coil Cleaner', sizes: ['Aerosol', '1 Gallon'] },
-          { id: 'wire-nuts', name: 'Wire Nuts Assortment', sizes: ['Standard'], unit: 'pack' },
-          { id: 'zip-ties', name: 'Zip Ties', sizes: ['Assorted'], unit: 'pack' }
-        ]
-      }
-    };
-    
-    // Enhanced R-410A PT chart
-    const R410A_PT = {
-      90: 44.7, 95: 47.1, 100: 49.6, 105: 52.2, 110: 54.9, 115: 57.7,
-      120: 60.6, 125: 63.6, 130: 66.7, 135: 69.9, 140: 73.2, 145: 76.6,
-      150: 80.1, 155: 83.7, 160: 87.4, 165: 91.3, 170: 95.2, 175: 99.3,
-      180: 103.5, 185: 107.8, 190: 112.2, 195: 116.7, 200: 121.4, 205: 126.1,
-      210: 131.0, 215: 135.9, 220: 140.9
-    };
-    
-    // ==================== MODAL & TOAST ====================
-    const modalContainer = $('modal-container');
-    const modalTitle = $('modal-title');
-    const modalBody = $('modal-body');
-    
-    function showModal(title, message) {
-      return new Promise((resolve) => {
-        modalTitle.textContent = title;
-        modalBody.textContent = message;
-        
-        $('modal-confirm').onclick = () => {
-          modalContainer.classList.remove('visible');
-          resolve(true);
-        };
-        
-        $('modal-cancel').onclick = () => {
-          modalContainer.classList.remove('visible');
-          resolve(false);
-        };
-        
-        modalContainer.classList.add('visible');
-      });
-    }
-
-    function showToast(message, type = 'info') {
-      const toast = $('toast-notification');
-      toast.textContent = message;
-      toast.className = 'toast-notification';
-      if (type !== 'info') {
-        toast.classList.add(type);
-      }
-      
-      toast.classList.add('visible');
-      
-      setTimeout(() => {
-        toast.classList.remove('visible');
-      }, 2500);
-    }
-
-    // ==================== MODE SWITCHING ====================
-    function setMode(mode) {
-      currentMode = mode;
-      document.body.className = `mode-${mode}`;
-      
-      // Update mode toggle buttons
-      document.querySelectorAll('.mode-toggle button').forEach(btn => btn.classList.remove('active'));
-      $(`btn-${mode}`).classList.add('active');
-      
-      // Re-apply heat/cool mode for service
-      if (mode === 'service') {
-        setHeatCoolMode(heatCoolMode);
-      }
-      
-      // Update generate button text
-      const btnText = $('generate-btn');
-      if (mode === 'service') {
-        btnText.innerHTML = '<span>✓</span> Generate Service Report';
-      } else if (mode === 'materials') {
-        btnText.innerHTML = '<span>✓</span> Generate Materials List';
-      }
-    }
-    
-    function setHeatCoolMode(mode) {
-      heatCoolMode = mode;
-      
-      // Remove previous heat/cool classes
-      document.body.classList.remove('mode-cooling', 'mode-heating');
-      
-      // Add new heat/cool class if in service mode
-      if (document.body.classList.contains('mode-service')) {
-        document.body.classList.add(`mode-${mode}`);
-      }
-      
-      // Update buttons
-      $('btn-hc-cooling').className = mode === 'cooling' ? 'active secondary' : 'secondary';
-      $('btn-hc-heating').className = mode === 'heating' ? 'active secondary' : 'secondary';
-      
-      // Clear refrigerant calculations
-      calcDelta();
-      clearRefrigerantCalculations();
-    }
-    
-    function toggleUnitData() {
-      const type = $('unit-type').value;
-      if (type === 'minisplit' || type === 'package') {
-        $('indoor-data').placeholder = "Unit Data (All-in-one system)";
-        $('outdoor-unit-fields').classList.add('hidden');
-      } else {
-        $('indoor-data').placeholder = "Model/Serial/Tonnage";
-        $('outdoor-unit-fields').classList.remove('hidden');
-      }
-    }
-    
-    function toggleSection(sectionId) {
-      const section = $(sectionId);
-      if (section && section.classList.contains('section')) {
-        section.classList.toggle('open');
-      }
-    }
-
-    // ==================== CALCULATIONS ====================
-    function clearRefrigerantCalculations() {
-      const sh = $('superheat');
-      const sc = $('subcool');
-      const shStatus = $('superheat-status');
-      const scStatus = $('subcool-status');
-      
-      if (sh) sh.value = '';
-      if (sc) sc.value = '';
-      if (shStatus) shStatus.innerHTML = '';
-      if (scStatus) scStatus.innerHTML = '';
-    }
-    
-    function calcDelta() {
-      const ret = num($('return-temp').value);
-      const sup = num($('supply-temp').value);
-      if (ret === null || sup === null) return;
-      
-      const delta = heatCoolMode === 'cooling' ? ret - sup : sup - ret;
-      $('delta-t').value = delta.toFixed(1) + ' °F';
-      
-      const statusDiv = $('delta-status');
-      if (heatCoolMode === 'cooling') {
-        if (delta < 14) statusDiv.innerHTML = '<div class="status bad">⚠️ Low delta - check airflow or low charge</div>';
-        else if (delta >= 16 && delta <= 22) statusDiv.innerHTML = '<div class="status good">✓ Delta T in optimal range (16-22°F)</div>';
-        else if (delta > 24) statusDiv.innerHTML = '<div class="status bad">⚠️ High delta - possible restriction</div>';
-        else statusDiv.innerHTML = '<div class="status warn">⚠️ Delta T marginal - verify charge</div>';
-      } else {
-        if (delta < 25) statusDiv.innerHTML = '<div class="status bad">⚠️ Low rise - check gas input or airflow</div>';
-        else if (delta >= 30 && delta <= 80) statusDiv.innerHTML = '<div class="status good">✓ Temperature rise in range (30-80°F)</div>';
-        else if (delta > 90) statusDiv.innerHTML = '<div class="status bad">⚠️ Excessive rise - airflow restriction</div>';
-        else statusDiv.innerHTML = '<div class="status warn">⚠️ Temperature rise marginal</div>';
-      }
-    }
-    
-    function calcStatic() {
-      const ret = num($('return-static').value);
-      const sup = num($('supply-static').value);
-      if (ret === null || sup === null) return;
-      
-      const total = Math.abs(ret) + Math.abs(sup);
-      $('total-static').value = total.toFixed(2) + ' in w.c.';
-      
-      const statusDiv = $('static-status');
-      if (total <= 0.50) statusDiv.innerHTML = '<div class="status good">✓ Static pressure acceptable (≤0.50)</div>';
-      else if (total <= 0.70) statusDiv.innerHTML = '<div class="status warn">⚠️ Static elevated (0.50-0.70)</div>';
-      else statusDiv.innerHTML = '<div class="status bad">⚠️ Static excessive (>0.70) - duct issues likely</div>';
-    }
-    
-    function validateVoltage() {
-      const lineVoltage = num($('voltage-line').value);
-      if (!lineVoltage) return;
-      
-      const statusDiv = $('voltage-status');
-      if (lineVoltage < 200) statusDiv.innerHTML = '<div class="status bad">⚠️ Low voltage (<200V)</div>';
-      else if (lineVoltage > 250) statusDiv.innerHTML = '<div class="status bad">⚠️ High voltage (>250V)</div>';
-      else if (lineVoltage >= 208 && lineVoltage <= 240) statusDiv.innerHTML = '<div class="status good">✓ Voltage in acceptable range</div>';
-      else statusDiv.innerHTML = '<div class="status warn">⚠️ Voltage marginal</div>';
-    }
-    
-    function lookupSatTemp(psig) {
-      const refrigerant = $('refrigerant').value;
-      if (refrigerant !== 'R-410A') return null;
-      let closest = null, minDiff = Infinity;
-      for (let pressure in R410A_PT) {
-        const diff = Math.abs(pressure - psig);
-        if (diff < minDiff) { minDiff = diff; closest = R410A_PT[pressure]; }
-      }
-      return closest;
-    }
-    
-    function calcRefrigerant() {
-      const suctP = num($('suction-pressure').value);
-      const suctT = num($('suction-temp').value);
-      const liqP = num($('liquid-pressure').value);
-      const liqT = num($('liquid-temp').value);
-      
-      if (heatCoolMode !== 'cooling') return;
-
-      if (suctP && suctT) {
-        const satTemp = lookupSatTemp(suctP);
-        if (satTemp) {
-          const superheat = suctT - satTemp;
-          $('superheat').value = superheat.toFixed(1) + ' °F';
-          const statusDiv = $('superheat-status');
-          if (superheat < 5) statusDiv.innerHTML = '<div class="status bad">⚠️ Low SH (<5°F) - possible overcharge</div>';
-          else if (superheat >= 8 && superheat <= 18) statusDiv.innerHTML = '<div class="status good">✓ Superheat in target range (8-18°F)</div>';
-          else if (superheat > 25) statusDiv.innerHTML = '<div class="status bad">⚠️ High SH (>25°F) - possible undercharge</div>';
-          else statusDiv.innerHTML = '<div class="status warn">⚠️ Superheat marginal</div>';
-        }
-      }
-      
-      if (liqP && liqT) {
-        const satTemp = lookupSatTemp(liqP);
-        if (satTemp) {
-          const subcool = satTemp - liqT;
-          $('subcool').value = subcool.toFixed(1) + ' °F';
-          const statusDiv = $('subcool-status');
-          if (subcool < 5) statusDiv.innerHTML = '<div class="status bad">⚠️ Low SC (<5°F) - possible undercharge</div>';
-          else if (subcool >= 8 && subcool <= 15) statusDiv.innerHTML = '<div class="status good">✓ Subcool in target range (8-15°F)</div>';
-          else if (subcool > 20) statusDiv.innerHTML = '<div class="status bad">⚠️ High SC (>20°F) - possible overcharge</div>';
-          else statusDiv.innerHTML = '<div class="status warn">⚠️ Subcool marginal</div>';
-        }
-      }
-    }
-    
-    function calculateAge() {
-      const mfgDate = $('mfg-date').value;
-      if (!mfgDate) return;
-      const mfg = new Date(mfgDate);
-      const years = (Date.now() - mfg.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
-      $('equipment-age').textContent = `Equipment Age: ${years.toFixed(1)} years`;
-    }
-    
-    function calculateLaborHours() {
-      const arrival = $('arrival-time').value;
-      const completion = $('completion-time').value;
-      if (!arrival || !completion) return;
-      const arrivalDate = new Date(`2000-01-01T${arrival}`);
-      const completionDate = new Date(`2000-01-01T${completion}`);
-      let diffMs = completionDate - arrivalDate;
-      if (diffMs < 0) diffMs += 24 * 60 * 60 * 1000;
-      const hours = diffMs / (1000 * 60 * 60);
-      $('total-hours').value = hours.toFixed(2) + ' hours';
-    }
-    
-    // ==================== VOICE INPUT ====================
-    let recognition = null;
-    let currentVoiceTarget = null;
-    
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      
-      recognition.onresult = (e) => {
-        if (currentVoiceTarget && e.results[0]) {
-          const transcript = e.results[0][0].transcript;
-          currentVoiceTarget.value = transcript;
-          currentVoiceTarget.dispatchEvent(new Event('input'));
-          currentVoiceTarget.dispatchEvent(new Event('change'));
-        }
-      };
-      
-      recognition.onend = () => {
-        document.querySelectorAll('.voice-btn.listening').forEach(btn => {
-          btn.classList.remove('listening');
-        });
-      };
-      
-      recognition.onerror = (e) => {
-        console.error('Speech recognition error:', e.error);
-        showToast(`Voice Error: ${e.error}`, 'danger');
-        document.querySelectorAll('.voice-btn.listening').forEach(btn => {
-          btn.classList.remove('listening');
-        });
-      };
-    }
-    
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('voice-btn')) {
-        const targetId = e.target.dataset.voice;
-        currentVoiceTarget = $(targetId);
-        
-        if (recognition && currentVoiceTarget) {
-          try { recognition.stop(); } catch (err) {}
-          document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.remove('listening'));
-          e.target.classList.add('listening');
-          try {
-            recognition.start();
-          } catch (err) {
-            console.error('Could not start recognition:', err);
-            showToast('Voice input failed to start', 'danger');
-          }
-        } else if (!recognition) {
-          showToast('Voice input not supported on this device', 'danger');
-        }
-      }
-    });
-    
-    // ==================== PHOTOS ====================
-    function takePhoto(purpose) {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.capture = 'environment';
-      
-      input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          photos.push({
-            purpose: purpose,
-            data: event.target.result,
-            timestamp: new Date().toISOString(),
-            id: Date.now()
-          });
-          updatePhotoPreview();
-        };
-        reader.readAsDataURL(file);
-      };
-      
-      input.click();
-    }
-    
-    async function deletePhoto(photoId) {
-      const confirmed = await showModal('Delete Photo', 'Are you sure you want to delete this photo?');
-      if (confirmed) {
-        photos = photos.filter(p => p.id !== photoId);
-        updatePhotoPreview();
-      }
-    }
-    
-    function updatePhotoPreview() {
-      $('photo-preview').innerHTML = photos.map(p => 
-        `<div class="photo-item">
-            <img src="${p.data}" alt="${p.purpose}">
-            <div class="photo-label">${p.purpose}</div>
-            <button class="photo-delete" onclick="deletePhoto(${p.id})">×</button>
-        </div>`
-      ).join('');
-    }
-    
-    // ==================== MATERIALS MANAGEMENT ====================
-    
-    function updateMaterialsList() {
-      const category = $('material-category').value;
-      const container = $('materials-catalog-container');
-      
-      if (!category) {
-        container.innerHTML = '<div class="text-muted" style="padding: 20px; text-align: center;">Select a category to view materials</div>';
-        return;
-      }
-      
-      const catalogData = materialsCatalog[category];
-      if (!catalogData) return;
-      
-      container.innerHTML = catalogData.items.map(item => `
-        <div class="material-item">
-          <div class="material-item-info">
-            <div class="material-item-name">${item.name}</div>
-            <div class="material-item-spec">${item.sizes ? item.sizes.slice(0, 3).join(', ') + (item.sizes.length > 3 ? ' +more' : '') : 'Standard'}</div>
-          </div>
-          <button class="material-add-btn" onclick="addMaterial('${category}', '${item.id}')">+ Add</button>
-        </div>
-      `).join('');
-    }
-    
-    function addMaterial(category, itemId) {
-      const catalogData = materialsCatalog[category];
-      const item = catalogData.items.find(i => i.id === itemId);
-      if (!item) return;
-      
-      const materialId = `mat-${Date.now()}-${Math.random()}`;
-      selectedMaterials.push({
-        id: materialId,
-        itemId: item.id,
-        category: catalogData.name,
-        name: item.name,
-        size: item.sizes ? item.sizes[0] : 'Standard',
-        sizes: item.sizes || ['Standard'],
-        spec: item.spec || null,
-        quantity: 1,
-        unit: item.unit || 'ea',
-        tonnage: item.tonnage || false,
-        tonnageRange: item.tonnageRange || null
-      });
-      
-      renderSelectedMaterials();
-      updateSuggestions();
-      showToast('Material added', 'success');
-    }
-    
-    function updateMaterialQuantity(id, qty) {
-      const material = selectedMaterials.find(m => m.id === id);
-      if (material) {
-        material.quantity = Math.max(1, parseInt(qty) || 1);
-        renderSelectedMaterials();
-      }
-    }
-    
-    function updateMaterialSize(id, size) {
-      const material = selectedMaterials.find(m => m.id === id);
-      if (material) {
-        material.size = size;
-        renderSelectedMaterials();
-        updateSuggestions();
-      }
-    }
-    
-    function removeMaterial(id) {
-      selectedMaterials = selectedMaterials.filter(m => m.id !== id);
-      renderSelectedMaterials();
-      updateSuggestions();
-    }
-    
-    function renderSelectedMaterials() {
-      const container = $('selected-materials-list');
-      const totalBadge = $('total-items-badge');
-      
-      const totalItems = selectedMaterials.reduce((sum, m) => sum + m.quantity, 0);
-      totalBadge.textContent = `${totalItems} item${totalItems !== 1 ? 's' : ''}`;
-      
-      if (selectedMaterials.length === 0) {
-        container.innerHTML = '<div class="text-muted" style="text-align: center; padding: 20px;">No materials selected yet. Add items from the catalog above.</div>';
-        return;
-      }
-      
-      container.innerHTML = selectedMaterials.map(m => `
-        <div class="selected-material">
-          <div class="selected-material-header">
-            <div>
-              <div class="selected-material-title">${m.name}</div>
-              <div class="selected-material-category">${m.category}</div>
+            <div class="service-card">
+                <span class="service-icon">🔥</span>
+                <h3>Heating Systems</h3>
+                <p>Complete heating system service from rooftop units to furnaces. Power verification, control logic testing, and environmental assessment on every visit.</p>
             </div>
-            <button class="remove-btn" onclick="removeMaterial('${m.id}')">×</button>
-          </div>
-          <div class="selected-material-controls">
-            ${m.sizes.length > 1 ? `
-              <select style="flex: 1; margin: 0;" onchange="updateMaterialSize('${m.id}', this.value)">
-                ${m.sizes.map(size => `<option value="${size}" ${m.size === size ? 'selected' : ''}>${size}</option>`).join('')}
-              </select>
-            ` : `
-              <div style="flex: 1; font-size: 14px; color: #666;">${m.spec ? `${m.size} - ${m.spec}` : m.size}</div>
-            `}
-            <input type="number" min="1" value="${m.quantity}" class="qty-input" onchange="updateMaterialQuantity('${m.id}', this.value)">
-            <div style="min-width: 30px; font-size: 14px; color: #666;">${m.unit}</div>
-          </div>
+            <div class="service-card">
+                <span class="service-icon">⚙️</span>
+                <h3>Preventive Maintenance</h3>
+                <p>Structured maintenance protocols that prevent callbacks. Regular inspections following our FMS Diagnostic Method ensure systems operate at peak efficiency.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">🔧</span>
+                <h3>Emergency Service</h3>
+                <p>Rapid response with full diagnostic capability. We arrive prepared with the tools and knowledge to resolve issues on the first visit.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">📊</span>
+                <h3>System Analysis</h3>
+                <p>Comprehensive system evaluations with documented findings. Clear reporting that helps you make informed decisions about repairs and replacements.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">🎓</span>
+                <h3>Client Education</h3>
+                <p>We teach, not sell. Every service interaction includes clear explanations of what we found, why it matters, and what your options are.</p>
+            </div>
         </div>
-      `).join('');
-    }
-    
-    function getTonnageFromSize(sizeStr) {
-      const match = sizeStr.match(/(\d+\.?\d*)\s*Ton/i);
-      return match ? parseFloat(match[1]) : null;
-    }
-    
-    function updateSuggestions() {
-      const suggestions = [];
-      
-      // Check if cooling equipment selected
-      const coolingEquipment = selectedMaterials.find(m => m.tonnage);
-      
-      if (coolingEquipment) {
-        const tonnage = getTonnageFromSize(coolingEquipment.size);
-        
-        if (tonnage) {
-          // Suggest lineset
-          const hasLineset = selectedMaterials.some(m => m.itemId && m.itemId.includes('lineset'));
-          if (!hasLineset) {
-            let linesetId;
-            if (tonnage <= 2.5) linesetId = 'lineset-small';
-            else if (tonnage <= 3.5) linesetId = 'lineset-medium';
-            else linesetId = 'lineset-large';
-            
-            const linesetItem = materialsCatalog.refrigerant.items.find(i => i.id === linesetId);
-            if (linesetItem) {
-              suggestions.push({
-                category: 'refrigerant',
-                item: linesetItem,
-                reason: `Matches ${tonnage} ton system`
-              });
-            }
-          }
-          
-          // Suggest disconnect
-          const hasDisconnect = selectedMaterials.some(m => m.itemId && m.itemId.includes('disconnect'));
-          if (!hasDisconnect) {
-            const disconnectId = tonnage >= 4 ? 'disconnect-60' : 'disconnect-30';
-            const disconnectItem = materialsCatalog.electrical.items.find(i => i.id === disconnectId);
-            if (disconnectItem) {
-              suggestions.push({
-                category: 'electrical',
-                item: disconnectItem,
-                reason: `Required for ${tonnage} ton unit`
-              });
-            }
-          }
-        }
-      }
-      
-      // Check if any equipment selected
-      const hasEquipment = selectedMaterials.some(m => m.category === 'Equipment');
-      
-      if (hasEquipment) {
-        // Suggest plenum
-        const hasPlenum = selectedMaterials.some(m => m.name && m.name.includes('Plenum'));
-        if (!hasPlenum) {
-          const plenumItem = materialsCatalog.ductwork.items.find(i => i.id === 'plenum-supply');
-          if (plenumItem) {
-            suggestions.push({
-              category: 'ductwork',
-              item: plenumItem,
-              reason: 'Required for equipment installation'
+    </section>
+
+    <section id="values" class="values">
+        <div class="values-content">
+            <div class="values-text">
+                <div class="section-label">Our Foundation</div>
+                <h2>Built on Principles, Not Promises</h2>
+            </div>
+            <div class="values-list">
+                <div class="value-item">
+                    <h3>Clarity Over Chaos</h3>
+                    <p>Every communication—technical, verbal, or written—reduces confusion. We explain what we find in plain language backed by verified evidence.</p>
+                </div>
+                <div class="value-item">
+                    <h3>Honor in the Field</h3>
+                    <p>Professional appearance, disciplined process, and respectful conduct. We represent our trade with pride on every service call.</p>
+                </div>
+                <div class="value-item">
+                    <h3>Client Respect</h3>
+                    <p>Your time matters. Your space matters. We work efficiently, communicate clearly, and never use pressure sales tactics.</p>
+                </div>
+                <div class="value-item">
+                    <h3>Growth Through Precision</h3>
+                    <p>Every diagnostic follows a logic sequence: Power → Airflow → Electrical → Refrigerant → Controls → Environment. No shortcuts.</p>
+                </div>
+                <div class="value-item">
+                    <h3>Earned Trust</h3>
+                    <p>Trust isn't given—it's built through consistent performance, honest communication, and technical excellence.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="process" class="process">
+        <div class="section-header">
+            <div class="section-label">The FMS Method</div>
+            <h2>Our Diagnostic Process</h2>
+            <p>A systematic approach that ensures nothing is missed and everything is verified.</p>
+        </div>
+        <div class="process-timeline">
+            <div class="process-step">
+                <div class="step-number">
+                    <div class="number-circle">1</div>
+                </div>
+                <div class="step-content">
+                    <h3>Power Verification</h3>
+                    <p>We confirm voltage at source and load, verify disconnects and breaker behavior. Never test a system that isn't properly powered.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="step-number">
+                    <div class="number-circle">2</div>
+                </div>
+                <div class="step-content">
+                    <h3>Airflow Assessment</h3>
+                    <p>Filter condition, blower response, static pressure measurement. Proper airflow is essential before moving to refrigerant diagnostics.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="step-number">
+                    <div class="number-circle">3</div>
+                </div>
+                <div class="step-content">
+                    <h3>Electrical Testing</h3>
+                    <p>Capacitance verification, contactor integrity, amp draw under load. Visual inspection of terminals and all electrical connections.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="step-number">
+                    <div class="number-circle">4</div>
+                </div>
+                <div class="step-content">
+                    <h3>Refrigerant Analysis</h3>
+                    <p>Superheat and subcool measurements—not just pressure readings. We verify system charge and identify TXV behavior patterns.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="step-number">
+                    <div class="number-circle">5</div>
+                </div>
+                <div class="step-content">
+                    <h3>Controls & Environment</h3>
+                    <p>Thermostat logic verification, sensor validation, and environmental assessment. Site-specific factors that affect system performance.</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <div class="step-number">
+                    <div class="number-circle">6</div>
+                </div>
+                <div class="step-content">
+                    <h3>Final Verification</h3>
+                    <p>System operational under load, all readings documented, client educated on findings. Every service includes a complete verification sweep.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="section-label">Get In Touch</div>
+                <h2>Ready for Professional Service?</h2>
+                <p style="color: rgba(255, 255, 255, 0.6); margin-top: 1rem; line-height: 1.7;">Contact Martin Pérez and the Fidelity team for precision HVAC service. We're here to provide clear answers and professional solutions.</p>
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <div class="contact-item-text">
+                            <h3>Phone</h3>
+                            <p><a href="tel:713-201-2842">713-201-2842</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">✉️</div>
+                        <div class="contact-item-text">
+                            <h3>Email</h3>
+                            <p><a href="mailto:nvvtruelife@outlook.com">nvvtruelife@outlook.com</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon">🌐</div>
+                        <div class="contact-item-text">
+                            <h3>Website</h3>
+                            <p><a href="http://fidelitymechanicalsolutions.com" target="_blank">fidelitymechanicalsolutions.com</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-form-area" style="background: rgba(255, 255, 255, 0.03); padding: 3rem; border: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center;">
+                <div style="text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 1.5rem;">🔧</div>
+                    <h3 style="font-size: 1.5rem; color: var(--white); margin-bottom: 1rem;">Field Operations</h3>
+                    <p style="color: rgba(255, 255, 255, 0.6); line-height: 1.7;">Serving the Houston area with professional heating, cooling, and maintenance solutions.</p>
+                    <div style="margin-top: 2rem;">
+                        <a href="tel:713-201-2842" class="btn btn-primary">Call Now</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Fidelity Mechanical Solutions. All rights reserved. | Precision • Trust • Technical Discipline</p>
+    </footer>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
-          }
-        }
-        
-        // Suggest drain
-        const hasDrain = selectedMaterials.some(m => m.itemId && (m.itemId.includes('drain') || m.itemId.includes('ptrap')));
-        if (!hasDrain) {
-          const drainItem = materialsCatalog.drainage.items.find(i => i.id === 'ptrap');
-          if (drainItem) {
-            suggestions.push({
-              category: 'drainage',
-              item: drainItem,
-              reason: 'Required for condensate drainage'
-            });
-          }
-        }
-      }
-      
-      // Render suggestions
-      const suggestionsContainer = $('suggestions-container');
-      const suggestionsList = $('suggestions-list');
-      
-      if (suggestions.length > 0) {
-        suggestionsContainer.classList.remove('hidden');
-        suggestionsList.innerHTML = suggestions.map(s => `
-          <div class="suggestion-item">
-            <div class="suggestion-info">
-              <div class="suggestion-name">${s.item.name}</div>
-              <div class="suggestion-reason">${s.reason}</div>
-            </div>
-            <button class="material-add-btn" onclick="addMaterial('${s.category}', '${s.item.id}')">+ Add</button>
-          </div>
-        `).join('');
-      } else {
-        suggestionsContainer.classList.add('hidden');
-      }
-    }
-    
-    // ==================== REPORT GENERATION ====================
-    
-    function gatherServiceData() {
-      return {
-        meta: { tech: $('tech-name').value || '[Technician]', mode: 'Service', heatCoolMode: heatCoolMode },
-        job: {
-          customer: $('customer').value,
-          address: $('address').value,
-          jobType: $('job-type').value,
-          complaint: $('complaint')?.value,
-        },
-        equipment: {
-          brand: $('brand').value,
-          unitType: $('unit-type')?.value,
-          indoor: $('indoor-data').value,
-          outdoor: $('outdoor-data').value,
-          tonnage: $('tonnage').value,
-          refrigerant: $('refrigerant').value,
-          mfgDate: $('mfg-date').value,
-          age: $('equipment-age').textContent
-        },
-        time: {
-          arrival: $('arrival-time').value,
-          completion: $('completion-time').value,
-          travel: $('travel-time').value,
-          total: $('total-hours').value
-        },
-        materials: {
-          refrigerant: { 
-            type: $('refrigerant-added-type').value, 
-            amount: $('refrigerant-amount').value, 
-            recovered: $('refrigerant-recovered').value 
-          },
-          filter: { size: $('filter-size').value, merv: $('filter-merv').value },
-          capacitor: { type: $('capacitor-type').value, qty: $('capacitor-qty').value },
-          contactor: { rating: $('contactor-rating').value, qty: $('contactor-qty').value },
-          other: $('other-parts').value
-        },
-        service: {
-          safety: {
-            disconnect: $('safety-disconnect').checked, 
-            clearances: $('safety-clearances').checked,
-            drain: $('safety-drain').checked, 
-            floats: $('safety-floats').checked,
-            gas: $('safety-gas')?.checked, 
-            vent: $('safety-vent')?.checked,
-            co: $('safety-co')?.checked, 
-            flameSensor: $('safety-flame-sensor')?.checked
-          },
-          operating: {
-            outdoorTemp: $('outdoor-temp').value, 
-            outdoorHumidity: $('outdoor-humidity').value,
-            returnTemp: $('return-temp').value, 
-            supplyTemp: $('supply-temp').value,
-            deltaT: $('delta-t').value, 
-            returnStatic: $('return-static').value,
-            supplyStatic: $('supply-static').value, 
-            totalStatic: $('total-static').value,
-            voltageLine: $('voltage-line').value, 
-            controlVoltage: $('control-voltage').value,
-            blowerAmps: $('blower-amps').value, 
-            suctionPressure: $('suction-pressure').value,
-            liquidPressure: $('liquid-pressure')?.value, 
-            suctionTemp: $('suction-temp')?.value,
-            liquidTemp: $('liquid-temp')?.value, 
-            superheat: $('superheat')?.value,
-            subcool: $('subcool')?.value, 
-            compAmps: $('comp-amps')?.value,
-            inducerAmps: $('inducer-amps')?.value, 
-            heatExchanger: $('heat-exchanger')?.value,
-            flameAppearance: $('flame-appearance')?.value
-          },
-          components: {
-            filter: $('filter').value, 
-            evapCoil: $('evap-coil').value,
-            condCoil: $('cond-coil').value, 
-            capacitorReading: $('capacitor-reading').value,
-            contactorCondition: $('contactor-condition').value, 
-            blowerCondition: $('blower-condition').value
-          },
-          findings: $('findings').value,
-          recommendations: $('recommendations').value,
-          workPerformed: $('work-performed').value
-        },
-        photos: photos,
-        signature: { 
-          tech: $('tech-name').value, 
-          customer: $('customer-signature').value 
-        }
-      };
-    }
-    
-    function gatherMaterialsData() {
-      return {
-        meta: { tech: $('mat-tech').value || '[Technician]', mode: 'Materials' },
-        job: {
-          customer: $('mat-customer').value,
-          address: $('mat-address').value,
-          date: $('mat-date').value,
-          notes: $('mat-notes').value
-        },
-        materials: selectedMaterials,
-        photos: photos,
-        signature: {
-          tech: $('tech-name').value,
-          customer: $('customer-signature').value
-        }
-      };
-    }
-    
-    function generateServiceReport(data) {
-      let report = `
-HVAC SERVICE REPORT
-======================================================
-Date: ${new Date().toLocaleString()}
-Technician: ${data.meta.tech}
-Mode: ${data.meta.mode} - ${data.meta.heatCoolMode.toUpperCase()}
-------------------------------------------------------
-Customer: ${data.job.customer}
-Address: ${data.job.address}
-Job Type: ${data.job.jobType}
-
-CUSTOMER COMPLAINT:
-  ${data.job.complaint || 'N/A'}
-
-EQUIPMENT IDENTITY
-------------------
-Brand: ${data.equipment.brand}
-Type: ${data.equipment.unitType}
-Indoor: ${data.equipment.indoor}
-Outdoor: ${data.equipment.outdoor}
-Tonnage: ${data.equipment.tonnage} | Refrigerant: ${data.equipment.refrigerant}
-Mfg Date: ${data.equipment.mfgDate} ${data.equipment.age ? `(${data.equipment.age})` : ''}
-
-TIME TRACKING
--------------
-Arrival: ${data.time.arrival} | Completion: ${data.time.completion}
-Total: ${data.time.total}
-
-OPERATING CONDITIONS
---------------------
-Outdoor: ${data.service.operating.outdoorTemp}°F, ${data.service.operating.outdoorHumidity}% RH
-Airflow:
-  Return: ${data.service.operating.returnTemp}°F | Supply: ${data.service.operating.supplyTemp}°F
-  Delta T: ${data.service.operating.deltaT}
-  Return Static: ${data.service.operating.returnStatic} | Supply: ${data.service.operating.supplyStatic}
-  Total Static: ${data.service.operating.totalStatic}
-
-Electrical:
-  Line Voltage: ${data.service.operating.voltageLine}V
-  Control: ${data.service.operating.controlVoltage}V
-  Blower Amps: ${data.service.operating.blowerAmps}
-
-${data.meta.heatCoolMode === 'cooling' ? `Refrigerant Circuit (COOLING):
-  Suction: ${data.service.operating.suctionPressure} psig @ ${data.service.operating.suctionTemp}°F
-  Liquid: ${data.service.operating.liquidPressure} psig @ ${data.service.operating.liquidTemp}°F
-  Superheat: ${data.service.operating.superheat} | Subcool: ${data.service.operating.subcool}
-  Compressor: ${data.service.operating.compAmps}` : 
-`Heating Circuit:
-  Heat Exchanger: ${data.service.operating.heatExchanger}
-  Flame: ${data.service.operating.flameAppearance}
-  Inducer: ${data.service.operating.inducerAmps}A`}
-
-COMPONENT INSPECTION
---------------------
-Filter: ${data.service.components.filter}
-Evap Coil: ${data.service.components.evapCoil} | Cond Coil: ${data.service.components.condCoil}
-Capacitor: ${data.service.components.capacitorReading}
-Contactor: ${data.service.components.contactorCondition}
-Blower: ${data.service.components.blowerCondition}
-
-MATERIALS USED
---------------
-${formatServiceMaterials(data.materials)}
-
-FINDINGS & RECOMMENDATIONS
---------------------------
-Findings:
-${data.service.findings}
-
-Recommendations:
-${data.service.recommendations}
-
-Work Performed:
-${data.service.workPerformed}
-
-PHOTO DOCUMENTATION
--------------------
-${data.photos.length} Photo(s): ${data.photos.map(p => p.purpose).join(', ')}
-
-TECHNICIAN CERTIFICATION
-------------------------
-${data.signature.tech}
-Customer Acknowledged: ${data.signature.customer}
-`;
-      return report.replace(/\n\s+\n/g, '\n\n');
-    }
-    
-    function formatServiceMaterials(materials) {
-      let text = '  ';
-      if (materials.refrigerant?.type) text += `Refrigerant: ${materials.refrigerant.type} - ${materials.refrigerant.amount}\n  `;
-      if (materials.filter?.size) text += `Filter: ${materials.filter.size} MERV ${materials.filter.merv}\n  `;
-      if (materials.capacitor?.qty > 0) text += `Capacitor: ${materials.capacitor.type} (${materials.capacitor.qty})\n  `;
-      if (materials.contactor?.qty > 0) text += `Contactor: ${materials.contactor.rating} (${materials.contactor.qty})\n  `;
-      if (materials.other) text += `Other: ${materials.other}\n  `;
-      return text.trim() || 'None';
-    }
-    
-    function generateMaterialsList(data) {
-      let list = '';
-      list += '╔════════════════════════════════════════════════════════════╗\n';
-      list += '║          HVAC MATERIALS LIST - PRE-INSTALL                 ║\n';
-      list += '╚════════════════════════════════════════════════════════════╝\n\n';
-      
-      list += 'JOB INFORMATION\n───────────────────────────────────────────────────────────────\n';
-      list += `Customer/Job: ${data.job.customer || 'N/A'}\n`;
-      list += `Address: ${data.job.address || 'N/A'}\n`;
-      list += `Technician: ${data.meta.tech}\n`;
-      list += `Date: ${data.job.date || new Date().toISOString().split('T')[0]}\n`;
-      if (data.job.notes) list += `Notes: ${data.job.notes}\n`;
-      list += '\n';
-      
-      if (data.materials.length === 0) {
-        list += 'No materials added to list.\n\n';
-      } else {
-        // Group materials by category
-        const groupedMaterials = data.materials.reduce((acc, m) => {
-          if (!acc[m.category]) acc[m.category] = [];
-          acc[m.category].push(m);
-          return acc;
-        }, {});
-        
-        list += 'MATERIALS\n═══════════════════════════════════════════════════════════════\n\n';
-        
-        Object.entries(groupedMaterials).forEach(([category, items]) => {
-          list += `${category}:\n`;
-          list += '─'.repeat(60) + '\n';
-          items.forEach(m => {
-            const sizeInfo = m.spec ? `${m.size} - ${m.spec}` : m.size;
-            list += `☐ ${m.name}\n`;
-            list += `  Size/Spec: ${sizeInfo}\n`;
-            list += `  Quantity: ${m.quantity} ${m.unit}\n`;
-            list += '\n';
-          });
-          list += '\n';
         });
-        
-        list += '═══════════════════════════════════════════════════════════════\n';
-        const totalItems = data.materials.reduce((sum, m) => sum + m.quantity, 0);
-        list += `TOTAL ITEMS: ${totalItems}\n`;
-        list += `TOTAL LINE ITEMS: ${data.materials.length}\n`;
-        list += '═══════════════════════════════════════════════════════════════\n';
-      }
-      
-      if (data.photos.length > 0) {
-        list += `\nATTACHED PHOTOS: ${data.photos.length}\n`;
-        list += data.photos.map(p => `  - ${p.purpose}`).join('\n') + '\n';
-      }
-      
-      list += `\n───────────────────────────────────────────────────────────────\n`;
-      list += `Generated: ${new Date().toLocaleString()}\n`;
-      list += `Technician: ${data.meta.tech}\n`;
-      list += `───────────────────────────────────────────────────────────────\n`;
-      
-      return list;
-    }
-    
-    function generate() {
-      const existing = document.querySelector('.report-preview')?.closest('.card');
-      if (existing) existing.remove();
-      
-      let reportText = '';
-      let reportData = {};
-      
-      if (currentMode === 'service') {
-        reportData = gatherServiceData();
-        reportText = generateServiceReport(reportData);
-        sessionStorage.setItem('currentReport', JSON.stringify(reportData));
-        sessionStorage.setItem('currentReportText', reportText);
-        displayReport(reportText, '📋 Service Report Generated');
-        showToast('Service Report Generated!', 'success');
-        
-      } else if (currentMode === 'materials') {
-        reportData = gatherMaterialsData();
-        reportText = generateMaterialsList(reportData);
-        sessionStorage.setItem('currentReport', JSON.stringify(reportData));
-        sessionStorage.setItem('currentReportText', reportText);
-        displayReport(reportText, '📋 Materials List Generated');
-        showToast('Materials List Generated!', 'success');
-      }
-    }
-    
-    function displayReport(text, title) {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div class="card-header">
-          <span>${title}</span>
-        </div>
-        <div class="status good">
-          <span>✓</span>
-          <span>Ready to export or share</span>
-        </div>
-        <pre class="report-preview" id="report-pre">${text}</pre>
-        <div class="grid-2 mt-8">
-          <button onclick="copyToClipboard()" class="success">📋 Copy</button>
-          <button onclick="printReport()" class="secondary">🖨️ Print</button>
-        </div>
-      `;
-      
-      document.querySelector('.actions').before(card);
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    
-    function copyToClipboard() {
-      const text = document.getElementById('report-pre')?.textContent;
-      if (!text) {
-        showToast('Generate a report first!', 'danger');
-        return;
-      }
-      
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-9999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      try {
-        const successful = document.execCommand('copy');
-        if (successful) {
-          showToast('✓ Copied to clipboard!', 'success');
-        } else {
-          showToast('Copy failed. Please copy manually.', 'danger');
-        }
-      } catch (err) {
-        showToast('Copy failed. Please copy manually.', 'danger');
-      }
-      document.body.removeChild(textArea);
-    }
-    
-    function printReport() {
-      const text = document.getElementById('report-pre')?.textContent;
-      if (!text) {
-        showToast('Generate a report first!', 'danger');
-        return;
-      }
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(`
-        <html><head><title>Field Buddy Report</title><style>
-            body { font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.4; margin: 0.5in; white-space: pre-wrap; }
-            @media print { body { margin: 0.25in; } }
-        </style></head><body>${text}</body></html>
-      `);
-      printWindow.document.close();
-      printWindow.focus();
-      setTimeout(() => {
-        printWindow.print();
-        printWindow.close();
-      }, 250);
-    }
-    
-    function exportReport() {
-      const text = sessionStorage.getItem('currentReportText');
-      const dataStr = sessionStorage.getItem('currentReport');
-      if (!text || !dataStr) {
-        showToast('Generate a report first', 'danger');
-        return;
-      }
-      
-      const data = JSON.parse(dataStr);
-      let customer = 'Job';
-      if (currentMode === 'service') {
-        customer = data.job.customer.replace(/\s/g, '_') || 'ServiceJob';
-      } else {
-        customer = data.job.customer.replace(/\s/g, '_') || 'MaterialsList';
-      }
-      const date = (data.job.date || new Date().toISOString().split('T')[0]).replace(/\//g, '-');
-      const fileName = `FieldBuddy_${currentMode.toUpperCase()}_${customer}_${date}.txt`;
 
-      const blob = new Blob([text], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('Exporting file...', 'success');
-    }
-    
-    async function clearForm() {
-      const confirmed = await showModal(
-        'Clear Form', 
-        'Are you sure you want to clear all data? This cannot be undone.'
-      );
-      if (!confirmed) return;
-      
-      document.querySelectorAll('input, select, textarea').forEach(el => {
-        if (el.type === 'checkbox') el.checked = false;
-        else el.value = '';
-      });
-      
-      selectedMaterials = [];
-      photos = [];
-      updatePhotoPreview();
-      renderSelectedMaterials();
-      updateSuggestions();
-      
-      const existing = document.querySelector('.report-preview')?.closest('.card');
-      if (existing) existing.remove();
-      
-      sessionStorage.removeItem('currentReport');
-      sessionStorage.removeItem('currentReportText');
-      
-      $('date').value = new Date().toISOString().split('T')[0];
-      $('mat-date').value = new Date().toISOString().split('T')[0];
-      
-      showToast('Form cleared', 'success');
-    }
-    
-    // ==================== CHECKBOX STYLING ====================
-    document.addEventListener('input', (e) => {
-      if (e.target.type === 'checkbox') {
-        const label = e.target.closest('label.check');
-        if (label) {
-          label.classList.toggle('checked', e.target.checked);
-        }
-      }
-    });
-    
-    // ==================== INITIALIZATION ====================
-    window.addEventListener('load', () => {
-      $('date').value = new Date().toISOString().split('T')[0];
-      $('mat-date').value = new Date().toISOString().split('T')[0];
-      
-      setMode('service');
-      
-      console.log('%c📦 Field Buddy Pro - Service & Materials System Loaded', 'color:#007AFF; font-size:14px; font-weight:bold');
-    });
-    
-  </script>
+        // Scroll-triggered animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe service cards
+        document.querySelectorAll('.service-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+
+        // Observe value items
+        document.querySelectorAll('.value-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-30px)';
+            item.style.transition = `all 0.6s ease ${index * 0.1}s`;
+            observer.observe(item);
+        });
+
+        // Observe process steps
+        document.querySelectorAll('.process-step').forEach((step, index) => {
+            step.style.opacity = '0';
+            step.style.transform = 'translateY(30px)';
+            step.style.transition = `all 0.6s ease ${index * 0.15}s`;
+            observer.observe(step);
+        });
+    </script>
 </body>
 </html>
