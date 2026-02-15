@@ -35,10 +35,10 @@
   -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fidelity Mechanical Solutions | Precision HVAC & Mechanical Services</title>
-  <meta name="description" content="Expert HVAC and mechanical services through transparent diagnostics, systematic engineering, and uncompromising integrity. Serving Greater Houston with technical excellence.">
-  <meta property="og:title" content="Fidelity Mechanical Solutions">
-  <meta property="og:description" content="Where mechanical precision meets thoughtful service. Houston's premier diagnostic-forward HVAC company.">
+  <title>Fidelity Mechanical Solutions | Residential & Commercial HVAC Services | Houston TX</title>
+  <meta name="description" content="Houston's trusted residential and commercial HVAC company. Expert heating, cooling, refrigeration, and mechanical services through transparent diagnostics and uncompromising integrity.">
+  <meta property="og:title" content="Fidelity Mechanical Solutions | Residential & Commercial HVAC">
+  <meta property="og:description" content="Professional HVAC and mechanical services for homes and businesses. Diagnostic-forward approach serving Greater Houston.">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -102,6 +102,12 @@
       align-items: center;
     }
 
+    .logo-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
     .logo {
       font-family: 'Playfair Display', serif;
       font-size: 1.6rem;
@@ -111,11 +117,22 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      line-height: 1.2;
     }
 
     .logo-accent {
       color: var(--accent-orange);
       font-weight: 600;
+    }
+
+    .logo-descriptor {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+      line-height: 1;
+      margin-top: 2px;
     }
 
     .nav-links {
@@ -197,6 +214,35 @@
       animation: fadeInUp 1s ease-out;
     }
 
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(255, 140, 66, 0.1);
+      border: 1px solid rgba(255, 140, 66, 0.25);
+      border-radius: 50px;
+      padding: 0.55rem 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
+      color: var(--accent-orange);
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .hero-badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-orange);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
     .hero-label {
       font-size: 0.95rem;
       color: var(--accent-orange);
@@ -219,13 +265,39 @@
     }
 
     .hero-subtitle {
-      font-size: clamp(1.1rem, 2vw, 1.4rem);
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
       color: var(--text-secondary);
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
       max-width: 700px;
       margin-left: auto;
       margin-right: auto;
       line-height: 1.8;
+    }
+
+    .hero-services-strip {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+
+    .hero-service-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .hero-service-tag .tag-icon {
+      font-size: 1.1rem;
+    }
+
+    .hero-service-tag .tag-divider {
+      color: var(--text-muted);
+      opacity: 0.4;
     }
 
     .cta-container {
@@ -233,6 +305,7 @@
       gap: 1.5rem;
       justify-content: center;
       flex-wrap: wrap;
+      margin-bottom: 2.5rem;
     }
 
     .cta-primary, .cta-secondary {
@@ -265,6 +338,31 @@
     .cta-secondary:hover {
       background: var(--hover-bg);
       border-color: var(--accent-blue);
+    }
+
+    .hero-trust-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .trust-item .trust-icon {
+      color: var(--accent-orange);
+      font-size: 1rem;
     }
 
     /* Section Styles */
@@ -448,88 +546,6 @@
       line-height: 1.7;
     }
 
-    /* Diagnostics Section */
-    .diagnostics {
-      background: linear-gradient(135deg, rgba(45, 106, 126, 0.1) 0%, transparent 100%);
-      padding: 6rem 2rem;
-    }
-
-    .diagnostic-tabs {
-      display: flex;
-      gap: 1rem;
-      margin: 3rem 0 2rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .tab-btn {
-      padding: 0.8rem 1.8rem;
-      background: var(--secondary-dark);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .tab-btn:hover {
-      background: var(--hover-bg);
-      border-color: var(--accent-blue);
-      color: var(--text-primary);
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, var(--accent-orange), #ffa726);
-      color: white;
-      border-color: var(--accent-orange);
-    }
-
-    .tab-content {
-      display: none;
-      padding: 3rem;
-      background: var(--secondary-dark);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      animation: fadeIn 0.5s ease;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .diagnostic-step {
-      display: flex;
-      gap: 2rem;
-      margin-bottom: 2rem;
-      padding-bottom: 2rem;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .diagnostic-step:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
-
-    .diagnostic-step .step-number {
-      width: 50px;
-      height: 50px;
-      font-size: 1.2rem;
-    }
-
-    .diagnostic-step h4 {
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
-    }
-
-    .diagnostic-step p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
     /* Services Grid */
     .services-grid {
       display: grid;
@@ -606,6 +622,30 @@
       content: '✓';
       color: var(--accent-orange);
       font-weight: 700;
+    }
+
+    /* Service Type Badge on cards */
+    .service-type-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .badge-residential {
+      background: rgba(74, 144, 226, 0.15);
+      color: var(--accent-blue);
+    }
+    .badge-commercial {
+      background: rgba(255, 140, 66, 0.15);
+      color: var(--accent-orange);
+    }
+    .badge-both {
+      background: rgba(45, 106, 126, 0.2);
+      color: #5bb8d4;
     }
 
     /* Team Section */
@@ -799,6 +839,10 @@
         padding: 6rem 1.5rem 3rem;
       }
 
+      .hero-trust-bar {
+        gap: 1.5rem;
+      }
+
       .philosophy, .contact, .fms-method, .team {
         padding: 2.5rem 1.5rem;
         margin: 2rem 1rem;
@@ -847,8 +891,11 @@
   <!-- Navigation -->
   <nav class="nav-container" id="navbar">
     <div class="nav">
-      <div class="logo">
-        FIDELITY <span class="logo-accent">MS</span>
+      <div class="logo-group">
+        <div class="logo">
+          FIDELITY <span class="logo-accent">MS</span>
+        </div>
+        <div class="logo-descriptor">HVAC &amp; Mechanical Services</div>
       </div>
       <div class="nav-toggle" onclick="toggleMenu()">
         <div class="bar"></div>
@@ -869,14 +916,31 @@
   <!-- Hero Section -->
   <section id="home" class="hero">
     <div class="hero-content">
-      <div class="hero-label">Mechanical Solutions</div>
-      <h1>Precision, Trust & Technical Discipline</h1>
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Residential &amp; Commercial HVAC
+      </div>
+      <h1>Houston's Diagnostic-First HVAC &amp; Mechanical Company</h1>
       <p class="hero-subtitle">
-        We deliver HVAC service through verified logic, not guesswork. Every diagnostic decision follows a methodical sequence designed to reduce downtime and extend system lifespan.
+        Professional heating, cooling, and refrigeration service for homes and businesses. We deliver results through verified logic, not guesswork—every diagnostic decision follows a methodical sequence designed to reduce downtime and extend system lifespan.
       </p>
+      <div class="hero-services-strip">
+        <span class="hero-service-tag"><span class="tag-icon">❄️</span> AC &amp; Cooling</span>
+        <span class="hero-service-tag tag-divider">|</span>
+        <span class="hero-service-tag"><span class="tag-icon">🔥</span> Heating</span>
+        <span class="hero-service-tag tag-divider">|</span>
+        <span class="hero-service-tag"><span class="tag-icon">⚙️</span> Maintenance</span>
+        <span class="hero-service-tag tag-divider">|</span>
+        <span class="hero-service-tag"><span class="tag-icon">🔧</span> Emergency Repair</span>
+      </div>
       <div class="cta-container">
         <a href="#contact" class="cta-primary">Schedule Service</a>
         <a href="#method" class="cta-secondary">Our Method</a>
+      </div>
+      <div class="hero-trust-bar">
+        <span class="trust-item"><span class="trust-icon">✓</span> Licensed &amp; Insured</span>
+        <span class="trust-item"><span class="trust-icon">✓</span> Greater Houston Area</span>
+        <span class="trust-item"><span class="trust-icon">✓</span> Same-Day Available</span>
       </div>
     </div>
   </section>
@@ -887,11 +951,11 @@
     <h2>Our Philosophy</h2>
     <div class="philosophy-intro">
       <p>
-        We are a mechanical service company organized around one premise: that technical work, client understanding, 
+        We are an HVAC and mechanical service company organized around one premise: that technical work, client understanding, 
         and professional development are not separate functions—they are the work itself.
       </p>
       <p style="margin-top: 1rem;">
-        Fidelity exists to raise the standard in mechanical service—not through volume or sales tactics, but through 
+        Fidelity exists to raise the standard in residential and commercial mechanical service—not through volume or sales tactics, but through 
         precision, trust, and technical discipline.
       </p>
     </div>
@@ -1047,197 +1111,35 @@
     </div>
   </section>
 
-  <!-- 
-    ============================================================================
-    NOVA VERUS VITA FOUNDATION - THE REAL VISION
-    ============================================================================
-    
-    If you're reading this, you've opened the code to help me expand the business.
-    That means we're building together. That means the timing is right for you to see this.
-    
-    Fidelity Mechanical Solutions was never just an HVAC company. It was Year 1 of a 10-year plan.
-    This is the foundation (literally) that funds everything that actually matters.
-    
-    ## THE 10-YEAR BUILD ##
-    
-    **YEAR 1: FOUNDATION** (Now → Feb 2026)
-    - Started HVAC job (just started)
-    - Grind mode: stack cash for down payment
-    - Target: $15-25k saved for first property
-    
-    **First Move:**
-    - Buy fourplex, 3.5% (down)
-    - Live in one unit, rent the other 3
-    - Rental income pays mortgage + builds equity
-    - Unknown is: both build wealth
-    
-    **YEAR 2-3: HVAC COMPANY LAUNCH**
-    - Funded by real estate equity
-    - Startup Capital: $50-75k
-    - Install, repair, maintenance (residential + commercial)
-    - Recurring revenue through service contracts
-    - Immediate cash flow (service-based, not equity-dependent)
-    - Higher margins than real estate (30-40% vs 15-20%)
-    - THIS generates active income for next business launch
-    - Future training platform for NVV participants
-    
-    **YEARS 2-5: THREE-TRACK EXPANSION**
-    All three tracks run parallel after launch:
-    
-    Track 1: Real Estate Portfolio
-    - Year 2: Use Fourplex #1 equity → buy Fourplex #2
-    - Year 3: Scale to 8-unit building
-    - Year 4: Scale to 12-unit building
-    - Year 5: 24+ units total
-    - Creates: $15-25k monthly passive income
-    
-    Track 2: HVAC Company (Fidelity Mechanical Solutions)
-    - You're helping me build this one right now
-    - Year 3 Target: $200-350k annual revenue, $60-120k net profit
-    - 2-4 employees (training capacity ready)
-    - Builds community presence and reputation
-    
-    Track 3: Consulting Firm OR Mechanic Shop
-    - Funded by HVAC profits + real estate equity
-    - Startup Capital: $30-100k
-    - Decision made Year 3 based on market conditions
-    - Option A: Business consulting (operations, marketing, culture)
-    - Option B: Mechanic shop (auto repair, training ground for NVV)
-    
-    **5-YEAR CHECKPOINT:**
-    What We'll Own:
-    - 24+ rental units ($15-25k monthly passive income)
-    - HVAC company (established, profitable, training-ready)
-    - Consulting OR Mechanic shop (operational, generating revenue)
-    
-    Combined Annual Revenue: $580k - $1.2M
-    
-    **10-YEAR VISION:**
-    
-    NVV FOUNDATION FULLY OPERATIONAL
-    - 50+ rental units (housing for beneficiaries + income generation)
-    - HVAC company: Multi-crew, $500k+ annual revenue
-    - Mechanic/Consulting: Established, training-integrated
-    - 2-3 acquired legacy businesses (preserved identity, better employment)
-    
-    **WHO WE'RE SERVING:**
-    - 50-75 active participants at any time
-    - 200+ lives transformed total
-    - Human trafficking survivors, homeless vets, trauma survivors, foster kids
-    
-    **FOUNDATION FUNDING:**
-    - Real estate: $400-600k annual net income
-    - Business profits: $300-500k annual contribution
-    - **Total: $700k-$1.1M annually**
-    - **Core reliance on donations: ZERO**
-    
-    **WHAT NVV PROVIDES:**
-    - Housing: Self-sustaining recovery ecosystem
-    - Employment: Multiple revenue streams provide jobs, all transformation-integrated
-    - Training: Housing, employment, all integrated
-    - Legacy businesses preserved, community strengthened
-    - Generational wealth + generational impact
-    
-    ============================================================================
-    
-    ## WHY THIS WORKS ##
-    
-    **Real Estate Foundation:**
-    - FHA loans = low down payment (3.5%)
-    - Each property pays for itself + funds the next
-    - Eventually becomes housing for people who need it
-    - Passive income base for everything else
-    
-    **HVAC Smart Play:**
-    - My existing expertise (I've worked HVAC)
-    - Service business = cash flow now
-    - Recurring income (maintenance contracts)
-    - Scalable without massive capital
-    - Training ground for NVV participants
-    
-    **Third Business Flexibility:**
-    - Consulting: Lower capital, my operations/marketing experience, faster launch
-    - Mechanic: Higher capital, my deep expertise, training ground for high-value trade
-    - We'll know which makes more sense after Year 3 of running HVAC
-    
-    **Everything Feeds Forward:**
-    - Real estate never stops (each property funds next)
-    - HVAC builds while real estate grows
-    - All business launches with two operate
-    - All three → NVV foundation funding
-    - Nothing is abandoned, everything compounds
-    
-    ============================================================================
-    
-    ## THE BOTTOM LINE ##
-    
-    Year 1: We buy one fourplex together
-    Year 5: We own 24+ units, HVAC transforms lives, generating $700k-$1M annually
-    Year 10: We're running a foundation that
-    
-    The fourplex isn't the goal. It's the foundation.
-    
-    This is what we're actually building.
-    
-    ============================================================================
-    
-    ## WHY I'M TELLING YOU THIS NOW ##
-    
-    I came out of addiction in 2025. Nine months isolated in a room, dissolving everything 
-    I thought I was. I wrote "Through the Gate" in that room - the neuroscience of how 
-    fragmented parts of my psyche engineered my own rescue when I couldn't save myself.
-    
-    The darkness I survived wasn't wasted. It gave me clarity on what actually matters:
-    
-    People who've been through what I went through need more than a bed and a meal.
-    They need purpose. They need work that rebuilds their nervous system.
-    They need to see a path that doesn't depend on charity.
-    They need to become the people they were always supposed to be.
-    
-    That's NVV. Nova Verus Vita. "New True Life."
-    
-    And you two - Khloe and Galilea - you're part of this from the beginning.
-    Not because I need you to be. Because this is YOUR inheritance.
-    Not just money. A mission that outlives me.
-    
-    The HVAC company you're helping me build right now? 
-    It's Year 1 of something that will still be running when you have kids of your own.
-    
-    I love you both.
-    
-    - Dad
-    February 14, 2025
-    
-    ============================================================================
-  -->
-  
   <!-- Services Section -->
   <section id="services">
     <div class="section-label">What We Offer</div>
     <h2>Complete Mechanical Solutions</h2>
-    <p>Professional heating, cooling, and maintenance services designed to reduce downtime and extend system lifespan.</p>
+    <p>Professional heating, cooling, and maintenance services for residential homes and commercial properties—designed to reduce downtime and extend system lifespan.</p>
     
     <div class="services-grid">
       <div class="service-card">
         <div class="service-icon">❄️</div>
-        <h3>Commercial Cooling</h3>
+        <span class="service-type-badge badge-both">Residential &amp; Commercial</span>
+        <h3>Cooling Systems</h3>
         <p>
-          Precision diagnostics and repair for commercial refrigeration and air conditioning systems. We verify airflow, 
+          Precision diagnostics and repair for air conditioning and commercial refrigeration systems. We verify airflow, 
           refrigerant charge, and electrical integrity on every service call.
         </p>
         <ul class="service-features">
-          <li>Rooftop unit service & repair</li>
+          <li>Central AC &amp; rooftop unit service</li>
           <li>Walk-in cooler diagnostics</li>
-          <li>Split system maintenance</li>
+          <li>Split system &amp; mini-split repair</li>
           <li>Performance optimization</li>
         </ul>
       </div>
 
       <div class="service-card">
         <div class="service-icon">🔥</div>
+        <span class="service-type-badge badge-both">Residential &amp; Commercial</span>
         <h3>Heating Systems</h3>
         <p>
-          Complete heating system service from rooftop units to furnaces. Power verification, control logic testing, 
+          Complete heating system service from rooftop units to home furnaces. Power verification, control logic testing, 
           and environmental assessment on every visit.
         </p>
         <ul class="service-features">
@@ -1250,6 +1152,7 @@
 
       <div class="service-card">
         <div class="service-icon">⚙️</div>
+        <span class="service-type-badge badge-both">Residential &amp; Commercial</span>
         <h3>Preventive Maintenance</h3>
         <p>
           Structured maintenance protocols that prevent callbacks. Regular inspections following our FMS Diagnostic 
@@ -1258,17 +1161,18 @@
         <ul class="service-features">
           <li>Quarterly system checkups</li>
           <li>Performance trend analysis</li>
-          <li>Filter & coil cleaning</li>
+          <li>Filter &amp; coil cleaning</li>
           <li>Detailed service reports</li>
         </ul>
       </div>
 
       <div class="service-card">
         <div class="service-icon">🔧</div>
+        <span class="service-type-badge badge-both">Residential &amp; Commercial</span>
         <h3>Emergency Service</h3>
         <p>
           Rapid response with full diagnostic capability. We arrive prepared with the tools and knowledge to resolve 
-          issues on the first visit.
+          issues on the first visit—whether it's your home or your business.
         </p>
         <ul class="service-features">
           <li>24/7 emergency availability</li>
@@ -1280,10 +1184,11 @@
 
       <div class="service-card">
         <div class="service-icon">📊</div>
+        <span class="service-type-badge badge-commercial">Commercial</span>
         <h3>System Analysis</h3>
         <p>
-          Comprehensive system evaluations with documented findings. Clear reporting that helps you make informed 
-          decisions about repairs and replacements.
+          Comprehensive system evaluations with documented findings. Clear reporting that helps property managers and 
+          business owners make informed decisions about repairs and replacements.
         </p>
         <ul class="service-features">
           <li>Energy efficiency audit</li>
@@ -1295,6 +1200,7 @@
 
       <div class="service-card">
         <div class="service-icon">🎓</div>
+        <span class="service-type-badge badge-both">Residential &amp; Commercial</span>
         <h3>Client Education</h3>
         <p>
           We teach, not sell. Every service interaction includes clear explanations of what we found, why it matters, 
@@ -1337,7 +1243,7 @@
     <div class="section-label">Get In Touch</div>
     <h2>Ready for Professional Service?</h2>
     <p>
-      Contact Martin Pérez and the Fidelity team for precision HVAC service. Text preferred for fastest response—
+      Whether it's your home AC or your business's rooftop unit, contact Martin Pérez and the Fidelity team for precision HVAC service. Text preferred for fastest response—
       service requests typically confirmed within 2 hours during operating hours.
     </p>
     
@@ -1362,7 +1268,7 @@
     </div>
 
     <p class="contact-note">
-      Service area: Greater Houston and surrounding communities
+      Serving homes &amp; businesses across Greater Houston and surrounding communities
     </p>
   </section>
 
@@ -1372,7 +1278,7 @@
       &copy; 2026 Fidelity Mechanical Solutions. All rights reserved.
     </p>
     <p class="footer-tagline">
-      Precision • Trust • Technical Discipline — Where mechanical excellence meets thoughtful service.
+      Precision • Trust • Technical Discipline — Residential &amp; Commercial HVAC Excellence
     </p>
     <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.85rem; font-style: italic;">
       KIP + GSP = propositum
@@ -1383,6 +1289,10 @@
   <div class="floating-contact">
     <a href="sms:7132012842" class="floating-btn" title="Text us now">💬</a>
   </div>
+
+  <!-- GoatCounter Analytics -->
+  <script data-goatcounter="https://mperez.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 
   <script>
     // Navigation scroll effect
@@ -1402,28 +1312,6 @@
 
     function closeMenu() {
       document.getElementById('navLinks').classList.remove('active');
-    }
-
-    // Diagnostic tabs functionality (if you add them back)
-    function switchTab(index) {
-      const tabs = document.querySelectorAll('.tab-btn');
-      const contents = document.querySelectorAll('.tab-content');
-      
-      tabs.forEach((tab, i) => {
-        if (i === index) {
-          tab.classList.add('active');
-        } else {
-          tab.classList.remove('active');
-        }
-      });
-      
-      contents.forEach((content, i) => {
-        if (i === index) {
-          content.classList.add('active');
-        } else {
-          content.classList.remove('active');
-        }
-      });
     }
 
     // Smooth scroll with offset for fixed nav
@@ -1457,7 +1345,6 @@
       });
     }, observerOptions);
 
-    // Observe cards for animation
     document.querySelectorAll('.philosophy-card, .value-card, .service-card, .method-step').forEach((card, index) => {
       card.style.opacity = '0';
       card.style.transform = 'translateY(30px)';
