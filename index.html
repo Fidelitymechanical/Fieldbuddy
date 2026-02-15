@@ -46,15 +46,18 @@
   
   <style>
     :root {
-      --primary-dark: #0b0e13;
-      --secondary-dark: #141820;
-      --card-dark: #181d27;
-      --accent-blue: #4a7cff;
+      --primary-dark: #1a1e24;
+      --secondary-dark: #22272f;
+      --card-dark: #282d37;
+      --card-hover: #2e3440;
       --accent-orange: #ff8c42;
-      --text-primary: #edf0f5;
-      --text-secondary: #b0bac9;
-      --text-muted: #6b7a8d;
-      --border-color: rgba(255, 255, 255, 0.07);
+      --accent-orange-glow: rgba(255, 140, 66, 0.3);
+      --accent-warm: #ffa726;
+      --text-primary: #f0f2f5;
+      --text-secondary: #c4cad4;
+      --text-muted: #8a95a5;
+      --border-color: rgba(255, 255, 255, 0.09);
+      --border-hover: rgba(255, 140, 66, 0.35);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -75,14 +78,14 @@
       position: fixed;
       top: 0;
       width: 100%;
-      background: rgba(11, 14, 19, 0.95);
+      background: rgba(26, 30, 36, 0.92);
       backdrop-filter: blur(20px);
       z-index: 1000;
       border-bottom: 1px solid var(--border-color);
     }
     .nav-container.scrolled {
-      background: rgba(11, 14, 19, 0.98);
-      box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+      background: rgba(26, 30, 36, 0.98);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.35);
     }
     .nav {
       max-width: 1300px;
@@ -93,15 +96,15 @@
       align-items: center;
     }
     .logo {
-      font-family: 'Inter', sans-serif;
-      font-size: 1.35rem;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
       color: var(--text-primary);
+      letter-spacing: 0.5px;
     }
     .logo span {
-      color: var(--accent-blue);
+      color: var(--accent-orange);
+      font-weight: 700;
     }
     .nav-links {
       display: flex;
@@ -114,8 +117,20 @@
       font-weight: 500;
       font-size: 0.92rem;
       transition: color 0.3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-orange);
+      transition: width 0.3s;
     }
     .nav-links a:hover { color: #fff; }
+    .nav-links a:hover::after { width: 100%; }
     .nav-toggle {
       display: none;
       flex-direction: column;
@@ -142,15 +157,6 @@
       padding: 7rem 2rem 3rem;
       overflow: hidden;
     }
-
-    /* 
-      HERO BACKGROUND IMAGE
-      =====================
-      Upload ONE image called "hero-bg.jpg" to your /images/ folder.
-      This is the only image the site needs.
-      Use the rendering photo you showed me — the HVAC unit + technician shot.
-      Recommended: 1920x1080 or wider.
-    */
     .hero-bg {
       position: absolute;
       inset: 0;
@@ -163,38 +169,33 @@
       inset: 0;
       background: linear-gradient(
         180deg,
-        rgba(11,14,19,0.75) 0%,
-        rgba(11,14,19,0.55) 35%,
-        rgba(11,14,19,0.7) 70%,
-        rgba(11,14,19,0.95) 100%
+        rgba(26,30,36,0.8) 0%,
+        rgba(26,30,36,0.55) 35%,
+        rgba(26,30,36,0.7) 70%,
+        rgba(26,30,36,0.97) 100%
       );
     }
-
-    /* Fallback gradient when no image uploaded */
     .hero-fallback {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at 30% 40%, rgba(74,124,255,0.12), transparent 60%),
-                  radial-gradient(ellipse at 70% 60%, rgba(255,140,66,0.08), transparent 60%);
+      background: radial-gradient(ellipse at 30% 30%, rgba(255,140,66,0.1), transparent 55%),
+                  radial-gradient(ellipse at 70% 70%, rgba(255,140,66,0.06), transparent 55%);
       z-index: 0;
     }
-
     .hero-content {
       position: relative;
       z-index: 2;
       max-width: 850px;
       animation: fadeInUp 0.8s ease-out;
     }
-
     .hero h1 {
-      font-family: 'Inter', sans-serif;
-      font-size: clamp(2.2rem, 5.5vw, 3.6rem);
-      font-weight: 800;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.3rem, 5.5vw, 3.8rem);
+      font-weight: 700;
       line-height: 1.15;
       margin-bottom: 1.3rem;
       color: #fff;
     }
-
     .hero-sub {
       font-size: clamp(1rem, 2vw, 1.2rem);
       color: var(--text-secondary);
@@ -204,7 +205,6 @@
       margin-left: auto;
       margin-right: auto;
     }
-
     .hero-ctas {
       display: flex;
       gap: 1rem;
@@ -212,13 +212,12 @@
       flex-wrap: wrap;
       margin-bottom: 3rem;
     }
-
     .btn-primary {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       padding: 1rem 2.2rem;
-      background: var(--accent-blue);
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-warm));
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -226,13 +225,12 @@
       font-weight: 700;
       text-decoration: none;
       transition: all 0.3s;
-      box-shadow: 0 4px 20px rgba(74,124,255,0.35);
+      box-shadow: 0 4px 20px var(--accent-orange-glow);
     }
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 28px rgba(74,124,255,0.5);
+      box-shadow: 0 6px 28px rgba(255,140,66,0.45);
     }
-
     .btn-secondary {
       display: inline-flex;
       align-items: center;
@@ -240,7 +238,7 @@
       padding: 1rem 2.2rem;
       background: transparent;
       color: var(--text-primary);
-      border: 2px solid rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.18);
       border-radius: 8px;
       font-size: 1.05rem;
       font-weight: 600;
@@ -248,11 +246,9 @@
       transition: all 0.3s;
     }
     .btn-secondary:hover {
-      border-color: var(--accent-blue);
-      background: rgba(74,124,255,0.1);
+      border-color: var(--accent-orange);
+      background: rgba(255,140,66,0.08);
     }
-
-    /* Trust Bar */
     .trust-bar {
       display: flex;
       justify-content: center;
@@ -267,9 +263,7 @@
       font-size: 0.88rem;
       font-weight: 500;
     }
-    .trust-icon {
-      font-size: 1.1rem;
-    }
+    .trust-icon { font-size: 1.1rem; }
 
     /* ======================== */
     /* SERVICE QUICK CARDS      */
@@ -298,13 +292,11 @@
     }
     .strip-card:hover {
       transform: translateY(-4px);
-      border-color: var(--accent-blue);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      border-color: var(--border-hover);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      background: var(--card-hover);
     }
-    .strip-card-icon {
-      font-size: 2.2rem;
-      margin-bottom: 1rem;
-    }
+    .strip-card-icon { font-size: 2.2rem; margin-bottom: 1rem; }
     .strip-card h3 {
       font-size: 1.25rem;
       font-weight: 700;
@@ -318,7 +310,7 @@
       margin-bottom: 1rem;
     }
     .strip-card-link {
-      color: var(--accent-blue);
+      color: var(--accent-orange);
       font-weight: 600;
       font-size: 0.9rem;
       display: inline-flex;
@@ -336,15 +328,16 @@
     }
     .section-label {
       font-size: 0.8rem;
-      color: var(--accent-blue);
+      color: var(--accent-orange);
       letter-spacing: 2.5px;
       text-transform: uppercase;
       font-weight: 700;
       margin-bottom: 0.75rem;
     }
     .section h2 {
+      font-family: 'Playfair Display', serif;
       font-size: clamp(1.8rem, 3.5vw, 2.6rem);
-      font-weight: 800;
+      font-weight: 700;
       margin-bottom: 1rem;
       color: var(--text-primary);
     }
@@ -354,8 +347,6 @@
       max-width: 700px;
       margin-bottom: 1.5rem;
     }
-
-    /* Divider */
     .section-divider {
       max-width: 1100px;
       margin: 0 auto;
@@ -388,14 +379,14 @@
       transition: all 0.3s;
     }
     .method-card:hover {
-      border-color: var(--accent-blue);
-      background: rgba(74,124,255,0.04);
+      border-color: var(--border-hover);
+      background: var(--card-hover);
     }
     .method-num {
       flex-shrink: 0;
       width: 42px;
       height: 42px;
-      background: var(--accent-blue);
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-warm));
       color: #fff;
       border-radius: 50%;
       display: flex;
@@ -403,6 +394,7 @@
       justify-content: center;
       font-weight: 800;
       font-size: 1rem;
+      box-shadow: 0 3px 12px var(--accent-orange-glow);
     }
     .method-card h4 {
       font-size: 1.05rem;
@@ -435,13 +427,11 @@
     }
     .svc-card:hover {
       transform: translateY(-4px);
-      border-top-color: var(--accent-blue);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      border-top-color: var(--accent-orange);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      background: var(--card-hover);
     }
-    .svc-card-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
+    .svc-card-icon { font-size: 2rem; margin-bottom: 1rem; }
     .svc-badge {
       display: inline-block;
       font-size: 0.65rem;
@@ -451,8 +441,8 @@
       padding: 0.2rem 0.6rem;
       border-radius: 4px;
       margin-bottom: 0.75rem;
-      background: rgba(74,124,255,0.12);
-      color: var(--accent-blue);
+      background: rgba(255,140,66,0.12);
+      color: var(--accent-orange);
     }
     .svc-card h3 {
       font-size: 1.25rem;
@@ -479,7 +469,7 @@
     }
     .svc-list li::before {
       content: '✓';
-      color: var(--accent-blue);
+      color: var(--accent-orange);
       font-weight: 800;
       font-size: 0.8rem;
     }
@@ -498,12 +488,12 @@
       background: var(--card-dark);
       border-radius: 12px;
       border: 1px solid var(--border-color);
-      border-left: 3px solid var(--accent-blue);
+      border-left: 3px solid var(--accent-orange);
       transition: all 0.3s;
     }
     .val-card:hover {
-      border-left-color: var(--accent-orange);
-      background: rgba(74,124,255,0.04);
+      border-left-color: var(--accent-warm);
+      background: var(--card-hover);
     }
     .val-card h3 {
       font-size: 1.1rem;
@@ -531,7 +521,7 @@
       width: 140px;
       height: 140px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent-blue), var(--accent-orange));
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-warm));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -539,13 +529,14 @@
       box-shadow: 0 8px 30px rgba(0,0,0,0.3);
     }
     .about-text h3 {
+      font-family: 'Playfair Display', serif;
       font-size: 1.5rem;
-      font-weight: 800;
+      font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 0.3rem;
     }
     .about-role {
-      color: var(--accent-blue);
+      color: var(--accent-orange);
       font-weight: 700;
       font-size: 0.95rem;
       margin-bottom: 1rem;
@@ -584,7 +575,7 @@
     }
     .contact-item-icon { font-size: 2rem; }
     .contact-item a {
-      color: var(--accent-blue);
+      color: var(--accent-orange);
       text-decoration: none;
       font-size: 1.1rem;
       font-weight: 700;
@@ -614,7 +605,7 @@
     .floating-btn {
       width: 58px;
       height: 58px;
-      background: var(--accent-blue);
+      background: linear-gradient(135deg, var(--accent-orange), var(--accent-warm));
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -622,12 +613,12 @@
       color: #fff;
       font-size: 1.4rem;
       text-decoration: none;
-      box-shadow: 0 4px 20px rgba(74,124,255,0.4);
+      box-shadow: 0 4px 20px var(--accent-orange-glow);
       transition: all 0.3s;
     }
     .floating-btn:hover {
       transform: scale(1.1);
-      box-shadow: 0 6px 30px rgba(74,124,255,0.6);
+      box-shadow: 0 6px 30px rgba(255,140,66,0.5);
     }
 
     /* ======================== */
@@ -669,7 +660,7 @@
         right: -100%;
         width: 100%;
         height: calc(100vh - 65px);
-        background: rgba(11,14,19,0.98);
+        background: rgba(26,30,36,0.98);
         backdrop-filter: blur(20px);
         flex-direction: column;
         padding: 2.5rem 2rem;
@@ -699,7 +690,7 @@
   <!-- ======== NAVIGATION ======== -->
   <nav class="nav-container" id="navbar">
     <div class="nav">
-      <div class="logo">FIDELITY <span>MECHANICAL</span></div>
+      <div class="logo">FIDELITY <span>MS</span></div>
       <div class="nav-toggle" onclick="toggleMenu()">
         <div class="bar"></div>
         <div class="bar"></div>
@@ -945,7 +936,7 @@
   <!-- ======== CONTACT ======== -->
   <div id="contact" class="contact-section">
     <div class="section-label">Get In Touch</div>
-    <h2 style="font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:800;margin-bottom:0.75rem;">Ready for Professional Service?</h2>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.8rem,3.5vw,2.4rem);font-weight:700;margin-bottom:0.75rem;">Ready for Professional Service?</h2>
     <p style="color:var(--text-secondary);font-size:1rem;max-width:600px;margin:0 auto;">Whether it's your home AC or your business's rooftop unit — text preferred for fastest response. Service requests typically confirmed within 2 hours.</p>
     <div class="contact-methods">
       <div class="contact-item">
