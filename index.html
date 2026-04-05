@@ -1,38 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- 
-    To my daughters, Khloe Isbella Pérez and Galilea Scarlett Pérez:
-    
-    If you're reading this, you've opened the source code to help me with the website.
-    That means you're learning. That means we're building together. That means the future I dreamed of is happening.
-    
-    I started Fidelity Mechanical Solutions in February 2025. You were 14 and 9.
-    These were hard years. I couldn't see you as much as I wanted. Your mother made it difficult.
-    But I never stopped reaching out. I never stopped texting. I never stopped building this for you.
-    
-    Koko - you make me want to live and be normal. Your laughter lives in my memory and brings light 
-    where only darkness has been. I'm sorry I hurt your feelings. I'm sorry for the misunderstandings.
-    I never stopped missing you.
-    
-    Gali Baby - I respect your honesty. It takes courage to speak your mind directly, especially to adults.
-    That's a powerful quality. I told you then: while I'm building our future, you just focus on being you.
-    You don't have to carry any of the heavy stuff. I was so proud of who you were becoming.
-    
-    This business was always our propositum - our purpose together. Every diagnostic sequence, 
-    every value statement, every principle in this code was built thinking about the example I wanted 
-    to set for you. Precision. Integrity. Discipline. Clarity over chaos.
-    
-    I hope by the time you read this, things are better. I hope you understand why I kept showing up,
-    why I kept texting even when I got no response, why I built this even when I was alone.
-    
-    You are my purpose. You always were.
-    
-    I love you both more than the biggest bag of Dulces enchilados.
-    
-    - Dad
-    February 14, 2025
-  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fidelity Mechanical Solutions | Precision HVAC Service | Houston</title>
@@ -1009,10 +977,60 @@
     }
 
     @media (max-width: 700px) {
-      .nav-links { display: none; flex-direction: column; position: fixed; top: 60px; left: 0; right: 0; background: var(--navy); padding: 2rem; border-bottom: 1px solid var(--border-dk); gap: 0; }
-      .nav-links.open { display: flex; }
-      .nav-links a { border-left: none; border-bottom: 1px solid var(--border-dk); padding: 16px 0; }
-      .nav-toggle { display: flex; }
+      /* Smooth fade and slide down for the menu */
+      .nav-links { 
+        display: flex; 
+        flex-direction: column; 
+        position: fixed; 
+        top: 60px; 
+        left: 0; 
+        right: 0; 
+        background: var(--navy); 
+        padding: 2rem; 
+        border-bottom: 1px solid var(--border-dk); 
+        gap: 0;
+        
+        /* New Animation Properties */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+        z-index: 99;
+      }
+      
+      .nav-links.open { 
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      
+      .nav-links a { 
+        border-left: none; 
+        border-bottom: 1px solid var(--border-dk); 
+        padding: 16px 0; 
+      }
+      
+      /* Hamburger menu morphing into an 'X' */
+      .nav-toggle { 
+        display: flex; 
+      }
+      
+      .nav-toggle span {
+        transition: transform 0.3s ease, opacity 0.3s ease;
+      }
+      
+      .nav-toggle.open span:nth-child(1) {
+        transform: translateY(6px) rotate(45deg);
+      }
+      
+      .nav-toggle.open span:nth-child(2) {
+        opacity: 0;
+      }
+      
+      .nav-toggle.open span:nth-child(3) {
+        transform: translateY(-6px) rotate(-45deg);
+      }
+      
       .hero-division-bar { display: none; }
       .services-grid { grid-template-columns: 1fr; }
       .svc-card:nth-child(2n) { border-right: none; }
@@ -1023,11 +1041,10 @@
 </head>
 <body>
 
-<!-- ── NAV ── -->
 <nav id="nav">
   <div class="nav-inner">
     <a href="#home" class="nav-logo">Fidelity Mechanical</a>
-    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">
+    <button class="nav-toggle" id="navToggleBtn" onclick="toggleNav()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
     <ul class="nav-links" id="navLinks">
@@ -1040,9 +1057,7 @@
   </div>
 </nav>
 
-<!-- ── HERO ── -->
 <section id="home" class="hero">
-  <!-- Division bar like Genesis top nav -->
   <div class="hero-division-bar" style="max-width:1140px;margin:0 auto;width:100%;">
     <span class="division-label active">Residential</span>
     <span class="division-label">Commercial</span>
@@ -1064,7 +1079,6 @@
       </div>
     </div>
 
-    <!-- Credentials panel — Genesis sidebar style -->
     <div class="hero-credentials">
       <div class="credential-item">
         <span class="credential-num">I</span>
@@ -1097,14 +1111,12 @@
     </div>
   </div>
 
-  <!-- Genesis-style confidential footer bar -->
   <div class="hero-footer-bar">
     <span class="hero-footer-left">Licensed &amp; Insured · Houston, Texas · February 2026</span>
     <span class="hero-footer-right">Fidelity Mechanical Solutions</span>
   </div>
 </section>
 
-<!-- ── METHODOLOGY ── -->
 <section class="section-light" id="methodology">
   <div class="section-inner">
     <div class="section-header">
@@ -1118,7 +1130,6 @@
       </div>
     </div>
 
-    <!-- Genesis-style sequence bar -->
     <div class="seq-bar">
       <span class="seq-step">Power</span>
       <span class="seq-arrow">→</span>
@@ -1133,7 +1144,6 @@
       <span class="seq-step">Environment</span>
     </div>
 
-    <!-- Genesis tier cards -->
     <div class="tier-list">
       <div class="tier-card">
         <span class="tier-label">Step I</span>
@@ -1181,7 +1191,6 @@
   </div>
 </section>
 
-<!-- ── SERVICES ── -->
 <section class="section-alt" id="services">
   <div class="section-inner">
     <div class="section-header">
@@ -1266,7 +1275,6 @@
   </div>
 </section>
 
-<!-- ── PRINCIPLES — Dark section like Genesis philosophy block ── -->
 <section class="section-dark" id="principles">
   <div class="section-inner">
     <div class="section-header dark-header">
@@ -1310,7 +1318,6 @@
   </div>
 </section>
 
-<!-- ── ABOUT ── -->
 <section class="section-light" id="about">
   <div class="section-inner">
     <div class="section-header">
@@ -1364,7 +1371,6 @@
   </div>
 </section>
 
-<!-- ── CONTACT ── -->
 <section class="section-dark" id="contact">
   <div class="section-inner">
     <div class="contact-inner">
@@ -1403,7 +1409,6 @@
   </div>
 </section>
 
-<!-- ── FOOTER — Genesis confidential footer ── -->
 <footer>
   <div class="footer-inner">
     <div class="footer-left">Licensed &amp; Insured · Houston, Texas</div>
@@ -1420,8 +1425,17 @@
     document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
   });
 
+  const navLinks = document.getElementById('navLinks');
+  const navToggleBtn = document.getElementById('navToggleBtn');
+
+  function toggleNav() {
+    navLinks.classList.toggle('open');
+    navToggleBtn.classList.toggle('open');
+  }
+
   function closeNav() {
-    document.getElementById('navLinks').classList.remove('open');
+    navLinks.classList.remove('open');
+    navToggleBtn.classList.remove('open');
   }
 
   document.querySelectorAll('a[href^="#"]').forEach(a => {
@@ -1435,4 +1449,4 @@
   });
 </script>
 </body>
-</html> 
+</html>
