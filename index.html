@@ -384,11 +384,59 @@
     }
 
     /* ═══════════════════════════════════════════
+       HERO IMAGE SLIDER
+    ═══════════════════════════════════════════ */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .hero-bg-slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform, opacity;
+    }
+    .hero-bg-slide.active {
+      opacity: 1;
+      animation: fmsKenBurns 9s ease-out forwards;
+    }
+    @keyframes fmsKenBurns {
+      from { transform: scale(1.08); }
+      to   { transform: scale(1.00); }
+    }
+    .hero-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(10,16,24,0.82) 0%, rgba(10,16,24,0.62) 60%, rgba(10,16,24,0.78) 100%);
+      z-index: 1;
+    }
+    /* Dot indicators */
+    .hero-dots { display: flex; gap: 10px; align-items: center; }
+    .hero-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.22);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      transition: background 0.4s ease, transform 0.4s ease;
+    }
+    .hero-dot.active { background: #4a7fa5; transform: scale(1.5); }
+
+    /* ═══════════════════════════════════════════
        REDUCED MOTION
     ═══════════════════════════════════════════ */
     @media (prefers-reduced-motion: reduce) {
       .reveal, .svc-card, .nav-shell, .btn-primary, .mobile-menu, .tier-card, .principle-cell, .svc-icon { transition: none !important; }
       .reveal { opacity: 1; transform: none; }
+      .hero-bg-slide.active { animation: none; }
     }
   </style>
 </head>
@@ -438,6 +486,14 @@
      HERO
 ═══════════════════════════════════════════ -->
 <section id="top" class="hero relative overflow-hidden min-h-screen flex flex-col">
+
+  <!-- Background image slider -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1920&auto=format&fit=crop&q=80')"></div>
+    <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=80')"></div>
+    <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1920&auto=format&fit=crop&q=80')"></div>
+    <div class="hero-bg-overlay"></div>
+  </div>
 
   <!-- Top division bar -->
   <div class="relative z-[2] border-b border-white/10" style="padding-top: 60px;">
@@ -516,8 +572,13 @@
 
   <!-- Hero footer bar -->
   <div class="relative z-[2] border-t border-white/10">
-    <div class="max-w-[1200px] mx-auto px-6 lg:px-8 py-4 flex justify-between items-center flex-wrap gap-2">
+    <div class="max-w-[1200px] mx-auto px-6 lg:px-8 py-4 flex justify-between items-center gap-2">
       <span class="font-mono text-[10px] tracking-wider-2 text-white/25">Licensed &amp; Insured · Houston, Texas · April 2026</span>
+      <div class="hero-dots" aria-label="Slide indicators">
+        <button class="hero-dot active" aria-label="Slide 1"></button>
+        <button class="hero-dot" aria-label="Slide 2"></button>
+        <button class="hero-dot" aria-label="Slide 3"></button>
+      </div>
       <span class="font-sans text-[10px] tracking-widest-4 uppercase text-white/25">Fidelity Mechanical Solutions</span>
     </div>
   </div>
@@ -1213,6 +1274,38 @@
       navToggle.classList.remove('open');
     });
   });
+
+  // Hero background slider
+  (function() {
+    const slides = document.querySelectorAll('.hero-bg-slide');
+    const dots   = document.querySelectorAll('.hero-dot');
+    let current  = 0;
+    let timer;
+
+    function activate(n) {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (n + slides.length) % slides.length;
+      const slide = slides[current];
+      // Restart Ken Burns by forcing reflow
+      slide.style.animation = 'none';
+      slide.getBoundingClientRect();
+      slide.style.animation = '';
+      slide.classList.add('active');
+      dots[current].classList.add('active');
+    }
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        clearInterval(timer);
+        activate(i);
+        timer = setInterval(() => activate(current + 1), 6500);
+      });
+    });
+
+    // First slide is already marked active in HTML; just start the timer
+    timer = setInterval(() => activate(current + 1), 6500);
+  })();
 
   // Smooth scroll for anchor links (with nav offset)
   document.querySelectorAll('a[href^="#"]').forEach(a => {
