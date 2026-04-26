@@ -439,32 +439,32 @@
        SEQUENCE BAR — enhanced
     ═══════════════════════════════════════════ */
     .seq-bar {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
       background: #0f1a27;
       border: 1px solid #e2e8f0;
-      padding: 0;
-      margin-bottom: 0;
       overflow: hidden;
+    }
+    @media (max-width: 767px) {
+      .seq-bar { grid-template-columns: repeat(3, 1fr); }
     }
     .seq-item {
       display: flex;
       align-items: center;
       justify-content: center;
-      flex: 1;
-      min-width: 80px;
-      padding: 18px 16px;
+      padding: 18px 10px;
       font-family: 'DM Mono', monospace;
       font-size: 9px;
-      letter-spacing: 0.28em;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
       color: rgba(255,255,255,0.55);
       border-right: 1px solid rgba(255,255,255,0.07);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
       transition: color 0.25s ease, background 0.25s ease;
       white-space: nowrap;
+      gap: 6px;
     }
+    .seq-item:last-child { border-right: none; }
     .seq-item:last-child { border-right: none; }
     .seq-item:hover { color: white; background: rgba(255,255,255,0.04); }
     .seq-item-num {
@@ -1141,7 +1141,7 @@
 
       <!-- Photo -->
       <div class="reveal founder-photo">
-        <img src="images/hvac-unit.jpg" alt="HVAC condenser unit — Fidelity Mechanical Solutions">
+        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&auto=format&fit=crop&q=90" alt="HVAC condenser unit — Fidelity Mechanical Solutions">
         <div class="founder-photo-overlay"></div>
         <div class="founder-photo-cap">
           <div class="font-display text-white text-[18px] leading-tight">Precision. Every Time.</div>
