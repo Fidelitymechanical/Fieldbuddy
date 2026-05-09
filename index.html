@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fidelity Mechanical Solutions | Precision HVAC Service | Houston</title>
-  <meta name="description" content="Houston's trusted HVAC company. AC repair, heating repair, new system installs, and preventive maintenance. Licensed & insured. Same-day service available. Call 713-201-2842.">
+  <meta name="description" content="Houston's trusted HVAC company. AC repair, heating repair, new system installs, and preventive maintenance. Licensed &amp; insured. Same-day service available. Call 713-201-2842.">
 
   <meta name="author" content="Martin Pérez">
   <meta name="creator" content="Martin Pérez">
@@ -15,7 +15,7 @@
   <!-- Dublin Core IP archive metadata -->
   <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/">
   <link rel="schema.DCTERMS" href="http://purl.org/dc/terms/">
-  <meta name="DC.title" content="Fidelity Mechanical Solutions — Proprietary HVAC Methodologies & Nova Verus Vita Intellectual Property Archive">
+  <meta name="DC.title" content="Fidelity Mechanical Solutions — Proprietary HVAC Methodologies &amp; Nova Verus Vita Intellectual Property Archive">
   <meta name="DC.creator" content="Martin Pérez">
   <meta name="DC.subject" content="FMS Diagnostic Method; 12-Week Neuroplastic Recovery Protocol; SnapMesh Construction Systems; SnapLock Connector System; PASA Demographic Intelligence Methodology; Escapist Disruptor Model; Global Sovereign Manufacturing; Nova Verus Vita Framework; Community Replication Model; Mosaic Principle; Family Bank Model; Beneficiary Transformation Pipeline; Volume-Based Dopamine Regulation">
   <meta name="DC.description" content="Proprietary intellectual property archive documenting original methodologies, construction systems, recovery protocols, and social enterprise frameworks conceived and developed by Martin Pérez, Houston, Texas. Original concepts date from 2013 through 2026.">
@@ -33,7 +33,7 @@
 
   <!-- Open Graph -->
   <meta property="og:title" content="Fidelity Mechanical Solutions | Precision HVAC Service | Houston">
-  <meta property="og:description" content="Licensed & insured HVAC service for homes and businesses. Transparent pricing. Precision methodology.">
+  <meta property="og:description" content="Licensed &amp; insured HVAC service for homes and businesses. Transparent pricing. Precision methodology.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Fidelity Mechanical Solutions">
   <meta property="og:url" content="https://fidelitymechanicalsolutions.com">
@@ -81,7 +81,7 @@
       },
       "geoRadius": "80000"
     },
-    "description": "Precision HVAC service for Houston residences and commercial properties. Licensed & insured.",
+    "description": "Precision HVAC service for Houston residences and commercial properties. Licensed &amp; insured.",
     "priceRange": "$$$",
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
@@ -93,7 +93,7 @@
       "@type": "OfferCatalog",
       "name": "HVAC Services",
       "itemListElement": [
-        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "AC Repair & Diagnostics"}},
+        {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "AC Repair &amp; Diagnostics"}},
         {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Heating System Repair"}},
         {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Preventive Maintenance"}},
         {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Emergency HVAC Service"}},
@@ -561,7 +561,7 @@
     .hero-bg-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(160deg, rgba(10,16,24,0.82) 0%, rgba(10,16,24,0.62) 60%, rgba(10,16,24,0.78) 100%);
+      background: linear-gradient(100deg, rgba(10,16,24,0.92) 0%, rgba(10,16,24,0.52) 50%, rgba(10,16,24,0.70) 100%);
       z-index: 1;
     }
     /* Dot indicators */
@@ -578,6 +578,124 @@
       transition: background 0.4s ease, transform 0.4s ease;
     }
     .hero-dot.active { background: #4a7fa5; transform: scale(1.5); }
+
+    /* ═══════════════════════════════════════════
+       KEN BURNS — per-slide variants
+    ═══════════════════════════════════════════ */
+    @keyframes fmsKBIn   { from { transform: scale(1.08); } to { transform: scale(1.00); } }
+    @keyframes fmsKBOut  { from { transform: scale(1.00); } to { transform: scale(1.07); } }
+    @keyframes fmsKBPan  { from { transform: scale(1.06) translateX(0%); } to { transform: scale(1.00) translateX(-2.5%); } }
+    .hero-bg-slide[data-kb="in"].active  { animation: fmsKBIn  9s ease-out forwards; }
+    .hero-bg-slide[data-kb="out"].active { animation: fmsKBOut 9s ease-out forwards; }
+    .hero-bg-slide[data-kb="pan"].active { animation: fmsKBPan 9s ease-out forwards; }
+
+    /* ═══════════════════════════════════════════
+       SERVICE CARDS — editorial photo headers
+    ═══════════════════════════════════════════ */
+    .svc-card { overflow: hidden; }
+    .svc-card::before {
+      height: 180px; /* span image height */
+      z-index: 3;
+      background: linear-gradient(to bottom, #4a7fa5 0%, rgba(74,127,165,0.0) 100%);
+    }
+    .svc-card-img {
+      height: 180px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+      overflow: hidden;
+    }
+    .svc-card-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(155deg, rgba(10,16,24,0.88) 0%, rgba(10,16,24,0.52) 100%);
+      pointer-events: none;
+    }
+    .svc-card:hover .svc-card-img { transform: scale(1.05); }
+    .svc-icon-float {
+      position: absolute;
+      bottom: 20px;
+      left: 28px;
+      z-index: 2;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15,26,39,0.94);
+      border: 1px solid rgba(74,127,165,0.35);
+      flex-shrink: 0;
+      transition: background 0.35s ease, border-color 0.35s ease;
+    }
+    .svc-card:hover .svc-icon-float { background: #162030; border-color: rgba(74,127,165,0.6); }
+    .svc-icon-float svg { color: #4a7fa5; }
+
+    /* ═══════════════════════════════════════════
+       PROCESS — right editorial photo column
+    ═══════════════════════════════════════════ */
+    .process-photo {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 3 / 4;
+    }
+    .process-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      filter: grayscale(12%) contrast(1.05);
+      transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .process-photo:hover img { transform: scale(1.04); }
+    .process-photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,16,24,0.88) 0%, rgba(10,16,24,0.12) 55%, transparent 100%);
+    }
+    .process-photo-cap {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 24px 22px;
+    }
+
+    /* ═══════════════════════════════════════════
+       PRE-CONTACT CTA BAND
+    ═══════════════════════════════════════════ */
+    .cta-band-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: grayscale(28%);
+    }
+    .cta-band-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, rgba(10,16,24,0.94) 0%, rgba(10,16,24,0.75) 55%, rgba(10,16,24,0.90) 100%);
+    }
+
+    /* ═══════════════════════════════════════════
+       MOBILE STICKY CALL BAR
+    ═══════════════════════════════════════════ */
+    #mobile-cta-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 49;
+      background: rgba(10,16,24,0.97);
+      border-top: 1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 10px 16px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      display: flex;
+      gap: 10px;
+      transform: translateY(100%);
+      transition: transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    #mobile-cta-bar.visible { transform: translateY(0); }
+    @media (min-width: 768px) { #mobile-cta-bar { display: none !important; } }
 
     /* ═══════════════════════════════════════════
        REDUCED MOTION
@@ -638,9 +756,12 @@
 
   <!-- Background image slider -->
   <div class="hero-bg" aria-hidden="true">
-    <div class="hero-bg-slide active" style="background-image: url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1920&auto=format&fit=crop&q=80')"></div>
-    <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=80')"></div>
-    <div class="hero-bg-slide" style="background-image: url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1920&auto=format&fit=crop&q=80')"></div>
+    <!-- Slide 1: HVAC technician at work — trust &amp; expertise first impression -->
+    <div class="hero-bg-slide active" data-kb="in" style="background-image: url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=1920&auto=format&fit=crop&q=80'); background-position: 60% center;"></div>
+    <!-- Slide 2: Beautiful Houston home — the comfort we protect -->
+    <div class="hero-bg-slide" data-kb="pan" style="background-image: url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1920&auto=format&fit=crop&q=80'); background-position: center 40%;"></div>
+    <!-- Slide 3: Condenser units — commercial &amp; residential scope -->
+    <div class="hero-bg-slide" data-kb="out" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&auto=format&fit=crop&q=80'); background-position: center;"></div>
     <div class="hero-bg-overlay"></div>
   </div>
 
@@ -865,127 +986,147 @@
         <span class="italic text-ink-mid">One standard.</span>
       </h2>
       <p class="text-ink-mid text-[15px] leading-[1.85] max-w-2xl font-light">
-        Residential estate or commercial facility — the same method and the same level of care applies to every engagement, without exception.</p>
-      </div>
+        Residential estate or commercial facility — the same method and the same level of care applies to every engagement, without exception.
+      </p>
     </div>
 
     <!-- Services grid -->
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-0 border border-line">
 
-      <article class="svc-card reveal p-9 border-r-0 lg:border-r border-line border-b border-line bg-white">
-        <div class="svc-icon-box">
-          <svg class="w-7 h-7 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
-            <line x1="12" y1="3" x2="12" y2="21"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="5.5" y1="5.5" x2="18.5" y2="18.5"/>
-            <line x1="18.5" y1="5.5" x2="5.5" y2="18.5"/>
-            <polyline points="9.5,5 12,7.5 14.5,5"/>
-            <polyline points="9.5,19 12,16.5 14.5,19"/>
-            <polyline points="5,9.5 7.5,12 5,14.5"/>
-            <polyline points="19,9.5 16.5,12 19,14.5"/>
-          </svg>
+      <article class="svc-card reveal border-r-0 lg:border-r border-line border-b border-line bg-white">
+        <div class="svc-card-img" style="background-image: url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=900&auto=format&fit=crop&q=80'); background-position: 60% center;">
+          <div class="svc-icon-float">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
+              <line x1="12" y1="3" x2="12" y2="21"/><line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="5.5" y1="5.5" x2="18.5" y2="18.5"/><line x1="18.5" y1="5.5" x2="5.5" y2="18.5"/>
+              <polyline points="9.5,5 12,7.5 14.5,5"/><polyline points="9.5,19 12,16.5 14.5,19"/>
+              <polyline points="5,9.5 7.5,12 5,14.5"/><polyline points="19,9.5 16.5,12 19,14.5"/>
+            </svg>
+          </div>
         </div>
-        <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Cooling</span>
-        <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Air Conditioning</h3>
-        <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Precision diagnostics and repair for central systems, split systems, mini-splits, and rooftop units. Airflow, refrigerant charge, and electrical integrity verified on every call.</p>
-        <ul class="svc-list list-none">
-          <li>Central AC and rooftop units</li>
-          <li>Split system and mini-split repair</li>
-          <li>Performance and efficiency analysis</li>
-          <li>Coil cleaning and system restoration</li>
-        </ul>
+        <div class="p-9">
+          <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Cooling</span>
+          <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Air Conditioning</h3>
+          <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Precision diagnostics and repair for central systems, split systems, mini-splits, and rooftop units. Airflow, refrigerant charge, and electrical integrity verified on every call.</p>
+          <ul class="svc-list list-none">
+            <li>Central AC and rooftop units</li>
+            <li>Split system and mini-split repair</li>
+            <li>Performance and efficiency analysis</li>
+            <li>Coil cleaning and system restoration</li>
+          </ul>
+        </div>
       </article>
 
-      <article class="svc-card reveal reveal-delay-1 p-9 lg:border-r border-line border-b border-line bg-white">
-        <div class="svc-icon-box">
-          <svg class="w-7 h-7 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
-            <path d="M12 3 C12 7 8 8.5 8 13 C8 16.5 10 19 12 21 C14 19 16 16.5 16 13 C16 10 14 9 13.5 6.5 C13.2 5 12.5 4 12 3 Z"/>
-            <path d="M12 11 C12 13 10.8 13.5 10.8 15.5 C10.8 17 11.5 18 12 19 C12.5 18 13.2 17 13.2 15.5 C13.2 14 12.5 13.5 12 11 Z"/>
-          </svg>
+      <article class="svc-card reveal reveal-delay-1 lg:border-r border-line border-b border-line bg-white">
+        <div class="svc-card-img" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&auto=format&fit=crop&q=80'); background-position: 40% center;">
+          <div class="svc-icon-float">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M12 3 C12 7 8 8.5 8 13 C8 16.5 10 19 12 21 C14 19 16 16.5 16 13 C16 10 14 9 13.5 6.5 C13.2 5 12.5 4 12 3 Z"/>
+              <path d="M12 11 C12 13 10.8 13.5 10.8 15.5 C10.8 17 11.5 18 12 19 C12.5 18 13.2 17 13.2 15.5 C13.2 14 12.5 13.5 12 11 Z"/>
+            </svg>
+          </div>
         </div>
-        <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Heating</span>
-        <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Heating Systems</h3>
-        <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Complete heating service from gas furnaces to heat pumps. Power verification, control logic, and safety assessment are standard on every heating call.</p>
-        <ul class="svc-list list-none">
-          <li>Gas furnace diagnostics and repair</li>
-          <li>Heat pump service</li>
-          <li>Ignition system repair</li>
-          <li>Safety inspection and documentation</li>
-        </ul>
+        <div class="p-9">
+          <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Heating</span>
+          <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Heating Systems</h3>
+          <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Complete heating service from gas furnaces to heat pumps. Power verification, control logic, and safety assessment are standard on every heating call.</p>
+          <ul class="svc-list list-none">
+            <li>Gas furnace diagnostics and repair</li>
+            <li>Heat pump service</li>
+            <li>Ignition system repair</li>
+            <li>Safety inspection and documentation</li>
+          </ul>
+        </div>
       </article>
 
-      <article class="svc-card reveal reveal-delay-2 p-9 border-r-0 border-line border-b border-line bg-white">
-        <div class="svc-icon-box">
-          <svg class="w-7 h-7 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
-            <circle cx="12" cy="12" r="2.5"/>
-            <path d="M12 2 V5 M12 19 V22 M2 12 H5 M19 12 H22 M5 5 L7 7 M17 17 L19 19 M5 19 L7 17 M17 7 L19 5"/>
-          </svg>
+      <article class="svc-card reveal reveal-delay-2 border-r-0 border-line border-b border-line bg-white">
+        <div class="svc-card-img" style="background-image: url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=900&auto=format&fit=crop&q=80'); background-position: center top;">
+          <div class="svc-icon-float">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
+              <circle cx="12" cy="12" r="2.5"/>
+              <path d="M12 2 V5 M12 19 V22 M2 12 H5 M19 12 H22 M5 5 L7 7 M17 17 L19 19 M5 19 L7 17 M17 7 L19 5"/>
+            </svg>
+          </div>
         </div>
-        <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Maintenance</span>
-        <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Preventive Care</h3>
-        <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Structured maintenance following the FMS Diagnostic Method. Not a checklist — a full system evaluation that documents performance trends and catches failures before they become emergencies.</p>
-        <ul class="svc-list list-none">
-          <li>Quarterly and seasonal inspections</li>
-          <li>Performance trend documentation</li>
-          <li>Filter and coil service</li>
-          <li>Written service reports provided</li>
-        </ul>
+        <div class="p-9">
+          <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Maintenance</span>
+          <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Preventive Care</h3>
+          <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Structured maintenance following the FMS Diagnostic Method. Not a checklist — a full system evaluation that documents performance trends and catches failures before they become emergencies.</p>
+          <ul class="svc-list list-none">
+            <li>Quarterly and seasonal inspections</li>
+            <li>Performance trend documentation</li>
+            <li>Filter and coil service</li>
+            <li>Written service reports provided</li>
+          </ul>
+        </div>
       </article>
 
-      <article class="svc-card reveal p-9 border-r-0 lg:border-r border-line border-b lg:border-b-0 border-line bg-white">
-        <div class="svc-icon-box">
-          <svg class="w-7 h-7 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
-            <path d="M13 2 L4 14 H11 L9 22 L20 10 H13 Z"/>
-          </svg>
+      <article class="svc-card reveal border-r-0 lg:border-r border-line border-b lg:border-b-0 border-line bg-white">
+        <div class="svc-card-img" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&auto=format&fit=crop&q=80'); background-position: center bottom;">
+          <div class="svc-icon-float">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M13 2 L4 14 H11 L9 22 L20 10 H13 Z"/>
+            </svg>
+          </div>
         </div>
-        <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Urgent Response</span>
-        <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Emergency Service</h3>
-        <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Rapid response with full diagnostic capability on the truck. The objective is resolution on the first visit — not a temporary fix that requires a return call.</p>
-        <ul class="svc-list list-none">
-          <li>Available seven days a week</li>
-          <li>Complete diagnostic equipment</li>
-          <li>Priority scheduling for established clients</li>
-          <li>Same-day service where available</li>
-        </ul>
+        <div class="p-9">
+          <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Urgent Response</span>
+          <h3 class="font-display text-[20px] text-ink mb-3 font-normal">Emergency Service</h3>
+          <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Rapid response with full diagnostic capability on the truck. The objective is resolution on the first visit — not a temporary fix that requires a return call.</p>
+          <ul class="svc-list list-none">
+            <li>Available seven days a week</li>
+            <li>Complete diagnostic equipment</li>
+            <li>Priority scheduling for established clients</li>
+            <li>Same-day service where available</li>
+          </ul>
+        </div>
       </article>
 
-      <article class="svc-card reveal reveal-delay-1 p-9 lg:border-r border-line border-b lg:border-b-0 border-line bg-white">
-        <div class="svc-icon-box">
-          <svg class="w-7 h-7 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
-            <rect x="3" y="3" width="7" height="7"/>
-            <rect x="14" y="3" width="7" height="7"/>
-            <rect x="3" y="14" width="7" height="7"/>
-            <rect x="14" y="14" width="7" height="7"/>
-          </svg>
+      <article class="svc-card reveal reveal-delay-1 lg:border-r border-line border-b lg:border-b-0 border-line bg-white">
+        <div class="svc-card-img" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&auto=format&fit=crop&q=80'); background-position: 70% center;">
+          <div class="svc-icon-float">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+            </svg>
+          </div>
         </div>
-        <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Commercial</span>
-        <h3 class="font-display text-[20px] text-ink mb-3 font-normal">System Analysis</h3>
-        <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Comprehensive evaluations with written findings for commercial and multi-property clients. Documentation supports informed capital decisions on repairs and system replacement.</p>
-        <ul class="svc-list list-none">
-          <li>Energy efficiency evaluation</li>
-          <li>Airflow balancing</li>
-          <li>Load calculation and system sizing</li>
-          <li>ROI and replacement analysis</li>
-        </ul>
+        <div class="p-9">
+          <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Commercial</span>
+          <h3 class="font-display text-[20px] text-ink mb-3 font-normal">System Analysis</h3>
+          <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Comprehensive evaluations with written findings for commercial and multi-property clients. Documentation supports informed capital decisions on repairs and system replacement.</p>
+          <ul class="svc-list list-none">
+            <li>Energy efficiency evaluation</li>
+            <li>Airflow balancing</li>
+            <li>Load calculation and system sizing</li>
+            <li>ROI and replacement analysis</li>
+          </ul>
+        </div>
       </article>
 
-      <article class="svc-card reveal reveal-delay-2 p-9 border-r-0 border-line bg-white">
-        <div class="svc-icon-box">
-          <svg class="w-7 h-7 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
-            <path d="M3 10 L12 3 L21 10"/>
-            <path d="M5 9 V20 H19 V9"/>
-            <path d="M10 20 V14 H14 V20"/>
-          </svg>
+      <article class="svc-card reveal reveal-delay-2 border-r-0 border-line bg-white">
+        <div class="svc-card-img" style="background-image: url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=900&auto=format&fit=crop&q=80'); background-position: center 35%;">
+          <div class="svc-icon-float">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M3 10 L12 3 L21 10"/>
+              <path d="M5 9 V20 H19 V9"/>
+              <path d="M10 20 V14 H14 V20"/>
+            </svg>
+          </div>
         </div>
-        <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Installation</span>
-        <h3 class="font-display text-[20px] text-ink mb-3 font-normal">New Systems</h3>
-        <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Equipment selection, installation, and commissioning for new builds and replacement systems. Properly sized. Properly installed. Documented from day one.</p>
-        <ul class="svc-list list-none">
-          <li>System selection and specification</li>
-          <li>Residential and light commercial</li>
-          <li>Commissioning and verification</li>
-          <li>Client walkthrough included</li>
-        </ul>
+        <div class="p-9">
+          <span class="block font-mono text-[9px] tracking-wider-2 uppercase text-blue mb-3">Installation</span>
+          <h3 class="font-display text-[20px] text-ink mb-3 font-normal">New Systems</h3>
+          <p class="text-[13px] text-ink-mid leading-[1.75] mb-5">Equipment selection, installation, and commissioning for new builds and replacement systems. Properly sized. Properly installed. Documented from day one.</p>
+          <ul class="svc-list list-none">
+            <li>System selection and specification</li>
+            <li>Residential and light commercial</li>
+            <li>Commissioning and verification</li>
+            <li>Client walkthrough included</li>
+          </ul>
+        </div>
       </article>
 
     </div>
@@ -1010,57 +1151,78 @@
       </p>
     </div>
 
-    <!-- Vertical flow -->
-    <div class="relative max-w-4xl ml-0 md:ml-[8%]">
-      <div class="process-line"></div>
+    <!-- Vertical flow — 2-col on desktop with sticky photo -->
+    <div class="grid lg:grid-cols-[1fr_340px] gap-16 lg:gap-20 items-start">
 
-      <!-- Step 01 -->
-      <div class="reveal flex gap-6 md:gap-10 pb-14 lg:pb-16">
-        <div class="flex-shrink-0 w-[64px] md:w-20 flex justify-center">
-          <div class="w-[14px] h-[14px] rounded-full bg-blue mt-[14px] relative z-10 ring-8 ring-white"></div>
+      <!-- Left: timeline -->
+      <div class="relative">
+        <div class="process-line"></div>
+
+        <!-- Step 01 -->
+        <div class="reveal flex gap-6 md:gap-10 pb-14 lg:pb-16">
+          <div class="flex-shrink-0 w-[64px] md:w-20 flex justify-center">
+            <div class="w-[14px] h-[14px] rounded-full bg-blue mt-[14px] relative z-10 ring-8 ring-white"></div>
+          </div>
+          <div class="flex-1 pt-1">
+            <div class="font-mono text-[10px] tracking-widest-4 uppercase text-blue mb-3">Phase 01 — Schedule</div>
+            <h3 class="font-display text-ink font-normal leading-tight mb-4" style="font-size: clamp(24px, 2.8vw, 34px);">
+              Reach out by phone or text.
+            </h3>
+            <p class="text-ink-mid text-[15px] leading-[1.85] font-light">
+              We respond promptly and arrive on schedule — uniformed, prepared, and equipped with the diagnostic tools to resolve the call on the first visit.
+            </p>
+          </div>
         </div>
-        <div class="flex-1 pt-1">
-          <div class="font-mono text-[10px] tracking-widest-4 uppercase text-blue mb-3">Phase 01 — Schedule</div>
-          <h3 class="font-display text-ink font-normal leading-tight mb-4" style="font-size: clamp(24px, 2.8vw, 34px);">
-            Reach out by phone or text.
-          </h3>
-          <p class="max-w-xl text-ink-mid text-[15px] leading-[1.85] font-light">
-            We respond promptly and arrive on schedule — uniformed, prepared, and equipped with the diagnostic tools to resolve the call on the first visit.
-          </p>
+
+        <!-- Step 02 -->
+        <div class="reveal reveal-delay-1 flex gap-6 md:gap-10 pb-14 lg:pb-16">
+          <div class="flex-shrink-0 w-[64px] md:w-20 flex justify-center">
+            <div class="w-[14px] h-[14px] rounded-full bg-blue mt-[14px] relative z-10 ring-8 ring-white"></div>
+          </div>
+          <div class="flex-1 pt-1">
+            <div class="font-mono text-[10px] tracking-widest-4 uppercase text-blue mb-3">Phase 02 — Diagnose</div>
+            <h3 class="font-display text-ink font-normal leading-tight mb-4" style="font-size: clamp(24px, 2.8vw, 34px);">
+              The FMS Diagnostic Method.
+            </h3>
+            <p class="text-ink-mid text-[15px] leading-[1.85] font-light">
+              The six-step FMS sequence runs on every visit — no shortcuts, no assumptions. Every measurement is recorded. You receive a plain-language summary of what was found and why it matters.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 03 -->
+        <div class="reveal reveal-delay-2 flex gap-6 md:gap-10">
+          <div class="flex-shrink-0 w-[64px] md:w-20 flex justify-center">
+            <div class="w-[14px] h-[14px] rounded-full bg-blue mt-[14px] relative z-10 ring-8 ring-white"></div>
+          </div>
+          <div class="flex-1 pt-1">
+            <div class="font-mono text-[10px] tracking-widest-4 uppercase text-blue mb-3">Phase 03 — Resolve</div>
+            <h3 class="font-display text-ink font-normal leading-tight mb-4" style="font-size: clamp(24px, 2.8vw, 34px);">
+              Findings explained, not sold.
+            </h3>
+            <p class="text-ink-mid text-[15px] leading-[1.85] font-light">
+              Every finding is documented in plain language. You see what we measured and what it means. The decision on what happens next is yours — without pressure and without upsell.
+            </p>
+          </div>
         </div>
       </div>
 
-      <!-- Step 02 -->
-      <div class="reveal reveal-delay-1 flex gap-6 md:gap-10 pb-14 lg:pb-16">
-        <div class="flex-shrink-0 w-[64px] md:w-20 flex justify-center">
-          <div class="w-[14px] h-[14px] rounded-full bg-blue mt-[14px] relative z-10 ring-8 ring-white"></div>
+      <!-- Right: editorial photo (desktop only, sticky) -->
+      <div class="hidden lg:block sticky top-24">
+        <div class="reveal process-photo">
+          <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800&auto=format&fit=crop&q=85" alt="FMS Diagnostic Method in the field">
+          <div class="process-photo-overlay"></div>
+          <div class="process-photo-cap">
+            <div class="font-display text-white text-[16px] leading-tight italic">Measured. Documented.</div>
+            <div class="font-mono text-[9px] tracking-widest-4 uppercase text-blue-lt mt-1.5">Every visit. No exceptions.</div>
+          </div>
         </div>
-        <div class="flex-1 pt-1">
-          <div class="font-mono text-[10px] tracking-widest-4 uppercase text-blue mb-3">Phase 02 — Diagnose</div>
-          <h3 class="font-display text-ink font-normal leading-tight mb-4" style="font-size: clamp(24px, 2.8vw, 34px);">
-            The FMS Diagnostic Method.
-          </h3>
-          <p class="max-w-xl text-ink-mid text-[15px] leading-[1.85] font-light">
-            The six-step FMS sequence runs on every visit — no shortcuts, no assumptions. Every measurement is recorded. You receive a plain-language summary of what was found and why it matters.
-          </p>
+        <div class="border border-line border-t-0 p-6 bg-ice-soft">
+          <div class="sec-eyebrow mb-3">In the Field</div>
+          <p class="text-[12px] text-ink-mid leading-[1.8]">Six measurements. Plain language findings. A decision that's yours to make — never ours to push.</p>
         </div>
       </div>
 
-      <!-- Step 03 -->
-      <div class="reveal reveal-delay-2 flex gap-6 md:gap-10">
-        <div class="flex-shrink-0 w-[64px] md:w-20 flex justify-center">
-          <div class="w-[14px] h-[14px] rounded-full bg-blue mt-[14px] relative z-10 ring-8 ring-white"></div>
-        </div>
-        <div class="flex-1 pt-1">
-          <div class="font-mono text-[10px] tracking-widest-4 uppercase text-blue mb-3">Phase 03 — Resolve</div>
-          <h3 class="font-display text-ink font-normal leading-tight mb-4" style="font-size: clamp(24px, 2.8vw, 34px);">
-            Findings explained, not sold.
-          </h3>
-          <p class="max-w-xl text-ink-mid text-[15px] leading-[1.85] font-light">
-            Every finding is documented in plain language. You see what we measured and what it means. The decision on what happens next is yours — without pressure and without upsell.
-          </p>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -1208,6 +1370,41 @@
 </section>
 
 <!-- ═══════════════════════════════════════════
+     CTA BAND — full-bleed photo + action
+═══════════════════════════════════════════ -->
+<section class="relative py-24 lg:py-36 overflow-hidden">
+  <div class="cta-band-bg" style="background-image: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=80');"></div>
+  <div class="cta-band-overlay"></div>
+
+  <div class="relative z-10 max-w-[1200px] mx-auto px-6 lg:px-8">
+    <div class="grid lg:grid-cols-[1fr_auto] gap-10 lg:gap-20 items-center">
+
+      <div>
+        <div class="sec-eyebrow light mb-2">Greater Houston · 7 Days a Week</div>
+        <h2 class="reveal font-display font-normal text-white leading-[1.05] mb-5" style="font-size: clamp(38px, 5vw, 66px);">
+          Your system deserves<br>
+          <span class="italic text-white/45">a better standard.</span>
+        </h2>
+        <p class="reveal reveal-delay-1 text-white/45 text-[15px] leading-[1.85] max-w-lg font-light">
+          Same-day service where available. No guesswork. No pressure. Precision HVAC from someone who actually cares about the outcome.
+        </p>
+      </div>
+
+      <div class="reveal reveal-delay-2 flex flex-col gap-4 lg:items-end">
+        <a href="tel:7132012842" class="btn-primary inline-flex items-center justify-center font-sans text-[10px] tracking-wider-2 uppercase text-white bg-blue border border-blue px-10 py-5 hover:bg-blue-lt hover:border-blue-lt cursor-pointer whitespace-nowrap" style="min-width: 220px;">
+          Call 713·201·2842
+        </a>
+        <a href="#contact" class="inline-flex items-center justify-center font-sans text-[10px] tracking-wider-2 uppercase text-white/55 hover:text-white border border-white/20 px-10 py-5 transition-colors duration-300 cursor-pointer whitespace-nowrap" style="min-width: 220px;">
+          Schedule a Visit
+        </a>
+        <span class="font-mono text-[9px] tracking-wider-2 uppercase text-white/25 text-center lg:text-right">Licensed &amp; Insured · Houston, TX</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
      CONTACT — dark
 ═══════════════════════════════════════════ -->
 <section id="contact" class="bg-navy py-20 lg:py-24 relative">
@@ -1321,6 +1518,18 @@
   </div>
 </footer>
 
+<!-- Mobile sticky call bar (hidden on md+) -->
+<div id="mobile-cta-bar" aria-label="Quick contact" aria-hidden="true">
+  <a href="tel:7132012842" class="flex-1 flex items-center justify-center bg-blue text-white font-mono text-[10px] tracking-widest-4 uppercase py-3.5 gap-2">
+    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.03 1.22 2 2 0 012 0h3a2 2 0 012 1.72c.13 1.02.36 2.02.68 2.99a2 2 0 01-.45 2.11L6.2 7.86a16 16 0 006.29 6.29l1.04-1.04a2 2 0 012.11-.45c.97.32 1.97.55 2.99.68A2 2 0 0122 14.92z"/></svg>
+    Call Now
+  </a>
+  <a href="sms:7132012842" class="flex-1 flex items-center justify-center border border-white/25 text-white/70 hover:text-white font-mono text-[10px] tracking-widest-4 uppercase py-3.5 gap-2 transition-colors duration-200">
+    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    Text
+  </a>
+</div>
+
 <!-- Goatcounter analytics -->
 <script data-goatcounter="https://mperez.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
@@ -1395,6 +1604,19 @@
     timer = setInterval(() => activate(current + 1), 6500);
   })();
 
+  // Mobile sticky CTA — show after scrolling past hero
+  const mobileCta = document.getElementById('mobile-cta-bar');
+  const heroEl = document.getElementById('top');
+  new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) {
+      mobileCta.classList.add('visible');
+      mobileCta.setAttribute('aria-hidden', 'false');
+    } else {
+      mobileCta.classList.remove('visible');
+      mobileCta.setAttribute('aria-hidden', 'true');
+    }
+  }, { threshold: 0.05 }).observe(heroEl);
+
   // Smooth scroll for anchor links (with nav offset)
   document.querySelectorAll('a[href^="#"]').forEach(a => {
     a.addEventListener('click', function(e) {
@@ -1413,6 +1635,5 @@
     });
   });
 </script>
-
 </body>
 </html>
